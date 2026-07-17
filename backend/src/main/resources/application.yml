@@ -1,0 +1,9 @@
+server:
+  port: 8080
+
+mcmanager:
+  server-directory: C:/Users/verdi/Documents/Minecraft/Server_1.5.2
+  jar-name: server.jar
+  min-ram: 1G
+  max-ram: 2G
+  java-executable: java
