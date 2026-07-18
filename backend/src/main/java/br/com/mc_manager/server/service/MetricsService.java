@@ -11,6 +11,7 @@ import oshi.software.os.OperatingSystem;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 
 @Service
 public class MetricsService {
@@ -62,7 +63,8 @@ public class MetricsService {
             Math.round(cpuUsage * 10) / 10.0,
             ramUsedMb,
             ramMaxMb,
-            uptimeSeconds
+            uptimeSeconds,
+            serverService.getOnlinePlayers()
     );
 
     template.convertAndSend("/topic/metrics", metrics);
@@ -71,7 +73,7 @@ public class MetricsService {
   private void broadcastResetedMetrics() {
     template.convertAndSend(
             "/topic/metrics",
-            new ServerMetricsDTO(0D, 0L, 0L, 0L));
+            new ServerMetricsDTO(0D, 0L, 0L, 0L, new ArrayList<>()));
   }
 
 }

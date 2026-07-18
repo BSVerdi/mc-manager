@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +28,11 @@ public class MinecraftServerService {
 
   private static final Pattern LEVEL_PREFIX_PATTERN =
           Pattern.compile("^.*?(\\[(?:INFO|WARN|ERROR|FATAL|DEBUG|TRACE)].*)$");
+
+  private static final Pattern JOIN_PATTERN = Pattern.compile("^(\\w+)\\[/[^\\]]+] logged in with entity id \\d+ at \\(.*\\)$");
+  private static final Pattern LEAVE_PATTERN = Pattern.compile("^(\\w+) lost connection: .*$");
+
+  private List<String> onlinePlayers = new ArrayList<>();
 
   @Value("${mcmanager.server-directory}")
   private String serverDirectory;
@@ -158,6 +165,9 @@ public class MinecraftServerService {
             new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
       String line;
       while ((line = reader.readLine()) != null) {
+        System.out.println(line);
+        trackPlayerEvents(line);
+
         broadcastLine(line);
       }
     } catch (IOException e) {
@@ -210,11 +220,32 @@ public class MinecraftServerService {
     return Long.parseLong(trimmed);
   }
 
+  private void trackPlayerEvents(String message) {
+    String clean = stripDatePrefix(message).replace("[INFO]", "").trim();
+    Matcher joinMatcher = JOIN_PATTERN.matcher(clean);
+
+    if (joinMatcher.matches()) {
+      onlinePlayers.add(joinMatcher.group(1));
+      return;
+    }
+
+    Matcher leaveMatcher = LEAVE_PATTERN.matcher(clean);
+
+    if (leaveMatcher.matches()) {
+      onlinePlayers.remove(leaveMatcher.group(1));
+      return;
+    }
+  }
+
   public Long getMaxRamMb() {
     return parseRamToMb(maxRam);
   }
 
   public Instant getStartedAt() {
     return startedAt;
+  }
+
+  public List<String> getOnlinePlayers() {
+    return onlinePlayers;
   }
 }
