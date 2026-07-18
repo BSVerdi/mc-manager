@@ -5,10 +5,7 @@ import {
   FileText,
   Folder,
   MoveLeft,
-  Undo2,
 } from "lucide-react";
-import { useFileBrowser } from "../../hooks/useFileBrowser";
-import { useFileEditor } from "../../hooks/useFileEditor";
 import type { Props } from ".";
 
 function formatSize(bytes: number): string {
@@ -59,7 +56,7 @@ export function FileBrowser({ browser, editor }: Props) {
   return (
     <>
       <section className="file-grid-container">
-        <section className="breadcrumbs">
+        <section className="file-grid-header">
           <a onClick={() => browser.goToBreadcrumb(-1)}>root</a>
           {breadcrumbs.map((part, i) => (
             <span key={i}>

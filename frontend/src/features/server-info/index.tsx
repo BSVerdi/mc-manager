@@ -56,6 +56,9 @@ export default function ServerInfo() {
             <strong>Server uptime: </strong>
             {formatUptime(metrics.uptimeSeconds)}
           </li>
+          <li>
+            <strong>Online players: </strong> {metrics.onlinePlayers.length}
+          </li>
         </ul>
       </section>
       <section className="commands-buttons">

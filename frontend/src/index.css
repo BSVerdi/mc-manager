@@ -28,6 +28,24 @@ main {
   background-color: var(--bg-app);
 }
 
+.side-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  width: 100%;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.side-menu-header h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-weight: bold;
+  text-align: center;
+}
+
 .side-menu {
   height: 100vh;
   width: 15vw;
@@ -41,27 +59,12 @@ main {
   gap: 10px;
 }
 
-.side-menu h1 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  height: 5vh;
-  width: 100%;
-  min-height: 100px;
-  font-weight: bold;
-  text-align: center;
-  margin: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border-color);
-}
-
 .side-menu nav {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 400px;
-  height: 80vh;
+  min-height: 200px;
   width: 100%;
   gap: 10px;
 }
@@ -100,6 +103,22 @@ main {
   color: var(--brand-color);
 }
 
+.side-menu-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 100%;
+  border-top: 1px solid var(--border-color);
+  padding: 10px;
+}
+
+.side-menu-footer {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
 .content {
   display: flex;
   flex-direction: column;
@@ -108,25 +127,28 @@ main {
   height: 100vh;
   flex: 1;
   gap: 15px;
-  margin: 10px;
+  padding: 20px;
 }
 
 .server-info {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   height: 120px;
   min-width: 600px;
-  min-height: 60px;
+  min-height: 100px;
   border-radius: 10px;
   box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.104);
   background-color: var(--bg-card);
 }
 
 .server-dashboard {
+  flex: 1;
   width: 100%;
-  height: 80vh;
   min-width: 600px;
+  min-height: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -138,20 +160,20 @@ main {
 }
 
 .metrics {
-  width: 100%;
+  color: var(--text-main);
   height: 100%;
   font-size: 16px;
-  color: var(--text-main);
-  margin: 10px;
+  padding: 12px;
 }
 
-.metrics li {
+.metrics ul {
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   width: 100%;
-  height: 60%;
+  height: 100%;
   list-style: none;
-  padding: 3px;
+  gap: 5px;
 }
 
 .on {
@@ -187,7 +209,6 @@ main {
   transform: translateY(0);
 }
 
-/* Agrupamento das cores dos botões */
 .start {
   background-color: lightgreen;
 }
@@ -228,6 +249,7 @@ main {
 }
 
 .file-grid-container {
+  position: relative;
   height: 100%;
   width: 30%;
   flex: 1;
@@ -237,25 +259,29 @@ main {
 }
 
 .file-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 5px;
   margin: 10px;
 }
 
-.breadcrumbs {
+.file-grid-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
   padding: 10px;
   border-bottom: 1px solid var(--border-color);
 }
 
-.breadcrumbs a {
-  font-family: var(--font-mono); /* Variável sendo usada */
+.file-grid-header a {
+  font-family: var(--font-mono);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.breadcrumbs a:hover {
+.file-grid-header a:hover {
   color: var(--brand-color);
 }
 
@@ -268,7 +294,7 @@ main {
   border-radius: 10px;
   cursor: pointer;
   user-select: none;
-  transition: all 0.2s ease; /* Corrigido o bug da transição */
+  transition: all 0.2s ease;
   padding: 5px;
 }
 
@@ -385,7 +411,7 @@ main {
 }
 
 .terminal {
-  padding-left: 5px;
+  padding: 5px;
   overflow: hidden;
 }
 
