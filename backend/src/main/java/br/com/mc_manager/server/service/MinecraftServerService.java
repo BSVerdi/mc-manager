@@ -1,6 +1,7 @@
 package br.com.mc_manager.server.service;
 
 import br.com.mc_manager.server.dto.LogLineDTO;
+import br.com.mc_manager.server.dto.PlayerDTO;
 import br.com.mc_manager.server.model.ServerStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -10,6 +11,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,6 +28,7 @@ public class MinecraftServerService {
   private final SimpMessagingTemplate template;
   private final ExecutorService executor = Executors.newCachedThreadPool();
   private final AtomicLong idCounter = new AtomicLong();
+  private final FileService fileService;
 
   private static final Pattern LEVEL_PREFIX_PATTERN =
           Pattern.compile("^.*?(\\[(?:INFO|WARN|ERROR|FATAL|DEBUG|TRACE)].*)$");
@@ -55,8 +59,9 @@ public class MinecraftServerService {
 
   private volatile Instant startedAt;
 
-  public MinecraftServerService(SimpMessagingTemplate template) {
+  public MinecraftServerService(SimpMessagingTemplate template, FileService fileService) {
     this.template = template;
+    this.fileService = fileService;
   }
 
   public ServerStatus getStatus() {
@@ -112,7 +117,10 @@ public class MinecraftServerService {
     }
     status.set(ServerStatus.STOPPING);
     broadcastStatus();
+
     sendCommand("stop");
+
+    onlinePlayers.clear();
   }
 
   public synchronized void restart() {
@@ -128,6 +136,8 @@ public class MinecraftServerService {
     Process processToStop = process;
 
     sendCommand("stop");
+
+    onlinePlayers.clear();
 
     executor.submit(() -> {
       try {
@@ -165,7 +175,6 @@ public class MinecraftServerService {
             new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
       String line;
       while ((line = reader.readLine()) != null) {
-        System.out.println(line);
         trackPlayerEvents(line);
 
         broadcastLine(line);
@@ -233,7 +242,6 @@ public class MinecraftServerService {
 
     if (leaveMatcher.matches()) {
       onlinePlayers.remove(leaveMatcher.group(1));
-      return;
     }
   }
 
@@ -245,7 +253,31 @@ public class MinecraftServerService {
     return startedAt;
   }
 
-  public List<String> getOnlinePlayers() {
-    return onlinePlayers;
+  public Integer getOnlinePlayers() {
+    return onlinePlayers.size();
+  }
+
+  public List<PlayerDTO> getPlayers() throws IOException {
+    List<String> operators = Arrays.asList(
+            fileService.getContent(serverDirectory + "/ops.txt")
+                    .content()
+                    .replace("\r", "")
+                    .split("\n")
+    );
+
+    return fileService.listFiles(serverDirectory + "/world/players").stream().map(
+            (player) -> {
+              String nickname = player.name().replace(".dat", "");
+              return new PlayerDTO(nickname, onlinePlayers.contains(nickname), operators.contains(nickname.toLowerCase()));
+            }
+    ).sorted(Comparator.comparing((p) -> p.nickname().toLowerCase())).toList();
+  }
+
+  public void opPlayer(String nickname) {
+    sendCommand("op " + nickname);
+  }
+
+  public void deopPlayer(String nickname) {
+    sendCommand("deop " + nickname);
   }
 }

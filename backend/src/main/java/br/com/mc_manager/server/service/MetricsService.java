@@ -11,7 +11,6 @@ import oshi.software.os.OperatingSystem;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 
 @Service
 public class MetricsService {
@@ -42,8 +41,6 @@ public class MetricsService {
       return;
     }
 
-    // CPU precisa de duas leituras no tempo para calcular %; a primeira
-    // chamada sempre retorna 0, o que e' esperado.
     double cpuUsage = previousTick == null
             ? 0.0
             : process.getProcessCpuLoadBetweenTicks(previousTick) * 100;
@@ -73,7 +70,7 @@ public class MetricsService {
   private void broadcastResetedMetrics() {
     template.convertAndSend(
             "/topic/metrics",
-            new ServerMetricsDTO(0D, 0L, 0L, 0L, new ArrayList<>()));
+            new ServerMetricsDTO(0D, 0L, 0L, 0L, 0));
   }
 
 }

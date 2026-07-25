@@ -1,4 +1,8 @@
 package br.com.mc_manager.server.dto;
 
-public record PlayerDTO() {
+public record PlayerDTO(
+        String nickname,
+        Boolean online,
+        Boolean operator
+) {
 }
