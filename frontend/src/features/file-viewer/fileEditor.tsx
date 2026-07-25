@@ -25,7 +25,6 @@ export function FileEditor({ browser, editor }: Props) {
                 color: !editor.isDirty || editor.saving ? "#6b7280" : "#f0c674",
               }}
             />
-            {/* {editor.saving ? "Salvando..." : "Salvar"} */}
           </button>
           <button onClick={editor.close}>
             <X style={{ width: 18, height: 18, color: "#ff0000" }} />

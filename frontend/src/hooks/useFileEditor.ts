@@ -24,8 +24,10 @@ export function useFileEditor() {
 
   const save = useCallback(() => {
     if (!file) return;
+
     setSaving(true);
     setError(null);
+    
     return api.files
       .saveContent(file.path, draft)
       .then(() => setFile((f) => (f ? { ...f, content: draft } : f)))

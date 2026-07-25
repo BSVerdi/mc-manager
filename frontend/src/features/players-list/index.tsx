@@ -1,7 +1,92 @@
+import { useEffect, useState } from "react";
+import type { Player } from "../../types/player";
+import { api } from "../../lib/apiClient";
+
+function PlayerAvatar({ name }: { name: string }) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  if (imageFailed) {
+    return <span>{name.charAt(0).toUpperCase()}</span>;
+  }
+
+  return (
+    <img
+      src={`https://mc-heads.net/avatar/${encodeURIComponent(name)}/40`}
+      alt={`Cabeça de ${name}`}
+      onError={() => setImageFailed(true)}
+      loading="lazy"
+    />
+  );
+}
+
 export default function PlayersList() {
+  const [players, setPlayers] = useState<Player[]>([]);
+
+  useEffect(() => {
+    const getPlayers = async () => {
+      const players = await api.server.getPlayers();
+
+      setPlayers(players);
+    };
+
+    getPlayers();
+    const interval = setInterval(getPlayers, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const setOperatorStatus = (nickname: string, operator: boolean) => {
+    setPlayers((old) =>
+      old.map((p) => (p.nickname === nickname ? { ...p, operator } : p)),
+    );
+  };
+
+  const handleToggleOp = async (player: Player) => {
+    const nextOperatorState = !player.operator;
+
+    setOperatorStatus(player.nickname, nextOperatorState);
+
+    if (nextOperatorState) {
+      api.server.opPlayer(player.nickname);
+    } else {
+      api.server.deopPlayer(player.nickname);
+    }
+  };
+
   return (
     <>
-      <h1>Lista de Jogadores</h1>
+      <section className="player-container">
+        <section className="player-list-header">
+          <h1>Player List</h1>
+        </section>
+        <ul className="player-list">
+          {players.map((player) => (
+            <li key={player.nickname} className="player-card">
+              <PlayerAvatar name={player.nickname} />
+              <div className="player-info">
+                <div>
+                  <h3>
+                    {player.nickname} {player.operator ? "(Operator)" : ""}
+                  </h3>
+                  <span>{player.online ? "Online" : "Offline"} </span>
+                </div>
+                <div className="player-commands">
+                  <button
+                    className={`operator-btn ${player.operator ? "active" : ""}`}
+                    onClick={() => {
+                      handleToggleOp(player);
+                      player.operator = false;
+                    }}
+                  >
+                    {player.operator ? "de-OP" : "OP"}
+                  </button>
+                  <button className="ban-btn">Banir</button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
     </>
   );
 }

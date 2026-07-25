@@ -48,6 +48,21 @@ export function useFileBrowser() {
     [currentPath, load],
   );
 
+  const upload = useCallback(
+    (file: File) => {
+      setError(null);
+
+      return api.files
+        .upload(currentPath, file)
+        .then(() => load(currentPath))
+        .catch((err) => {
+          setError(err.response?.data?.error ?? err.message);
+          throw err;
+        });
+    },
+    [currentPath, load],
+  );
+
   return {
     currentPath,
     entries,
@@ -57,5 +72,6 @@ export function useFileBrowser() {
     goUp,
     goToBreadcrumb,
     reload: () => load(currentPath),
+    upload,
   };
 }

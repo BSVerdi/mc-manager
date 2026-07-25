@@ -26,8 +26,36 @@ main {
   align-items: center;
   justify-content: center;
   background-color: var(--bg-app);
+  scroll-behavior: smooth;
 }
 
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  flex: 1;
+  gap: 15px;
+  padding: 20px;
+}
+
+.server-dashboard {
+  flex: 1;
+  width: 100%;
+  min-width: 600px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-card);
+  border-radius: 10px;
+  box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.104);
+  gap: 10px;
+}
+
+/* side menu style  */
 .side-menu-header {
   display: flex;
   align-items: center;
@@ -119,17 +147,7 @@ main {
   color: var(--text-sub);
 }
 
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  flex: 1;
-  gap: 15px;
-  padding: 20px;
-}
-
+/* server info style  */
 .server-info {
   display: flex;
   flex-direction: row;
@@ -142,21 +160,6 @@ main {
   border-radius: 10px;
   box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.104);
   background-color: var(--bg-card);
-}
-
-.server-dashboard {
-  flex: 1;
-  width: 100%;
-  min-width: 600px;
-  min-height: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bg-card);
-  border-radius: 10px;
-  box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.104);
-  gap: 10px;
 }
 
 .metrics {
@@ -174,6 +177,10 @@ main {
   height: 100%;
   list-style: none;
   gap: 5px;
+}
+
+.metrics li {
+  margin-right: 60px;
 }
 
 .on {
@@ -239,6 +246,7 @@ main {
   box-shadow: 0 2px 4px rgba(240, 128, 128, 0.3);
 }
 
+/* file viewer style  */
 .file-container {
   display: flex;
   align-items: center;
@@ -252,6 +260,7 @@ main {
   position: relative;
   height: 100%;
   width: 30%;
+  min-width: 300px;
   flex: 1;
   overflow-y: auto;
   border: 1px solid var(--border-color);
@@ -266,6 +275,9 @@ main {
 }
 
 .file-grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -285,17 +297,37 @@ main {
   color: var(--brand-color);
 }
 
+.upload-btn {
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+  transition: all 0.2s ease;
+  border-radius: 5px;
+  border: none;
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.upload-btn:hover {
+  transform: scale(1.1);
+  background-color: var(--bg-app);
+  box-shadow: var(--shadow-subtle);
+}
+
+.upload-btn:active {
+  transform: scale(1);
+}
+
 .file-card {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
+  align-items: center;
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  cursor: pointer;
   user-select: none;
   transition: all 0.2s ease;
   padding: 5px;
+  gap: 10px;
 }
 
 .file-card:hover {
@@ -310,6 +342,19 @@ main {
 
 .file-card:hover .file-icon {
   transform: scale(1.05);
+}
+
+.file-card.walk-back {
+  cursor: pointer;
+}
+
+.file-item-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  flex: 1;
+  gap: 16px;
 }
 
 .file-details {
@@ -334,6 +379,25 @@ main {
   margin-top: 4px;
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+.download-btn {
+  border: none;
+  background-color: transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin-right: 20px;
+  border-radius: 5px;
+}
+
+.download-btn:hover {
+  transform: scale(1.1);
+  background-color: var(--bg-app);
+  box-shadow: var(--shadow-subtle);
+}
+
+.download-btn:active {
+  transform: scale(1);
 }
 
 .file-editor-container {
@@ -400,6 +464,7 @@ main {
   text-align: center;
 }
 
+/* console style */
 .console {
   display: flex;
   flex-direction: column;
@@ -438,4 +503,99 @@ main {
   outline: none;
   font-family: inherit;
   color: #2a2a2a;
+}
+
+/* players-list style  */
+.player-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  gap: 10px;
+}
+
+.player-list-header {
+  width: 100%;
+  height: 60;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.player-list {
+  width: 100%;
+  overflow-y: auto;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-card {
+  display: flex;
+  align-items: flex-start;
+  width: 95%;
+  gap: 16px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  user-select: none;
+  transition: all 0.2s ease;
+  padding: 10px;
+}
+
+.player-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-subtle);
+}
+
+.player-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.player-commands {
+  width: 120px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.player-commands button {
+  cursor: pointer;
+  border: none;
+  width: 60px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+  color: var(--text-main);
+  background-color: var(--bg-app);
+  box-shadow: var(--shadow-subtle);
+}
+
+.operator-btn:hover {
+  transform: translateY(-2px);
+  color: var(--brand-color);
+  background-color: var(--brand-bg);
+}
+
+.operator-btn:active {
+  transform: translateY(0);
+}
+
+.operator-btn.active {
+  background-color: var(--brand-bg);
+  color: var(--brand-color);
+}
+
+.ban-btn:hover {
+  color: red;
+  background-color: rgb(248, 155, 155);
+  transform: translateY(-2px);
+}
+
+.ban-btn:active {
+  transform: translateY(0);
 }

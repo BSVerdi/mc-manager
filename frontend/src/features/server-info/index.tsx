@@ -57,7 +57,7 @@ export default function ServerInfo() {
             {formatUptime(metrics.uptimeSeconds)}
           </li>
           <li>
-            <strong>Online players: </strong> {metrics.onlinePlayers.length}
+            <strong>Online players: </strong> {metrics.onlinePlayers}
           </li>
         </ul>
       </section>

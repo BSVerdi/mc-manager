@@ -3,7 +3,7 @@ export type Metrics = {
   ramUsedMb: number;
   ramMaxMb: number;
   uptimeSeconds: number;
-  onlinePlayers: [];
+  onlinePlayers: number;
 };
 
 export const EMPTY_METRICS: Metrics = {
@@ -11,5 +11,5 @@ export const EMPTY_METRICS: Metrics = {
   ramUsedMb: 0,
   ramMaxMb: 0,
   uptimeSeconds: 0,
-  onlinePlayers: [],
+  onlinePlayers: 0,
 };
