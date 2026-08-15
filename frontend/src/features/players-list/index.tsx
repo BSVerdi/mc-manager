@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Player } from "../../types/player";
+import type { Player } from "../../types/Player";
 import { api } from "../../lib/apiClient";
 
 function PlayerAvatar({ name }: { name: string }) {

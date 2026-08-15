@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { api } from "../lib/apiClient";
-import type { FileContent } from "../types/file";
+import type { FileContent } from "../types/File";
 
 export function useFileEditor() {
   const [file, setFile] = useState<FileContent | null>(null);
@@ -27,7 +27,7 @@ export function useFileEditor() {
 
     setSaving(true);
     setError(null);
-    
+
     return api.files
       .saveContent(file.path, draft)
       .then(() => setFile((f) => (f ? { ...f, content: draft } : f)))

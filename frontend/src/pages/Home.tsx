@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-import Console from "../../features/console";
-import ServerInfo from "../../features/server-info";
-import FileViewer from "../../features/file-viewer";
-import SideMenu from "../../features/side-menu";
-import PlayersList from "../../features/players-list";
-import Settings from "../../features/settings";
+import Console from "../features/console";
+import ServerInfo from "../features/server-info";
+import FileViewer from "../features/file-viewer";
+import SideMenu from "../features/side-menu";
+import PlayersList from "../features/players-list";
+import Settings from "../features/settings";
 
 export default function Home() {
   const [selected, setSelected] = useState("Console");

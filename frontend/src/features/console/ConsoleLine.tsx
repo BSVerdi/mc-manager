@@ -1,4 +1,4 @@
-import type { Log } from "../../types/log";
+import type { Log } from "../../types/Log";
 
 type Props = {
   log: Log;

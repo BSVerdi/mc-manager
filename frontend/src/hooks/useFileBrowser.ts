@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../lib/apiClient";
-import type { FileEntry } from "../types/file";
+import type { FileEntry } from "../types/File";
 
 export function useFileBrowser() {
   const [currentPath, setCurrentPath] = useState("");

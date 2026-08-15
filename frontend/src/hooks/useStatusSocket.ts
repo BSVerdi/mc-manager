@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/apiClient";
-import { defaultStatus, type Status } from "../types/status";
+import { defaultStatus, type Status } from "../types/Status";
 import { onStompConnect, stompClient } from "../lib/stompClient";
 
 export function useStatusSocket() {
