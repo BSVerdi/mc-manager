@@ -4,6 +4,7 @@ import br.com.mc_manager.server.repository.UserRepository;
 import br.com.mc_manager.server.security.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 public class AccessTokenFilter extends OncePerRequestFilter {
@@ -32,28 +34,37 @@ public class AccessTokenFilter extends OncePerRequestFilter {
     String token = recoverRequestToken(request);
 
     if (token != null) {
-      var email = service.verifyToken(token);
-      var user = userRepository.findByEmailIgnoreCase(email).orElseThrow();
+      try {
+        var email = service.verifyToken(token);
+        var user = userRepository.findByEmailIgnoreCase(email).orElseThrow();
 
-      var authentication = new UsernamePasswordAuthenticationToken(
-              email,
-              null,
-              user.getAuthorities()
-      );
+        var authentication = new UsernamePasswordAuthenticationToken(
+                email,
+                null,
+                user.getAuthorities()
+        );
 
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+      } catch (Exception e) {
+        SecurityContextHolder.clearContext();
+
+        throw new RuntimeException(e);
+      }
+
     }
 
     filterChain.doFilter(request, response);
   }
 
   private String recoverRequestToken(HttpServletRequest request) {
-    var authorizationHeader = request.getHeader("Authorization");
-
-    if (authorizationHeader != null) {
-      return authorizationHeader.replace("Bearer ", "");
+    if (request.getCookies() == null) {
+      return null;
     }
 
-    return null;
+    return Arrays.stream(request.getCookies())
+            .filter(cookie -> "access_token".equals(cookie.getName()))
+            .findFirst()
+            .map(Cookie::getValue)
+            .orElse(null);
   }
 }

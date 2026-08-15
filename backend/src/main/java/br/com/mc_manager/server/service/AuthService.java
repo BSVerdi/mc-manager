@@ -1,8 +1,8 @@
 package br.com.mc_manager.server.service;
 
 import br.com.mc_manager.server.dto.LoginDTO;
-import br.com.mc_manager.server.dto.RefreshTokenDTO;
 import br.com.mc_manager.server.dto.TokenDTO;
+import br.com.mc_manager.server.dto.UserDetailsDTO;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.UserRepository;
 import br.com.mc_manager.server.security.service.TokenService;
@@ -13,7 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthenticationService {
+public class AuthService {
 
   @Autowired
   private AuthenticationManager authenticationManager;
@@ -41,13 +41,19 @@ public class AuthenticationService {
 
   }
 
-  public TokenDTO refreshToken(@Valid RefreshTokenDTO dto) {
-    var userId = Long.valueOf(tokenService.verifyToken(dto.refreshToken()));
+  public TokenDTO refreshToken(@Valid String refreshToken) {
+    var userId = Long.valueOf(tokenService.verifyToken(refreshToken));
     var user = userRepository.findById(userId).orElseThrow();
 
     var accessToken = tokenService.generateToken(user);
-    var refreshToken = tokenService.generateRefreshToken(user);
+    var newRefreshToken = tokenService.generateRefreshToken(user);
 
     return new TokenDTO(accessToken, refreshToken);
+  }
+
+  public UserDetailsDTO getMe(String name) {
+    var user = userRepository.findByEmailIgnoreCase(name).orElseThrow();
+
+    return new UserDetailsDTO(user);
   }
 }
