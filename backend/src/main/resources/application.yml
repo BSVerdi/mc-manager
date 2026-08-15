@@ -1,3 +1,17 @@
+spring:
+  datasource:
+    url: ${MYSQL_DB_URL}/mc_manager?createDatabaseIfNotExist=true
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  flyway:
+    enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
 server:
   port: 8080
 
@@ -7,3 +21,5 @@ mcmanager:
   min-ram: 1G
   max-ram: 2G
   java-executable: java
+  secret-key: ${JWT_SECRET}
+

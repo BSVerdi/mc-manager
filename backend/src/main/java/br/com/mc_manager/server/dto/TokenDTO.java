@@ -1,4 +1,7 @@
 package br.com.mc_manager.server.dto;
 
-public record TokenDTO() {
+public record TokenDTO(
+        String accessToken,
+        String refreshToken
+) {
 }

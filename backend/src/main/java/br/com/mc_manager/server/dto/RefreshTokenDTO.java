@@ -1,4 +1,8 @@
 package br.com.mc_manager.server.dto;
 
-public record RefreshTokenDTO() {
+import jakarta.validation.constraints.NotBlank;
+
+public record RefreshTokenDTO(
+        @NotBlank String refreshToken
+) {
 }

@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/server")
-@CrossOrigin(origins = "*")
 public class ServerController {
 
   private final MinecraftServerService service;

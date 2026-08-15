@@ -1,4 +1,8 @@
-package br.com.mc_manager.server.controller;
+package br.com.mc_manager.server.dto;
 
-public class RegisterUserDTO {
+public record RegisterUserDTO(
+        String name,
+        String email,
+        String password
+) {
 }

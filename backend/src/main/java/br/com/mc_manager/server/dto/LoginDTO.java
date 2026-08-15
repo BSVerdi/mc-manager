@@ -1,4 +1,9 @@
 package br.com.mc_manager.server.dto;
 
-public record LoginDTO() {
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginDTO(
+        @NotBlank String email,
+        @NotBlank String password
+) {
 }
