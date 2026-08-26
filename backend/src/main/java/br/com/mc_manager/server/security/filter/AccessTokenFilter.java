@@ -35,7 +35,7 @@ public class AccessTokenFilter extends OncePerRequestFilter {
 
     if (token != null) {
       try {
-        var email = service.verifyToken(token);
+        var email = service.verifyAccessToken(token);
         var user = userRepository.findByEmailIgnoreCase(email).orElseThrow();
 
         var authentication = new UsernamePasswordAuthenticationToken(
@@ -48,7 +48,7 @@ public class AccessTokenFilter extends OncePerRequestFilter {
       } catch (Exception e) {
         SecurityContextHolder.clearContext();
 
-        throw new RuntimeException(e);
+        return;
       }
 
     }
@@ -67,4 +67,5 @@ public class AccessTokenFilter extends OncePerRequestFilter {
             .map(Cookie::getValue)
             .orElse(null);
   }
+
 }

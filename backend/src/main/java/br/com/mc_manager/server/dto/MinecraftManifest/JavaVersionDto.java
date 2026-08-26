@@ -1,4 +1,4 @@
 package br.com.mc_manager.server.dto.MinecraftManifest;
 
-public record JavaVersionDto() {
+public record JavaVersionDto(String majorVersion) {
 }

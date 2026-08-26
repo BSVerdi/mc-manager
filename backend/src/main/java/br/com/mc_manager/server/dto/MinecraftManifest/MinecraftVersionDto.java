@@ -1,4 +1,4 @@
-package br.com.mc_manager.server.dto;
+package br.com.mc_manager.server.dto.MinecraftManifest;
 
-public record MinecraftServerVersionsDTO(String version, String type, String url) {
+public record MinecraftVersionDto(String id, String type, String url) {
 }

@@ -4,15 +4,19 @@ import br.com.mc_manager.server.security.filter.AccessTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -21,6 +25,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
   @Autowired
@@ -34,7 +39,7 @@ public class SecurityConfig {
               req.requestMatchers(
                       "/api/auth/login",
                       "/api/auth/refresh-token",
-                      "/api/users/register",
+                      "/api/auth/register",
                       "/api/auth/logout"
               ).permitAll();
 
@@ -42,6 +47,9 @@ public class SecurityConfig {
             })
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .csrf(AbstractHttpConfigurer::disable)
+            .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint(unauthorizedEntryPoint())
+                    .accessDeniedHandler(forbiddenHandler()))
             .addFilterBefore(
                     accessTokenFilter,
                     UsernamePasswordAuthenticationFilter.class
@@ -71,6 +79,24 @@ public class SecurityConfig {
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
     return request -> config;
+  }
+
+  @Bean
+  public AuthenticationEntryPoint unauthorizedEntryPoint() {
+    return (request, response, authException) -> {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      response.setContentType("application/json");
+      response.getWriter().write("{\"error\":\"Nao autenticado\"}");
+    };
+  }
+
+  @Bean
+  public AccessDeniedHandler forbiddenHandler() {
+    return (request, response, accessDeniedException) -> {
+      response.setStatus(HttpStatus.FORBIDDEN.value());
+      response.setContentType("application/json");
+      response.getWriter().write("{\"error\":\"Acesso negado\"}");
+    };
   }
 
 }

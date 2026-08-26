@@ -5,72 +5,79 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import oshi.SystemInfo;
-import oshi.hardware.HardwareAbstractionLayer;
 import oshi.software.os.OSProcess;
 import oshi.software.os.OperatingSystem;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class MetricsService {
 
-  private final SimpMessagingTemplate template;
-  private final MinecraftServerService serverService;
   private final SystemInfo systemInfo = new SystemInfo();
+  private final Map<Long, OSProcess> previousTicks = new ConcurrentHashMap<>();
 
-  private OSProcess previousTick;
+  private final SimpMessagingTemplate template;
+  private final ServerRuntimeService serverManagerService;
 
-  public MetricsService(SimpMessagingTemplate template, MinecraftServerService serverService) {
+  public MetricsService(SimpMessagingTemplate template, ServerRuntimeService serverManagerService) {
     this.template = template;
-    this.serverService = serverService;
+    this.serverManagerService = serverManagerService;
   }
 
   @Scheduled(fixedRate = 1000) // a cada 3s
-  public void broadcastMetrics() {
-    Long pid = serverService.getProcessPid();
+  public void broadcastAllMetrics() {
+    var activeIds = serverManagerService.getActiveServersIds();
+
+    previousTicks.keySet().removeIf(id -> !activeIds.contains(id));
+
+    for (Long serverId : activeIds) {
+      broadcastMetricsFor(serverId);
+    }
+  }
+
+  private void broadcastMetricsFor(Long serverId) {
+    Long pid = serverManagerService.getProcessPid(serverId);
+
     if (pid == null) {
-      previousTick = null; // servidor parado: reseta a leitura anterior
+      previousTicks.remove(serverId);
       return;
     }
 
     OperatingSystem os = systemInfo.getOperatingSystem();
     OSProcess process = os.getProcess(pid.intValue());
+
     if (process == null) {
-      broadcastResetedMetrics();
       return;
     }
 
-    double cpuUsage = previousTick == null
-            ? 0.0
-            : process.getProcessCpuLoadBetweenTicks(previousTick) * 100;
-    previousTick = process;
+    OSProcess previousTick = previousTicks.get(serverId);
+    double cpuUsage = previousTick == null ? 0.0 :
+            process.getProcessCpuLoadBetweenTicks(previousTick) * 100;
 
-    HardwareAbstractionLayer hardware = systemInfo.getHardware();
-    long ramUsedMb = process.getResidentSetSize() / (1024 * 1024);
-    long ramMaxMb = serverService.getMaxRamMb();
+    previousTicks.put(serverId, process);
 
-    Instant startedAt = serverService.getStartedAt();
+    Long ramUsedMb = process.getResidentSetSize() / (1024 * 1024);
+    Long ramMaxMb = serverManagerService.getMaxRamMb(serverId);
 
-    Long uptimeSeconds = startedAt != null
-            ? Duration.between(startedAt, Instant.now()).getSeconds()
-            : 0;
+    Instant startedAt = serverManagerService.getStartedAt(serverId);
+
+    Long uptimeSeconds = startedAt != null ? Duration.between(startedAt, Instant.now()).getSeconds() : 0;
+
+    var onlinePlayers = serverManagerService.getOnlinePlayersCount(serverId);
 
     ServerMetricsDTO metrics = new ServerMetricsDTO(
-            Math.round(cpuUsage * 10) / 10.0,
+            serverId,
+            Math.round(cpuUsage) / 10.0,
             ramUsedMb,
             ramMaxMb,
             uptimeSeconds,
-            serverService.getOnlinePlayers()
+            onlinePlayers
     );
 
-    template.convertAndSend("/topic/metrics", metrics);
-  }
-
-  private void broadcastResetedMetrics() {
-    template.convertAndSend(
-            "/topic/metrics",
-            new ServerMetricsDTO(0D, 0L, 0L, 0L, 0));
+    template.convertAndSend("/topic/metrics/" + serverId, metrics);
   }
 
 }

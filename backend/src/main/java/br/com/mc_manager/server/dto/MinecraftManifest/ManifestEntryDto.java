@@ -1,4 +1,8 @@
-package br.com.mc_manager.server.dto;
+package br.com.mc_manager.server.dto.MinecraftManifest;
 
-public record ManifestEntryDTO() {
+import java.util.List;
+
+public record ManifestEntryDto(
+        List<MinecraftVersionDto> versions
+) {
 }

@@ -16,10 +16,10 @@ server:
   port: 8080
 
 mcmanager:
+  servers-root-directory: ${SERVERS-ROOT-DIRECTORY}
   server-directory: ${SERVER-DIRECTORY}
-  jar-name: server.jar
-  min-ram: 1G
-  max-ram: 2G
-  java-executable: java
+  java-8: ${JAVA8-PATH}
+  java-21: ${JAVA21-PATH}
+  java-25: ${JAVA25-PATH}
   secret-key: ${JWT_SECRET}
 

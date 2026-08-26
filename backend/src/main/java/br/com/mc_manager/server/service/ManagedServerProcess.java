@@ -2,16 +2,15 @@ package br.com.mc_manager.server.service;
 
 import br.com.mc_manager.server.dto.LogLineDTO;
 import br.com.mc_manager.server.dto.PlayerDTO;
+import br.com.mc_manager.server.model.Player;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.ServerStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,26 +18,29 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MagedServerProcess {
+public class ManagedServerProcess {
 
   private static final Pattern LEVEL_PREFIX_PATTERN =
-          Pattern.compile("^.*?(\\[(?:INFO|WARN|ERROR|FATAL|DEBUG|TRACE)].*)$");
+          Pattern.compile("^(?:\\[\\d{2}:\\d{2}:\\d{2}]|.*?) (\\[.*].*)$");
   private static final Pattern JOIN_PATTERN =
-          Pattern.compile("^(\\w+)\\[/[^\\]]+] logged in with entity id \\d+ at \\(.*\\)$");
+          Pattern.compile("^(?:\\[.*]).* (\\w+)\\[/[^\\]]+] logged in with entity id \\d+ at \\(.*\\)");
   private static final Pattern LEAVE_PATTERN =
-          Pattern.compile("^(\\w+) lost connection: .*$");
+          Pattern.compile("^(?:\\[.*]).* (\\w+) lost connection: .*$");
 
   private final Server server;
   private final String javaExecutable;
   private final Path serverDirectory;
+  private final PlayerService playerService;
 
   private final SimpMessagingTemplate template;
   private final ExecutorService executor;
+  private final Long maxRamMb;
 
-  private final Set<String> onlinePlayers = ConcurrentHashMap.newKeySet();
+  private final Set<Player> onlinePlayers = ConcurrentHashMap.newKeySet();
   private final AtomicLong idCounter = new AtomicLong();
   private final AtomicReference<ServerStatus> status = new AtomicReference<>(ServerStatus.OFFLINE);
 
@@ -46,18 +48,39 @@ public class MagedServerProcess {
   private volatile BufferedWriter processInput;
   private volatile Instant startedAt;
 
-  public MagedServerProcess(
+  public ManagedServerProcess(
           Server server,
           SimpMessagingTemplate template,
           ExecutorService executor,
           String javaExecutable,
-          Path serverDirectory
+          Path serverDirectory,
+          PlayerService playerService
   ) {
     this.server = server;
     this.template = template;
     this.executor = executor;
     this.javaExecutable = javaExecutable;
     this.serverDirectory = serverDirectory;
+    this.playerService = playerService;
+    this.maxRamMb = parseRamToMb(server.getMaxRam());
+  }
+
+  private static Long parseRamToMb(String ram) {
+    String trimmed = ram.trim().toUpperCase();
+
+    if (trimmed.endsWith("G")) {
+      return Long.parseLong(trimmed.substring(0, trimmed.length() - 1)) * 1024;
+    }
+
+    if (trimmed.endsWith("M")) {
+      return Long.parseLong(trimmed.substring(0, trimmed.length() - 1));
+    }
+
+    return Long.parseLong(trimmed);
+  }
+
+  public Long getMaxRamMb() {
+    return this.maxRamMb;
   }
 
   public Long getServerId() {
@@ -130,42 +153,16 @@ public class MagedServerProcess {
     broadcastStatus();
 
     sendCommand("stop");
-    onlinePlayers.clear();
+    disconnectAllPlayers();
   }
 
   public synchronized void restart() {
-    if (process == null || !process.isAlive()) {
-      broadcastLine("[CONSOLE] Servidor não está rodando");
-      return;
-    }
+    broadcastLine("[CONSOLE] Servidor reiniciando");
 
-    status.set(ServerStatus.RESTARTING);
-    broadcastStatus();
-    broadcastLine("[CONSOLE] Reiniciando servidor");
-
-    Process processToStop = process;
-    sendCommand("stop");
-    onlinePlayers.clear();
-
-    executor.submit(() -> {
-      try {
-        boolean exited = processToStop.waitFor(60, TimeUnit.SECONDS);
-
-        if (!exited) {
-          broadcastLine("[CONSOLE] Forçando encerramento");
-          processToStop.destroyForcibly();
-          processToStop.waitFor();
-        }
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        return;
-      }
-
-      start();
-    });
+    stopThen(this::start);
   }
 
-  private synchronized void sendCommand(String command) {
+  public synchronized void sendCommand(String command) {
     if (processInput == null || process == null || !process.isAlive()) {
       broadcastLine("[CONSOLE] Não é possível enviar comando: servidor parado");
       return;
@@ -181,46 +178,80 @@ public class MagedServerProcess {
   }
 
   public void opPlayer(String nickname) {
+    getPlayerAndExecuteAMethod(nickname, playerService::opPlayer);
+
     sendCommand("op " + nickname);
   }
 
   public void deOpPlayer(String nickname) {
+    getPlayerAndExecuteAMethod(nickname, playerService::deopPlayer);
+
     sendCommand("deop " + nickname);
   }
 
-  public List<PlayerDTO> getPlayers() throws IOException {
-    Path opsFile = serverDirectory.resolve("ops.txt");
+  public void banPlayer(String nickname) {
+    getPlayerAndExecuteAMethod(nickname, playerService::banPlayer);
 
-    List<String> operators = Files.exists(opsFile) ? Files.readAllLines(opsFile) : List.of();
-
-    Path playersDir = serverDirectory.resolve("world").resolve("players");
-
-    if (!Files.isDirectory(playersDir)) {
-      return List.of();
-    }
-
-    try (var stream = Files.list(playersDir)) {
-      return stream.map(p -> p.getFileName().toString().replace(".dat", ""))
-              .map(nickname -> new PlayerDTO(
-                      nickname,
-                      onlinePlayers.contains(nickname),
-                      operators.contains(nickname.toLowerCase())
-              ))
-              .sorted(Comparator.comparing(p -> p.nickname().toLowerCase()))
-              .toList();
-    }
+    sendCommand("ban " + nickname);
   }
 
+  public void unbanPlayer(String nickname) {
+    getPlayerAndExecuteAMethod(nickname, playerService::unbanPlayer);
+
+    sendCommand("unban " + nickname);
+  }
+
+  public Integer getOnlinePlayersCount() {
+    return onlinePlayers.size();
+  }
+
+  public List<PlayerDTO> getOnlinePlayersList() {
+    var playersDto = onlinePlayers.stream().map(PlayerDTO::new).toList();
+
+    return playersDto;
+  }
+
+  public synchronized void stopThen(Runnable onStopped) {
+    if (process == null || !process.isAlive()) {
+      onStopped.run();
+      return;
+    }
+
+    status.set(ServerStatus.STOPPING);
+    broadcastStatus();
+
+    Process processToStop = process;
+    sendCommand("stop");
+    disconnectAllPlayers();
+
+    executor.submit(() -> {
+      try {
+        boolean exited = processToStop.waitFor(60, TimeUnit.SECONDS);
+        if (!exited) {
+          broadcastLine("[CONSOLE] Forçando encerramento...");
+          processToStop.destroyForcibly();
+          processToStop.waitFor();
+        }
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return;
+      }
+
+      onStopped.run();
+    });
+  }
 
   private void watchProcessExit() {
     try {
       int exitCode = process.waitFor();
 
-      status.set(ServerStatus.STOPPING);
+      broadcastStatus();
       startedAt = null;
 
       broadcastLine("[CONSOLE] Processo encerrado com código " + exitCode);
+      status.set(ServerStatus.OFFLINE);
       broadcastStatus();
+
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
@@ -254,18 +285,30 @@ public class MagedServerProcess {
 
     Matcher joinMatcher = JOIN_PATTERN.matcher(clean);
     if (joinMatcher.matches()) {
-      onlinePlayers.add(joinMatcher.group(1));
+      var playerName = joinMatcher.group(1);
+
+      var player = playerService.getServerPlayer(this.server.getId(), playerName);
+      playerService.playerConnected(player);
+
+      onlinePlayers.add(player);
+
       return;
     }
 
     Matcher leaverMatcher = LEAVE_PATTERN.matcher(clean);
     if (leaverMatcher.matches()) {
-      onlinePlayers.remove(leaverMatcher.group(1));
+      var playerNickname = leaverMatcher.group(1);
+
+      getPlayerAndExecuteAMethod(playerNickname, (player) -> {
+        playerService.playerDisconnected(player);
+        onlinePlayers.remove(player);
+      });
     }
+
   }
 
   private void broadcastStatus() {
-    template.convertAndSend("/topic/console/" + server.getId(), status.get());
+    template.convertAndSend("/topic/status/" + server.getId(), status.get());
   }
 
   private void broadcastLine(String rawLine) {
@@ -275,4 +318,17 @@ public class MagedServerProcess {
             new LogLineDTO(idCounter.incrementAndGet(), clean, Instant.now().toString())
     );
   }
+
+  private void disconnectAllPlayers() {
+    onlinePlayers.forEach(playerService::playerDisconnected);
+    onlinePlayers.clear();
+  }
+
+  private void getPlayerAndExecuteAMethod(String nickname, Consumer<Player> action) {
+    onlinePlayers.stream()
+            .filter(player -> player.getNickname().equals(nickname))
+            .findFirst()
+            .ifPresent(action);
+  }
+
 }

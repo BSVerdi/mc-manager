@@ -1,0 +1,2 @@
+ALTER TABLE players
+    ADD COLUMN online BOOLEAN DEFAULT false;

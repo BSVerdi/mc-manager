@@ -1,20 +1,26 @@
 package br.com.mc_manager.server.controller;
 
-import br.com.mc_manager.server.service.MinecraftServerService;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.mc_manager.server.service.ServerRuntimeService;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 public class ConsoleWebSocketController {
 
-  @Autowired
-  private MinecraftServerService service;
 
-  @MessageMapping("/command")
-  public void handleCommand(String command) {
-    service.sendCommand(command);
+  private final ServerRuntimeService serverManagerService;
+
+  public ConsoleWebSocketController(ServerRuntimeService serverManagerService) {
+    this.serverManagerService = serverManagerService;
+  }
+
+  @MessageMapping("/command/{serverId}")
+  public void handleCommand(
+          @DestinationVariable Long serverId,
+          String command
+  ) {
+    serverManagerService.sendCommand(serverId, command);
   }
 
 }

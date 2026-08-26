@@ -1,4 +1,6 @@
 package br.com.mc_manager.server.dto;
 
-public record StatusResponseDto() {
+import br.com.mc_manager.server.model.ServerStatus;
+
+public record StatusResponseDto(ServerStatus status) {
 }

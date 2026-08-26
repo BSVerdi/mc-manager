@@ -1,27 +1,22 @@
 package br.com.mc_manager.server.service;
 
-import br.com.mc_manager.server.dto.RegisterUserDTO;
-import br.com.mc_manager.server.dto.UserDetailsDTO;
-import br.com.mc_manager.server.model.Profile;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.UserRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.security.Principal;
 
 @Service
 public class UserService implements UserDetailsService {
 
-  @Autowired
-  private UserRepository repository;
+  private final UserRepository repository;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  public UserService(UserRepository repository) {
+    this.repository = repository;
+  }
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -29,24 +24,12 @@ public class UserService implements UserDetailsService {
             .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
   }
 
-  @Transactional
-  public UserDetailsDTO registerUser(RegisterUserDTO registerUser) {
-    var exists = repository.existsByEmail(registerUser.email());
+  public User currentUser(Principal principal) {
+    return repository.findByEmailIgnoreCase(principal.getName()).orElseThrow();
+  }
 
-    if (exists) {
-      throw new DuplicateKeyException("Email already exists");
-    }
-
-    var encodedPassword = passwordEncoder.encode(registerUser.password());
-
-    var user = repository.save(new User(
-            registerUser.name(),
-            registerUser.email(),
-            encodedPassword,
-            Profile.USER
-    ));
-
-    return new UserDetailsDTO(user);
+  public User currentUser(String username) {
+    return repository.findByEmailIgnoreCase(username).orElseThrow();
   }
 
 }

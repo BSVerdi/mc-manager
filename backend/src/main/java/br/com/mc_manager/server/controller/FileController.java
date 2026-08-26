@@ -6,66 +6,93 @@ import br.com.mc_manager.server.dto.MediaDTO;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
 import br.com.mc_manager.server.service.FileService;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/files")
+@RequestMapping("/api/servers/{serverId}/files")
 public class FileController {
 
-  @Autowired
-  private FileService service;
+  private final FileService fileService;
+
+  public FileController(FileService fileService) {
+    this.fileService = fileService;
+  }
 
   @GetMapping
-  public ResponseEntity<List<FileEntryDTO>> list(@RequestParam(defaultValue = "") String path) throws IOException {
-    List<FileEntryDTO> list = service.listFiles(path);
+  @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
+  public ResponseEntity<List<FileEntryDTO>> list(
+          @PathVariable Long serverId,
+          @RequestParam(defaultValue = "") String path
+  ) {
+    var files = fileService.listFiles(serverId, path);
 
-    return ResponseEntity.ok().body(list);
+    return ResponseEntity.ok(files);
   }
 
   @GetMapping("/content")
-  public ResponseEntity<FileContentDTO> getContent(@RequestParam String path) throws IOException {
-    FileContentDTO dto = service.getContent(path);
+  @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
+  public ResponseEntity<FileContentDTO> getContent(@PathVariable Long serverId, @RequestParam String path) throws IOException {
+    var content = fileService.getContent(serverId, path);
 
-    return ResponseEntity.ok(dto);
+    return ResponseEntity.ok(content);
   }
 
   @PutMapping("/content")
-  public ResponseEntity<Void> saveContent(@RequestParam String path, @RequestBody SaveFileRequestDTO request) throws IOException {
-    service.saveContent(path, request);
+  @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
+  public ResponseEntity<Void> saveContent(@PathVariable Long serverId, @RequestParam String path, @RequestBody SaveFileRequestDTO request) throws IOException {
+    fileService.saveContent(serverId, path, request);
 
     return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/download")
-  public ResponseEntity<Resource> download(@RequestParam String path) throws IOException {
-    MediaDTO media = service.download(path);
+  @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
+  public ResponseEntity<Resource> download(@PathVariable Long serverId, @RequestParam String path) throws IOException {
+    MediaDTO media = fileService.download(serverId, path);
+
+    String fileName = media.path().toString();
+    String encoded = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replace("+", "%20");
 
     return ResponseEntity.ok()
             .contentType(media.mediaType())
             .header(HttpHeaders.CONTENT_DISPOSITION,
-                    "attatchment; filename=\"" + media.path() + "\"")
+                    "attachment; filename=\"" + fileName + "\"; filename*=UTF-8''" + encoded)
             .body(media.resource());
   }
 
   @GetMapping("/download-zip")
-  public void downloadZip(@RequestParam String path, HttpServletResponse response) throws IOException {
-    service.downloadZip(path, response);
+  @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
+  public void downloadZip(@PathVariable Long serverId, @RequestParam String path, HttpServletResponse response
+  ) throws IOException {
+    fileService.downloadZip(serverId, path, response);
   }
 
-  @PostMapping("upload")
+  @PostMapping("/upload")
+  @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
   public ResponseEntity<Void> upload(
+          @PathVariable Long serverId,
           @RequestParam(defaultValue = "") String path,
           @RequestParam("file") MultipartFile file
   ) throws IOException {
-    service.upload(path, file);
+    fileService.upload(serverId, path, file);
+
+    return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/delete")
+  @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
+  public ResponseEntity<Void> delete(@PathVariable Long serverId, @RequestParam String path) throws IOException {
+    fileService.delete(serverId, path);
 
     return ResponseEntity.noContent().build();
   }

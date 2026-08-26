@@ -1,18 +1,19 @@
 package br.com.mc_manager.server.controller;
 
 import br.com.mc_manager.server.dto.LoginDTO;
+import br.com.mc_manager.server.dto.RegisterUserDTO;
 import br.com.mc_manager.server.dto.TokenDTO;
 import br.com.mc_manager.server.dto.UserDetailsDTO;
 import br.com.mc_manager.server.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
 
@@ -20,11 +21,14 @@ import java.time.Duration;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-  @Autowired
-  private AuthService service;
+  private final AuthService service;
+
+  public AuthController(AuthService service) {
+    this.service = service;
+  }
 
   @PostMapping("/login")
-  public ResponseEntity<TokenDTO> login(
+  public ResponseEntity<Void> login(
           @Valid @RequestBody LoginDTO dto,
           HttpServletResponse response
   ) {
@@ -36,13 +40,14 @@ public class AuthController {
   }
 
   @PostMapping("/refresh-token")
-  public ResponseEntity<TokenDTO> refreshToken(
+  public ResponseEntity<Void> refreshToken(
           @CookieValue(name = "refresh_token", required = false) String refreshToken,
           HttpServletResponse response
   ) {
     if (refreshToken == null) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
     var token = service.refreshToken(refreshToken);
 
     setAuthCookie(response, token);
@@ -60,9 +65,27 @@ public class AuthController {
   @PostMapping("/logout")
   public ResponseEntity<Void> logout(HttpServletResponse response) {
     clearCookie(response, "access_token");
-    clearCookie(response, "refreshToken");
+    clearCookie(response, "refresh_token");
 
     return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/register")
+  public ResponseEntity<Void> register(
+          @Valid @RequestBody RegisterUserDTO dto,
+          HttpServletResponse response,
+          UriComponentsBuilder uriBuilder
+  ) {
+    var registeredUser = service.registerUser(dto);
+
+    setAuthCookie(response, registeredUser.tokenDTO());
+
+    var uri = uriBuilder
+            .path("/users/{id}")
+            .buildAndExpand(registeredUser.id())
+            .toUri();
+
+    return ResponseEntity.created(uri).build();
   }
 
 

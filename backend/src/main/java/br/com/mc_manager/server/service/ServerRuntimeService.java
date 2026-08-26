@@ -1,5 +1,6 @@
 package br.com.mc_manager.server.service;
 
+import br.com.mc_manager.server.dto.PlayerDTO;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.repository.ServerRepository;
@@ -7,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
-public class ServerManagerService {
+public class ServerRuntimeService {
 
   private final ExecutorService executor = Executors.newCachedThreadPool();
   private final Map<Long, ManagedServerProcess> instances = new ConcurrentHashMap<>();
@@ -36,7 +36,7 @@ public class ServerManagerService {
   @Value("${mcmanager.java-25}")
   private String java25;
 
-  public ServerManagerService(ServerRepository serverRepository, ServerFileProvisioningService provisioningService, SimpMessagingTemplate template, PlayerService playerService) {
+  public ServerRuntimeService(ServerRepository serverRepository, ServerFileProvisioningService provisioningService, SimpMessagingTemplate template, PlayerService playerService) {
     this.serverRepository = serverRepository;
     this.provisioningService = provisioningService;
     this.template = template;
@@ -65,6 +65,14 @@ public class ServerManagerService {
 
   public void deopPlayer(Long serverId, String nickname) {
     getOrCreateInstance(serverId).deOpPlayer(nickname);
+  }
+
+  public void banPlayer(Long serverId, String nickname) {
+    getOrCreateInstance(serverId).banPlayer(nickname);
+  }
+
+  public void unbanPlayer(Long serverId, String nickname) {
+    getOrCreateInstance(serverId).unbanPlayer(nickname);
   }
 
   public ServerStatus getStatus(Long serverId) {
@@ -97,7 +105,7 @@ public class ServerManagerService {
     return getExistingInstance(serverId).map(ManagedServerProcess::getStartedAt).orElse(null);
   }
 
-  public List<String> getOnlinePlayersList(Long serverId) {
+  public List<PlayerDTO> getOnlinePlayersList(Long serverId) {
     return getExistingInstance(serverId).map(ManagedServerProcess::getOnlinePlayersList).orElse(List.of());
   }
 
@@ -153,14 +161,6 @@ public class ServerManagerService {
       case "JAVA_25" -> java25;
       default -> java25;
     };
-  }
-
-  public void assertOwnership(Server server, Principal principal) {
-    boolean isOwner = !server.getOwner().getEmail().equals(principal.getName());
-
-    if (isOwner) {
-      throw new SecurityException("Voce não tem permissão para acessar esse arquivo");
-    }
   }
 
 }

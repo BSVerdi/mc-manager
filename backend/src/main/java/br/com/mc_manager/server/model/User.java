@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -31,6 +32,9 @@ public class User implements UserDetails {
 
   @Enumerated(EnumType.STRING)
   private Profile profile;
+
+  @OneToMany(mappedBy = "owner")
+  private List<Server> servers;
 
   public User(String name, String email, String encryptedPassword, Profile profile) {
     this.name = name;

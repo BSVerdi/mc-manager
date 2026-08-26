@@ -4,14 +4,14 @@ import br.com.mc_manager.server.model.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class TokenService {
@@ -19,54 +19,64 @@ public class TokenService {
   @Value("${mcmanager.secret-key}")
   private String secret;
 
-  public String generateToken(User user) {
-    try {
-      Algorithm algorithm = Algorithm.HMAC256(secret);
+  private static final String ISSUER = "mc-manager";
+  private static final String TYPE_CLAIM = "type";
 
-      return JWT.create()
-              .withIssuer("Mc-manager")
-              .withSubject(user.getUsername())
-              .withExpiresAt(expiration(30))
-              .sign(algorithm);
-    } catch (JWTCreationException ex) {
-      throw new RuntimeException("Erro ao gerar token JWT");
-    }
+  public String generateAccessToken(User user) {
+    return generateToken(user, "access", 30);
   }
 
   public String generateRefreshToken(User user) {
+    return generateToken(user, "refresh", 120);
+  }
+
+  public String generateToken(User user, String type, Integer minutes) {
     try {
       Algorithm algorithm = Algorithm.HMAC256(secret);
 
       return JWT.create()
-              .withIssuer("Mc-manager")
-              .withSubject(user.getId().toString())
-              .withExpiresAt(expiration(120))
+              .withIssuer(ISSUER)
+              .withSubject(user.getUsername())
+              .withClaim(TYPE_CLAIM, type)
+              .withExpiresAt(expiration(minutes))
               .sign(algorithm);
     } catch (JWTCreationException ex) {
       throw new RuntimeException("Erro ao gerar token JWT");
     }
   }
 
-  public String verifyToken(String token) {
-    DecodedJWT decodedJWT;
+  public String verifyAccessToken(String token) {
+    return verifyToken(token, "access");
+  }
 
+  public String verifyRefreshToken(String token) {
+    return verifyToken(token, "refresh");
+  }
+
+  public String verifyToken(String token, String type) {
     try {
       Algorithm algorithm = Algorithm.HMAC256(secret);
-
       JWTVerifier verifier = JWT.require(algorithm)
-              .withIssuer("Mc-manager")
+              .withIssuer(ISSUER)
               .build();
 
-      decodedJWT = verifier.verify(token);
+      DecodedJWT decodedJWT = verifier.verify(token);
+
+
+      String actualType = decodedJWT.getClaim(TYPE_CLAIM).asString();
+
+      if (!type.equals(actualType)) {
+        throw new JWTVerificationException("Token invalido");
+      }
 
       return decodedJWT.getSubject();
-    } catch (JWTCreationException ex) {
+    } catch (JWTVerificationException ex) {
       throw new RuntimeException("Erro ao verificar token JWT");
     }
   }
 
   public Instant expiration(Integer minutes) {
-    return LocalDateTime.now().plusMinutes(minutes).toInstant(ZoneOffset.of("-03:00"));
+    return Instant.now().plus(minutes, ChronoUnit.MINUTES);
   }
 
 }
