@@ -56,7 +56,7 @@ export function ServerCard({ server }: { server: Server }) {
                 exit={{ opacity: 0, scale: 0.6 }}
                 transition={{ duration: 0.2 }}
               >
-                <Play style={{ width: 32, height: 32, fill: "green" }} />
+                <Play style={{ width: 32, height: 32 }} />
               </motion.div>
             ) : (
               <motion.div
@@ -66,7 +66,7 @@ export function ServerCard({ server }: { server: Server }) {
                 exit={{ opacity: 0, scale: 0.6 }}
                 transition={{ duration: 0.2 }}
               >
-                <Square style={{ width: 32, height: 32, fill: "red" }} />
+                <Square style={{ width: 32, height: 32 }} />
               </motion.div>
             )}
           </AnimatePresence>
