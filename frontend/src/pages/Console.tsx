@@ -1,10 +1,13 @@
 import { Virtuoso } from "react-virtuoso";
-import ConsoleLine from "./ConsoleLine";
-import { useConsoleSocket } from "../../hooks/useConsoleSocket";
+import ConsoleLine from "../components/ConsoleLine";
+import { useConsoleSocket } from "../hooks/useConsoleSocket";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useServerId } from "../hooks/useServerId";
 
 export default function Console() {
-  const { logs, sendCommand } = useConsoleSocket();
+  const serverId = useServerId();
+  const { logs, sendCommand } = useConsoleSocket(Number(serverId));
   const [command, setCommand] = useState("");
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

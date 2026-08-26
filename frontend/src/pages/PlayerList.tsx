@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import type { Player } from "../../types/Player";
-import { api } from "../../lib/apiClient";
+import type { Player } from "../types/Player";
+import { api } from "../lib/apiClient";
+import { useServerId } from "../hooks/useServerId";
+import { UserStar } from "lucide-react";
 
 function PlayerAvatar({ name }: { name: string }) {
   const [imageFailed, setImageFailed] = useState(false);
@@ -20,11 +22,12 @@ function PlayerAvatar({ name }: { name: string }) {
 }
 
 export default function PlayersList() {
+  const serverId = useServerId();
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
     const getPlayers = async () => {
-      const players = await api.server.getPlayers();
+      const players = await api.player.getPlayers(serverId);
 
       setPlayers(players);
     };
@@ -47,18 +50,15 @@ export default function PlayersList() {
     setOperatorStatus(player.nickname, nextOperatorState);
 
     if (nextOperatorState) {
-      api.server.opPlayer(player.nickname);
+      api.player.opPlayer(serverId, player.nickname);
     } else {
-      api.server.deopPlayer(player.nickname);
+      api.player.deopPlayer(serverId, player.nickname);
     }
   };
 
   return (
     <>
       <section className="player-container">
-        <section className="player-list-header">
-          <h1>Player List</h1>
-        </section>
         <ul className="player-list">
           {players.map((player) => (
             <li key={player.nickname} className="player-card">
@@ -66,7 +66,10 @@ export default function PlayersList() {
               <div className="player-info">
                 <div>
                   <h3>
-                    {player.nickname} {player.operator ? "(Operator)" : ""}
+                    {player.operator ? (
+                      <UserStar style={{ width: 16, height: 16 }} />
+                    ) : null}{" "}
+                    {player.nickname}
                   </h3>
                   <span>{player.online ? "Online" : "Offline"} </span>
                 </div>

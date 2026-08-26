@@ -1,16 +1,24 @@
 import { MonitorCog } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import InputItem from "../components/InputItem";
 
 export default function Register() {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
+
+    const result = await register(name, email, password);
+
+    if (!result) {
+      alert("Erro ao registrar a conta");
+    }
   };
 
   return (
@@ -26,27 +34,22 @@ export default function Register() {
             <span>Registre uma conta para continuar</span>
           </div>
           <form onSubmit={handleSubmit} className="auth-inputs">
-            <div className="auth-input">
-              <span>Nome de usuário</span>
-              <input type="text" onChange={(e) => setName(e.target.value)} />
-            </div>
-            <div className="auth-input">
-              <span>Email</span>
-              <input
-                type="email"
-                placeholder="exemplo@email.com"
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-              />
-            </div>
-            <div className="auth-input">
-              <span>Senha</span>
-              <input
-                type="password"
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+            <InputItem
+              title="Nome de usuário"
+              type="text"
+              setFunction={setName}
+            />
+            <InputItem
+              title="Email"
+              type="email"
+              placeHolder="exemplo@email.com"
+              setFunction={setEmail}
+            />
+            <InputItem
+              title="Senha"
+              type="password"
+              setFunction={setPassword}
+            />
             <button className="auth-btn" type="submit">
               Registrar
             </button>

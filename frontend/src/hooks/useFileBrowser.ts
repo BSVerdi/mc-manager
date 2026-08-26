@@ -2,28 +2,31 @@ import { useCallback, useEffect, useState } from "react";
 import { api } from "../lib/apiClient";
 import type { FileEntry } from "../types/File";
 
-export function useFileBrowser() {
+export function useFileBrowser(serverId: number) {
   const [currentPath, setCurrentPath] = useState("");
   const [entries, setEntries] = useState<FileEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback((path: string) => {
-    setLoading(true);
-    setError(null);
-    api.files
-      .list(path)
-      .then((res) => {
-        setEntries(res);
-        setCurrentPath(path);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+  const load = useCallback(
+    (path: string) => {
+      setLoading(true);
+      setError(null);
+      api.files
+        .list(serverId, path)
+        .then((res) => {
+          setEntries(res);
+          setCurrentPath(path);
+        })
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false));
+    },
+    [serverId],
+  );
 
   useEffect(() => {
     load("");
-  }, [load]);
+  }, [serverId]);
 
   const openFolder = useCallback(
     (name: string) => {
@@ -53,7 +56,7 @@ export function useFileBrowser() {
       setError(null);
 
       return api.files
-        .upload(currentPath, file)
+        .upload(serverId, currentPath, file)
         .then(() => load(currentPath))
         .catch((err) => {
           setError(err.response?.data?.error ?? err.message);
@@ -61,6 +64,21 @@ export function useFileBrowser() {
         });
     },
     [currentPath, load],
+  );
+
+  const uploadZip = useCallback(
+    (file: File) => {
+      setError(null);
+
+      return api.files
+        .uploadZip(serverId, currentPath, file)
+        .catch((err) => {
+          setError(err.response?.data?.error ?? err.message);
+          throw err;
+        })
+        .finally(() => window.location.reload());
+    },
+    [currentPath],
   );
 
   return {
@@ -73,5 +91,6 @@ export function useFileBrowser() {
     goToBreadcrumb,
     reload: () => load(currentPath),
     upload,
+    uploadZip,
   };
 }

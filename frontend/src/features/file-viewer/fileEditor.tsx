@@ -1,6 +1,5 @@
 import { Save, X } from "lucide-react";
-import type { Props } from ".";
-import { redirect } from "react-router-dom";
+import type { Props } from "../../pages/FileViewer";
 
 export function FileEditor({ browser, editor }: Props) {
   if (!editor.file) return null;

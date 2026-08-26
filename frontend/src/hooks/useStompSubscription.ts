@@ -21,34 +21,6 @@ export function useStompSubscription<T>(topic: string, initialValue: T): T {
       unregister();
       subscription?.unsubscribe();
     };
-
-    // const trySubscribe = () => {
-    //   const subscription = stompClient.subscribe(topic, (message) => {
-    //     setData(JSON.parse(message.body));
-    //   });
-
-    //   return subscription;
-    // };
-
-    // let subscription: ReturnType<typeof stompClient.subscribe> | undefined;
-
-    // stompClient.onConnect = () => {
-    //   subscription = trySubscribe();
-    // };
-
-    // if (stompClient.connected) {
-    //   subscription = trySubscribe();
-    // } else {
-    //   const originalOnConnect = stompClient.onConnect;
-
-    //   stompClient.onConnect = (frame) => {
-    //     originalOnConnect?.(frame);
-
-    //     subscription = trySubscribe();
-    //   };
-    // }
-
-    // return () => subscription?.unsubscribe();
   }, [topic]);
 
   return data;

@@ -6,5 +6,6 @@ import Router from "./router.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Router />
+    <div id="portal-root" className="cu" />
   </StrictMode>,
 );

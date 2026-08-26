@@ -1,5 +1,9 @@
 export type Player = {
+  id: number;
   nickname: string;
-  online: boolean;
+  icon: string;
+  banned: boolean;
   operator: boolean;
+  online: boolean;
+  lastLogin: number;
 };

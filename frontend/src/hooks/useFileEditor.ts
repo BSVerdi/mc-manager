@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { api } from "../lib/apiClient";
 import type { FileContent } from "../types/File";
 
-export function useFileEditor() {
+export function useFileEditor(serverId: number) {
   const [file, setFile] = useState<FileContent | null>(null);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(false);
@@ -13,7 +13,7 @@ export function useFileEditor() {
     setLoading(true);
     setError(null);
     api.files
-      .getContent(path)
+      .getContent(serverId, path)
       .then((res) => {
         setFile(res);
         setDraft(res.content);
@@ -29,7 +29,7 @@ export function useFileEditor() {
     setError(null);
 
     return api.files
-      .saveContent(file.path, draft)
+      .saveContent(serverId, file.path, draft)
       .then(() => setFile((f) => (f ? { ...f, content: draft } : f)))
       .catch((err) => setError(err.message))
       .finally(() => setSaving(false));

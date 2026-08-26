@@ -1,43 +1,45 @@
-import { useState } from "react";
-
-import Console from "../features/console";
-import ServerInfo from "../features/server-info";
-import FileViewer from "../features/file-viewer";
-import SideMenu from "../features/side-menu";
-import PlayersList from "../features/players-list";
-import Settings from "../features/settings";
+import { PlusCircle, Server as ServerIcon } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import type { Server, Server as server } from "../types/Server";
+import { api } from "../lib/apiClient";
+import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import { useServerList } from "../hooks/useServerList";
+import { useServerStatus } from "../hooks/useServerStatus";
+import { ServerCard } from "../components/ServerCard";
+import CreateServer from "../features/create_server/CreateServer";
 
 export default function Home() {
-  const [selected, setSelected] = useState("Console");
+  const { user } = useAuth();
+  const { servers } = useServerList();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <>
-      <main>
-        <aside className="side-menu">
-          <SideMenu selected={selected} setSelected={setSelected} />
-        </aside>
-        <section className="content">
-          <section className="server-info">
-            <ServerInfo />
-          </section>
-          <section className="server-dashboard">
-            {(() => {
-              switch (selected) {
-                case "Console":
-                  return <Console />;
-                case "Files":
-                  return <FileViewer />;
-                case "Players":
-                  return <PlayersList />;
-                case "Settings":
-                  return <Settings />;
-                default:
-                  return <Console />;
-              }
-            })()}
+    <div className="user-dashboard">
+      <section className="user-dashboard-header">
+        <h2>Dashboard</h2>
+      </section>
+      <section className="infos">
+        <h3>Bem vindo de volta, {user?.username}!</h3>
+      </section>
+      <section className="server-list-container">
+        <section className="server-list-header">
+          <span>
+            <ServerIcon /> All servers
+          </span>
+          <button onClick={() => setIsOpen(true)} className="create-server-btn">
+            <PlusCircle /> Create New Server
+          </button>
+          <CreateServer isOpen={isOpen} setIsOpen={setIsOpen} />
+        </section>
+        <section className="server-grid-container">
+          <section className="server-grid">
+            {servers.map((server) => (
+              <ServerCard key={server.id} server={server} />
+            ))}
           </section>
         </section>
-      </main>
-    </>
+      </section>
+    </div>
   );
 }

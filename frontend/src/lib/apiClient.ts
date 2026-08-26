@@ -1,6 +1,12 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
-import type { Status } from "../types/Status";
 import type { FileContent, FileEntry } from "../types/File";
+import {
+  type Server,
+  type CreateServerRequest,
+  type UpdateServerRequest,
+  type ServerVersion,
+} from "../types/Server";
+import type { Status } from "../types/Status";
 import type { Player } from "../types/Player";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
@@ -11,63 +17,117 @@ export const http = axios.create({
 });
 
 export const api = {
-  server: {
-    start: () => http.post<void>("/server/start").then((res) => res.data),
-
-    stop: () => http.post<void>("/server/stop").then((res) => res.data),
-
-    restart: () => http.post<void>("/server/restart").then((res) => res.data),
-
-    status: () =>
-      http.get<{ status: Status }>("/server/status").then((res) => res.data),
-
-    getPlayers: () =>
-      http.get<Player[]>("/server/players").then((res) => res.data),
-
-    opPlayer: (nickname: string) =>
+  servers: {
+    list: () => http.get<Server[]>("/servers").then((res) => res.data),
+    get: (serverId: number) =>
+      http.get<Server>(`/servers/${serverId}`).then((res) => res.data),
+    create: (data: CreateServerRequest) =>
+      http.post<Server>("/servers", data).then((res) => res.data),
+    update: (serverId: number, data: UpdateServerRequest) =>
+      http.put<Server>(`/servers/${serverId}`, data).then((res) => res.data),
+    delete: (serverId: number) =>
+      http.delete<void>(`/servers/${serverId}`).then((res) => res.data),
+    getReleasedVersions: () =>
       http
-        .patch<void>("/server/players/op", null, { params: { nickname } })
+        .get<ServerVersion[]>("/servers/versions/released")
+        .then((res) => res.data),
+  },
+
+  server: {
+    start: (serverId: number) =>
+      http.post<void>(`/servers/${serverId}/start`).then((res) => res.data),
+
+    stop: (serverId: number) =>
+      http.post<void>(`/servers/${serverId}/stop`).then((res) => res.data),
+
+    restart: (serverId: number) =>
+      http.post<void>(`/servers/${serverId}/restart`).then((res) => res.data),
+
+    status: (serverId: number) =>
+      http
+        .get<{ status: Status }>(`/servers/${serverId}/status`)
+        .then((res) => res.data),
+  },
+
+  player: {
+    getPlayers: (serverId: number) =>
+      http
+        .get<Player[]>(`/servers/${serverId}/players`)
         .then((res) => res.data),
 
-    deopPlayer: (nickname: string) =>
+    opPlayer: (serverId: number, nickname: string) =>
       http
-        .patch<void>("/server/players/deop", null, { params: { nickname } })
+        .patch<void>(
+          `/servers/${serverId}/players/${encodeURIComponent(nickname)}/op`,
+        )
+        .then((res) => res.data),
+
+    deopPlayer: (serverId: number, nickname: string) =>
+      http
+        .patch(
+          `/servers/${serverId}/players/${encodeURIComponent(nickname)}/deop`,
+        )
         .then((res) => res.data),
   },
 
   files: {
-    list: (path = "") =>
+    list: (serverId: number, path = "") =>
       http
-        .get<FileEntry[]>("/files", { params: { path } })
+        .get<FileEntry[]>(`/servers/${serverId}/files`, { params: { path } })
         .then((res) => res.data),
 
-    getContent: (path: string) =>
+    getContent: (serverId: number, path: string) =>
       http
-        .get<FileContent>("/files/content", { params: { path } })
+        .get<FileContent>(`/servers/${serverId}/files/content`, {
+          params: { path },
+        })
         .then((res) => res.data),
 
-    saveContent: (path: string, content: string) =>
+    saveContent: (serverId: number, path: string, content: string) =>
       http
-        .put<void>("/files/content", { content }, { params: { path } })
+        .put<void>(
+          `/servers/${serverId}/files/content`,
+          { content },
+          { params: { path } },
+        )
         .then((res) => res.data),
 
-    downloadUrl: (path: string) =>
-      `${BASE_URL}/files/download?path=${encodeURIComponent(path)}`,
+    downloadUrl: (serverId: number, path: string) =>
+      `${BASE_URL}/servers/${serverId}/files/download?path=${encodeURIComponent(path)}`,
 
-    downloadZipUrl: (path: string) =>
-      `${BASE_URL}/files/download-zip?path=${encodeURIComponent(path)}`,
+    downloadZipUrl: (serverId: number, path: string) =>
+      `${BASE_URL}/servers/${serverId}/files/download-zip?path=${encodeURIComponent(path)}`,
 
-    upload: (path: string, file: File) => {
+    upload: (serverId: number, path: string, file: File) => {
       const formData = new FormData();
       formData.append("file", file);
 
       return http
-        .post<void>("/files/upload", formData, {
+        .post<void>(`/servers/${serverId}/files/upload`, formData, {
           params: { path },
           headers: { "Content-Type": "multipart/form-data" },
         })
         .then((res) => res.data);
     },
+
+    uploadZip: (serverId: number, path: string, zipFile: File) => {
+      const formData = new FormData();
+      formData.append("file", zipFile);
+
+      return http
+        .post<void>(`/servers/${serverId}/files/upload-zip`, formData, {
+          params: { path },
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then((res) => res.data);
+    },
+
+    delete: (serverId: number, path: string) =>
+      http
+        .delete<void>(`/servers/${serverId}/files/delete`, {
+          params: { path },
+        })
+        .then((res) => res.data),
   },
 
   auth: {
@@ -76,8 +136,24 @@ export const api = {
 
     logout: async () => http.post("/auth/logout").then((res) => res.data),
 
+    register: async (name: string, email: string, password: string) =>
+      http
+        .post("/auth/register", { name, email, password })
+        .then((res) => res.data),
+
     me: async () => http.get("/auth/me").then((res) => res.data),
   },
+};
+
+const refreshClient = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true,
+});
+
+type PendingRequest = {
+  resolve: (value: unknown) => void;
+  reject: (reason: unknown) => void;
+  config: RetryableRequestConfig;
 };
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
@@ -85,7 +161,7 @@ interface RetryableRequestConfig extends InternalAxiosRequestConfig {
 }
 
 let isRefreshing = false;
-let pendingRequests: Array<() => void> = [];
+let pendingRequests: PendingRequest[] = [];
 
 http.interceptors.response.use(
   (response) => response,
@@ -98,8 +174,10 @@ http.interceptors.response.use(
       !originalRequest._retry
     ) {
       if (isRefreshing) {
-        return new Promise((resolve) => {
-          pendingRequests.push(() => resolve(http(originalRequest)));
+        originalRequest._retry = true;
+
+        return new Promise((resolve, reject) => {
+          pendingRequests.push({ resolve, reject, config: originalRequest });
         });
       }
 
@@ -107,15 +185,19 @@ http.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await http.post("/auth/refresh-token");
+        await refreshClient.post("/auth/refresh-token");
 
-        pendingRequests.forEach((retry) => retry());
+        pendingRequests.forEach(({ resolve, config }) => resolve(http(config)));
         pendingRequests = [];
 
         return http(originalRequest);
       } catch (refreshError) {
+        pendingRequests.forEach(({ reject }) => reject(refreshError));
         pendingRequests = [];
-        window.location.href = "/login";
+
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
 
         return Promise.reject(refreshError);
       } finally {
