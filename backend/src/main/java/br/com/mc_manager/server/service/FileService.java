@@ -18,11 +18,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 @Service
@@ -179,6 +181,37 @@ public class FileService {
       throw new RuntimeException("Erro ao deletar " + path, e);
     }
 
+  }
+
+  public void uploadZip(Long serverId, String path, MultipartFile zipFile) throws IOException {
+    Path target = resolveSafePath(serverId, path);
+
+    if (!Files.isDirectory(target)) {
+      throw new IllegalArgumentException("O caminho informado não é um diretório");
+    }
+
+    try (ZipInputStream zipIn = new ZipInputStream(zipFile.getInputStream(), StandardCharsets.UTF_8)) {
+      ZipEntry entry;
+
+      while ((entry = zipIn.getNextEntry()) != null) {
+        String entryName = entry.getName().replace('\\', '/');
+
+        Path targetFile = target.resolve(entryName).normalize();
+
+        if (!targetFile.startsWith(target)) {
+          throw new SecurityException("Entrada de zip inválida (fora do diretório): " + entryName);
+        }
+
+        if (entry.isDirectory()) {
+          Files.createDirectories(targetFile);
+        } else {
+          Files.createDirectories(targetFile.getParent());
+          Files.copy(zipIn, targetFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        zipIn.closeEntry();
+      }
+    }
   }
 
   private void deleteFile(Path target) {

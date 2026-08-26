@@ -89,6 +89,18 @@ public class FileController {
     return ResponseEntity.noContent().build();
   }
 
+  @PostMapping("/upload-zip")
+  @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
+  public ResponseEntity<Void> uploadZip(
+          @PathVariable Long serverId,
+          @RequestParam String path,
+          @RequestParam("file") MultipartFile file
+  ) throws IOException {
+    fileService.uploadZip(serverId, path, file);
+
+    return ResponseEntity.noContent().build();
+  }
+
   @DeleteMapping("/delete")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
   public ResponseEntity<Void> delete(@PathVariable Long serverId, @RequestParam String path) throws IOException {
