@@ -1,9 +1,6 @@
-import ServerInfo from "../features/server-info/serverInfo";
-import TopMenu from "../features/navigation/TopMenu";
 import { Navigate, Outlet, useParams } from "react-router-dom";
-import { useState } from "react";
-import Console from "./Console";
-import { useServerId } from "../hooks/useServerId";
+import TopMenu from "../features/navigation/TopMenu";
+import ServerInfo from "../features/server-info/serverInfo";
 
 export default function ServerDashboard() {
   const { serverId } = useParams<{ serverId: string }>();

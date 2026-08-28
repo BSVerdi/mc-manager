@@ -1,8 +1,7 @@
+import { useState } from "react";
 import { Virtuoso } from "react-virtuoso";
 import ConsoleLine from "../components/ConsoleLine";
 import { useConsoleSocket } from "../hooks/useConsoleSocket";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
 import { useServerId } from "../hooks/useServerId";
 
 export default function Console() {

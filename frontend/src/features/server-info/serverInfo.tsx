@@ -1,9 +1,12 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { StartServer } from "../../components/StartServer";
 import { useMetricsSocket } from "../../hooks/useMetricsSocket";
 import { useServerControl } from "../../hooks/useServerControl";
 import { useServerData } from "../../hooks/useServerData";
 import { useStatusSocket } from "../../hooks/useStatusSocket";
 import { api } from "../../lib/apiClient";
 import { Status } from "../../types/Status";
+import { RotateCcw } from "lucide-react";
 
 function formatUptime(totalSeconds: number): string {
   if (totalSeconds <= 0) return "--";
@@ -21,7 +24,7 @@ export default function ServerInfo({ serverId }: { serverId: number }) {
   const status = useStatusSocket(serverId);
   const metrics = useMetricsSocket(serverId);
   const { server } = useServerData(serverId);
-  const { start, stop, restart } = useServerControl(serverId);
+  const { restart } = useServerControl(serverId);
 
   return (
     <section className="server-info">
@@ -73,14 +76,9 @@ export default function ServerInfo({ serverId }: { serverId: number }) {
         </ul>
       </section>
       <section className="commands-buttons">
-        <button onClick={start} className="start">
-          Iniciar
-        </button>
-        <button onClick={restart} className="restart">
-          restart
-        </button>
-        <button onClick={stop} className="stop">
-          Parar
+        <StartServer serverId={serverId} status={status} />
+        <button key="restart" onClick={restart} className="restart-btn">
+          <RotateCcw style={{ width: 32, height: 32 }} />
         </button>
       </section>
     </section>

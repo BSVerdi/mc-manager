@@ -1,11 +1,10 @@
+import { Trash2, TriangleAlert } from "lucide-react";
 import { useState } from "react";
-import { ramSizes, type Option } from "../data/server";
-import Select from "react-select";
-import { api } from "../lib/apiClient";
-import { useServerId } from "../hooks/useServerId";
 import InputItem from "../components/InputItem";
 import SelectItem from "../components/SelectItem";
-import { Trash2, TriangleAlert } from "lucide-react";
+import { ramSizes, type Option } from "../data/server";
+import { useServerId } from "../hooks/useServerId";
+import { api } from "../lib/apiClient";
 
 export default function ServerSettings() {
   const serverId = useServerId();

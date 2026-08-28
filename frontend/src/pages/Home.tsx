@@ -1,13 +1,9 @@
 import { PlusCircle, Server as ServerIcon } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
-import type { Server, Server as server } from "../types/Server";
-import { api } from "../lib/apiClient";
-import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
-import { useServerList } from "../hooks/useServerList";
-import { useServerStatus } from "../hooks/useServerStatus";
+import { useState } from "react";
 import { ServerCard } from "../components/ServerCard";
+import { useAuth } from "../context/AuthContext";
 import CreateServer from "../features/create_server/CreateServer";
+import { useServerList } from "../hooks/useServerList";
 
 export default function Home() {
   const { user } = useAuth();

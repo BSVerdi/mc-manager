@@ -1,7 +1,7 @@
-import { useFileBrowser } from "../hooks/useFileBrowser";
-import { useFileEditor } from "../hooks/useFileEditor";
 import { FileBrowser } from "../features/file-viewer/fileBrowser";
 import { FileEditor } from "../features/file-viewer/fileEditor";
+import { useFileBrowser } from "../hooks/useFileBrowser";
+import { useFileEditor } from "../hooks/useFileEditor";
 import { useServerId } from "../hooks/useServerId";
 
 export type Props = {

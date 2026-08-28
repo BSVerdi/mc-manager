@@ -310,6 +310,14 @@
   box-shadow: var(--shadow-subtle);
 }
 
+.server-card:hover .server-card-icon {
+  transform: scale(1.05);
+}
+
+.server-card-icon {
+  transition: all 0.2s ease-in-out;
+}
+
 .server-card-main {
   flex: 1;
   display: flex;
@@ -335,7 +343,8 @@
   gap: 2px;
 }
 
-.server-btn {
+.server-btn,
+.restart-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -343,28 +352,26 @@
   width: 48px;
   border: none;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: transparent;
+}
+
+.server-btn:hover,
+.restart-btn:hover {
+  transform: scale(1.1);
+}
+
+.server-btn:active,
+.restart-btn:active {
+  transform: scale(1);
 }
 
 .server-btn.start {
-  background-color: transparent;
   color: green;
-  transition: all 0.2s ease-in-out;
-}
-
-.server-btn.start:hover {
-  transform: scale(1.1);
-  box-shadow: none;
 }
 
 .server-btn.stop {
-  background-color: transparent;
   color: red;
-  transition: all 0.2s ease-in-out;
-}
-
-.server-btn.stop:hover {
-  transform: scale(1.1);
-  box-shadow: none;
 }
 
 .create-server-overlay {
@@ -529,7 +536,10 @@
   color: var(--brand-color);
 }
 
-/* server info style  */
+/* =========================== */
+/*      SERVER INFO STYLE      */
+/* =========================== */
+
 .server-info {
   display: flex;
   flex-direction: row;
@@ -554,6 +564,7 @@
 .metrics ul {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   flex-wrap: wrap;
   width: 100%;
   height: 100%;
@@ -574,58 +585,17 @@
 }
 
 .commands-buttons {
+  height: 100%;
   display: flex;
-  align-items: center;
+  justify-content: center;
   padding: 10px;
   gap: 10px;
+  margin-right: 20px;
 }
 
-.commands-buttons button {
-  height: 40px;
-  width: 80px;
-  border: none;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-}
-
-.commands-buttons button:hover {
-  cursor: pointer;
-  transform: translateY(-2px);
-  filter: brightness(1.1);
-}
-
-.commands-buttons button:active {
-  transform: translateY(0);
-}
-
-.start {
-  background-color: lightgreen;
-}
-.start:hover {
-  box-shadow: 0 4px 12px rgba(0, 128, 0, 0.5);
-}
-.start:active {
-  box-shadow: 0 2px 4px rgba(0, 128, 0, 0.3);
-}
-
-.restart {
-  background-color: darkorange;
-}
-.restart:hover {
-  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.5);
-}
-.restart:active {
-  box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3);
-}
-
-.stop {
-  background-color: lightcoral;
-}
-.stop:hover {
-  box-shadow: 0 4px 12px rgba(240, 128, 128, 0.5);
-}
-.stop:active {
-  box-shadow: 0 2px 4px rgba(240, 128, 128, 0.3);
+.restart-btn {
+  color: chocolate;
+  background: transparent;
 }
 
 .server-content {
