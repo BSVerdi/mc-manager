@@ -2,90 +2,94 @@ package br.com.mc_manager.server.service;
 
 import br.com.mc_manager.server.dto.PlayerDTO;
 import br.com.mc_manager.server.model.Player;
+import br.com.mc_manager.server.model.Server;
+import br.com.mc_manager.server.model.ServerPlayer;
+import br.com.mc_manager.server.model.ServerPlayerId;
 import br.com.mc_manager.server.repository.PlayerRepository;
+import br.com.mc_manager.server.repository.ServerPlayerRepository;
 import br.com.mc_manager.server.repository.ServerRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 @Service
 public class PlayerService {
 
   private static final String PLAYER_ICON_BASE_URL = "https://mc-heads.net/avatar/";
-  private final PlayerRepository repository;
+  private final PlayerRepository playerRepository;
   private final ServerRepository serverRepository;
+  private final ServerPlayerRepository serverPlayerRepository;
 
-  public PlayerService(PlayerRepository repository, ServerRepository serverRepository) {
-    this.repository = repository;
+  public PlayerService(PlayerRepository repository, ServerRepository serverRepository, ServerPlayerRepository serverPlayerRepository) {
+    this.playerRepository = repository;
     this.serverRepository = serverRepository;
+    this.serverPlayerRepository = serverPlayerRepository;
   }
 
   public List<PlayerDTO> listServerPlayers(Long serverId) {
-    var players = repository.findByServerId(serverId);
+    List<ServerPlayer> players = serverPlayerRepository.findByServerId(serverId);
 
     return players.stream().map(PlayerDTO::new).toList();
   }
 
-  public Player getServerPlayer(Long serverId, String nickname) {
-    var existsPlayer = repository.existsByServerIdAndNickname(serverId, nickname);
+  public void saveServerPlayer(Long serverId, String nickname) {
+    Player player = playerRepository.findByNickname(nickname)
+            .orElseGet(() -> playerRepository.save(
+                    new Player(nickname, PLAYER_ICON_BASE_URL + nickname + "/48")
+            ));
 
-    if (!existsPlayer) {
-      var player = saveServerPlayer(serverId, nickname);
+    ServerPlayerId serverPlayerId = new ServerPlayerId(serverId, player.getId());
+    boolean alreadyLinked = serverPlayerRepository.existsById(serverPlayerId);
 
-      return player;
+    if (!alreadyLinked) {
+      Server server = serverRepository.findById(serverId).orElseThrow();
+      ServerPlayer memberShip = new ServerPlayer(server, player);
+
+      serverPlayerRepository.save(memberShip);
     }
-
-    var player = repository.findByServerIdAndNickname(serverId, nickname).orElseThrow();
-
-    return player;
   }
 
-  private Player saveServerPlayer(Long serverId, String nickname) {
-    var server = serverRepository.findById(serverId).orElseThrow();
-
-    var player = new Player(
-            nickname,
-            PLAYER_ICON_BASE_URL + nickname + "/48",
-            server
-    );
-
-    return repository.save(player);
+  public void playerConnected(Long serverId, String nickname) {
+    updateStatus(serverId, nickname, ServerPlayer::playerConnected);
   }
 
-  public void playerConnected(Player player) {
-    player.playerConnected();
-
-    repository.save(player);
+  public void playerDisconnected(Long serverId, String nickname) {
+    updateStatus(serverId, nickname, ServerPlayer::playerDisconnected);
   }
 
-  public void playerDisconnected(Player player) {
-    player.playerDisconnected();
-
-    repository.save(player);
+  public void opPlayer(Long serverId, String nickname) {
+    updateStatus(serverId, nickname, ServerPlayer::operator);
   }
 
-  public void opPlayer(Player player) {
-    player.operator();
-
-    repository.save(player);
+  public void deopPlayer(Long serverId, String nickname) {
+    updateStatus(serverId, nickname, ServerPlayer::deOperator);
   }
 
-  public void deopPlayer(Player player) {
-    player.deOperator();
-
-    repository.save(player);
+  public void banPlayer(Long serverId, String nickname) {
+    updateStatus(serverId, nickname, ServerPlayer::banned);
   }
 
-  public void banPlayer(Player player) {
-    player.banned();
-
-    repository.save(player);
+  public void unbanPlayer(Long serverId, String nickname) {
+    updateStatus(serverId, nickname, ServerPlayer::unBanned);
   }
 
-  public void unbanPlayer(Player player) {
-    player.unBanned();
+  private void updateStatus(Long serverId, String nickname, Consumer<ServerPlayer> action) {
+    ServerPlayer serverPlayer = findServerPlayer(serverId, nickname);
 
-    repository.save(player);
+    action.accept(serverPlayer);
+    serverPlayerRepository.save(serverPlayer);
+  }
+
+  private ServerPlayer findServerPlayer(Long serverId, String nickname) {
+    Player player = playerRepository.findByNickname(nickname)
+            .orElseThrow(() -> new IllegalArgumentException("Player não encontrado!"));
+
+    ServerPlayerId serverPlayerId = new ServerPlayerId(serverId, player.getId());
+    ServerPlayer serverPlayer = serverPlayerRepository.findById(serverPlayerId)
+            .orElseThrow(() -> new IllegalArgumentException("Player não está associado ao servidor!"));
+
+    return serverPlayer;
   }
 
 }

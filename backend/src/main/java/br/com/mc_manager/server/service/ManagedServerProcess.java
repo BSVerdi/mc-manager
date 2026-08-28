@@ -1,8 +1,6 @@
 package br.com.mc_manager.server.service;
 
 import br.com.mc_manager.server.dto.LogLineDTO;
-import br.com.mc_manager.server.dto.PlayerDTO;
-import br.com.mc_manager.server.model.Player;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.ServerStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -11,14 +9,12 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,7 +36,7 @@ public class ManagedServerProcess {
   private final ExecutorService executor;
   private final Long maxRamMb;
 
-  private final Set<Player> onlinePlayers = ConcurrentHashMap.newKeySet();
+  private final Set<String> onlinePlayers = ConcurrentHashMap.newKeySet();
   private final AtomicLong idCounter = new AtomicLong();
   private final AtomicReference<ServerStatus> status = new AtomicReference<>(ServerStatus.OFFLINE);
 
@@ -157,6 +153,10 @@ public class ManagedServerProcess {
   }
 
   public synchronized void restart() {
+    if (process == null || !process.isAlive()) {
+      broadcastLine("[CONSOLE] Não é possível reiniciar servidor offline");
+      return;
+    }
     broadcastLine("[CONSOLE] Servidor reiniciando");
 
     stopThen(this::start);
@@ -178,37 +178,27 @@ public class ManagedServerProcess {
   }
 
   public void opPlayer(String nickname) {
-    getPlayerAndExecuteAMethod(nickname, playerService::opPlayer);
-
+    playerService.opPlayer(server.getId(), nickname);
     sendCommand("op " + nickname);
   }
 
   public void deOpPlayer(String nickname) {
-    getPlayerAndExecuteAMethod(nickname, playerService::deopPlayer);
-
+    playerService.deopPlayer(server.getId(), nickname);
     sendCommand("deop " + nickname);
   }
 
   public void banPlayer(String nickname) {
-    getPlayerAndExecuteAMethod(nickname, playerService::banPlayer);
-
+    playerService.banPlayer(server.getId(), nickname);
     sendCommand("ban " + nickname);
   }
 
   public void unbanPlayer(String nickname) {
-    getPlayerAndExecuteAMethod(nickname, playerService::unbanPlayer);
-
+    playerService.unbanPlayer(server.getId(), nickname);
     sendCommand("unban " + nickname);
   }
 
   public Integer getOnlinePlayersCount() {
     return onlinePlayers.size();
-  }
-
-  public List<PlayerDTO> getOnlinePlayersList() {
-    var playersDto = onlinePlayers.stream().map(PlayerDTO::new).toList();
-
-    return playersDto;
   }
 
   public synchronized void stopThen(Runnable onStopped) {
@@ -287,10 +277,10 @@ public class ManagedServerProcess {
     if (joinMatcher.matches()) {
       var playerName = joinMatcher.group(1);
 
-      var player = playerService.getServerPlayer(this.server.getId(), playerName);
-      playerService.playerConnected(player);
+      playerService.saveServerPlayer(server.getId(), playerName);
+      playerService.playerConnected(server.getId(), playerName);
 
-      onlinePlayers.add(player);
+      onlinePlayers.add(playerName);
 
       return;
     }
@@ -299,10 +289,8 @@ public class ManagedServerProcess {
     if (leaverMatcher.matches()) {
       var playerNickname = leaverMatcher.group(1);
 
-      getPlayerAndExecuteAMethod(playerNickname, (player) -> {
-        playerService.playerDisconnected(player);
-        onlinePlayers.remove(player);
-      });
+      playerService.playerDisconnected(server.getId(), playerNickname);
+      onlinePlayers.remove(playerNickname);
     }
 
   }
@@ -320,15 +308,8 @@ public class ManagedServerProcess {
   }
 
   private void disconnectAllPlayers() {
-    onlinePlayers.forEach(playerService::playerDisconnected);
+    onlinePlayers.forEach((playerName) -> playerService.playerDisconnected(server.getId(), playerName));
     onlinePlayers.clear();
-  }
-
-  private void getPlayerAndExecuteAMethod(String nickname, Consumer<Player> action) {
-    onlinePlayers.stream()
-            .filter(player -> player.getNickname().equals(nickname))
-            .findFirst()
-            .ifPresent(action);
   }
 
 }

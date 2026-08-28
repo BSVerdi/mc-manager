@@ -1,6 +1,5 @@
 package br.com.mc_manager.server.service;
 
-import br.com.mc_manager.server.dto.PlayerDTO;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.repository.ServerRepository;
@@ -9,7 +8,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -103,10 +101,6 @@ public class ServerRuntimeService {
 
   public Instant getStartedAt(Long serverId) {
     return getExistingInstance(serverId).map(ManagedServerProcess::getStartedAt).orElse(null);
-  }
-
-  public List<PlayerDTO> getOnlinePlayersList(Long serverId) {
-    return getExistingInstance(serverId).map(ManagedServerProcess::getOnlinePlayersList).orElse(List.of());
   }
 
   public Set<Long> getActiveServersIds() {

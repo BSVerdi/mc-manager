@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.dto;
 
-import br.com.mc_manager.server.model.Player;
+import br.com.mc_manager.server.model.ServerPlayer;
 
 import java.time.Instant;
 
@@ -13,15 +13,15 @@ public record PlayerDTO(
         Boolean online,
         Instant lastLogin
 ) {
-  public PlayerDTO(Player player) {
+  public PlayerDTO(ServerPlayer serverPlayer) {
     this(
-            player.getId(),
-            player.getNickname(),
-            player.getIcon(),
-            player.getBanned(),
-            player.getOperator(),
-            player.getOnline(),
-            player.getLastLogin()
+            serverPlayer.getPlayer().getId(),
+            serverPlayer.getPlayer().getNickname(),
+            serverPlayer.getPlayer().getIcon(),
+            serverPlayer.isBanned(),
+            serverPlayer.isOperator(),
+            serverPlayer.isOnline(),
+            serverPlayer.getLastLogin()
     );
   }
 }

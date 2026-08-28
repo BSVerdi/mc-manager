@@ -8,7 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "servers")
@@ -31,8 +32,8 @@ public class Server {
   @ManyToOne(fetch = FetchType.LAZY)
   private User owner;
 
-  @OneToMany(mappedBy = "server", cascade = CascadeType.REMOVE)
-  private List<Player> players;
+  @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<ServerPlayer> players = new HashSet<>();
 
   private Instant createdAt;
 

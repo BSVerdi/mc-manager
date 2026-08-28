@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "players")
@@ -20,48 +21,13 @@ public class Player {
 
   private String nickname;
   private String icon;
-  private Boolean banned;
-  private Boolean operator;
-  private Boolean online;
-  private Instant lastLogin;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Server server;
+  @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<ServerPlayer> server = new HashSet<>();
 
-  public Player(String nickname, String icon, Server server) {
+  public Player(String nickname, String icon) {
     this.nickname = nickname;
     this.icon = icon;
-    this.server = server;
-
-    this.online = true;
-    this.banned = false;
-    this.operator = false;
-
-    this.lastLogin = null;
-  }
-
-  public void playerDisconnected() {
-    this.online = false;
-  }
-
-  public void playerConnected() {
-    this.online = true;
-  }
-
-  public void banned() {
-    this.banned = true;
-  }
-
-  public void unBanned() {
-    this.banned = false;
-  }
-
-  public void operator() {
-    this.operator = true;
-  }
-
-  public void deOperator() {
-    this.operator = false;
   }
 
 }
