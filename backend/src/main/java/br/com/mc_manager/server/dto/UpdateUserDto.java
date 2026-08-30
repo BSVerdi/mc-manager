@@ -1,4 +1,8 @@
 package br.com.mc_manager.server.dto;
 
-public class UpdateUserDto {
+import jakarta.validation.constraints.NotBlank;
+
+public record UpdateUserDto(
+        @NotBlank String username
+) {
 }

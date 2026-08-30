@@ -8,6 +8,7 @@ import br.com.mc_manager.server.model.ServerPlayerId;
 import br.com.mc_manager.server.repository.PlayerRepository;
 import br.com.mc_manager.server.repository.ServerPlayerRepository;
 import br.com.mc_manager.server.repository.ServerRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -74,11 +75,11 @@ public class PlayerService {
     updateStatus(serverId, nickname, ServerPlayer::unBanned);
   }
 
+  @Transactional
   private void updateStatus(Long serverId, String nickname, Consumer<ServerPlayer> action) {
     ServerPlayer serverPlayer = findServerPlayer(serverId, nickname);
 
     action.accept(serverPlayer);
-    serverPlayerRepository.save(serverPlayer);
   }
 
   private ServerPlayer findServerPlayer(Long serverId, String nickname) {

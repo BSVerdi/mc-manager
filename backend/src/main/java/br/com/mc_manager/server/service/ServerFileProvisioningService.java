@@ -17,7 +17,7 @@ import java.util.Comparator;
 public class ServerFileProvisioningService {
 
   private final MinecraftMetaDataService minecraftMetaDataService;
-  @Value("${mcmanager.servers-root-directory}")
+  @Value("${mcmanager.data-root-directory}" + "/servers")
   private String rootDirectory;
 
   public ServerFileProvisioningService(MinecraftMetaDataService minecraftMetaDataService) {

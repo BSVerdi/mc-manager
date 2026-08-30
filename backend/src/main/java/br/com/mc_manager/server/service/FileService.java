@@ -171,7 +171,7 @@ public class FileService {
     if (!Files.exists(target)) return;
 
     if (Files.isDirectory(target)) {
-      deleteFile(target);
+      deleteFiles(target);
       return;
     }
 
@@ -214,7 +214,7 @@ public class FileService {
     }
   }
 
-  private void deleteFile(Path target) {
+  private void deleteFiles(Path target) {
     try (var walk = Files.walk(target)) {
       walk.sorted(Comparator.reverseOrder())
               .forEach(path -> {
@@ -256,7 +256,7 @@ public class FileService {
     }
   }
 
-  private String extractExtension(String name) {
+  public String extractExtension(String name) {
     int dotIndex = name.lastIndexOf('.');
 
     return dotIndex >= 0 ? name.substring(dotIndex + 1).toLowerCase() : "";

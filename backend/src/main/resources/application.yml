@@ -21,8 +21,7 @@ server:
   port: 8080
 
 mcmanager:
-  servers-root-directory: ${SERVERS-ROOT-DIRECTORY}
-  server-directory: ${SERVER-DIRECTORY}
+  data-root-directory: ${DATA-ROOT-DIRECTORY}
   java-8: ${JAVA8-PATH}
   java-21: ${JAVA21-PATH}
   java-25: ${JAVA25-PATH}
