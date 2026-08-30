@@ -5,14 +5,16 @@ type InputItemProps = {
   defaultValue?: string;
   setFunction: (value: any) => void;
   isRequired?: boolean;
+  disabled?: boolean;
 };
 
-export default function Input({
+export default function InputItem({
   type,
   title,
   placeHolder,
   defaultValue,
-  setFunction: stateFunction,
+  setFunction,
+  disabled,
 }: InputItemProps) {
   return (
     <div className="input-item-container">
@@ -21,8 +23,9 @@ export default function Input({
         type={type}
         placeholder={placeHolder}
         defaultValue={defaultValue}
-        onChange={(e) => stateFunction(e.target.value)}
+        onChange={(e) => setFunction(e.target.value)}
         className="input-item"
+        disabled={disabled}
       />
     </div>
   );

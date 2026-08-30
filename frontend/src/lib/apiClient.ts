@@ -1,13 +1,13 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import type { FileContent, FileEntry } from "../types/File";
+import type { Player } from "../types/Player";
 import {
-  type Server,
   type CreateServerRequest,
-  type UpdateServerRequest,
+  type Server,
   type ServerVersion,
+  type UpdateServerRequest,
 } from "../types/Server";
 import type { Status } from "../types/Status";
-import type { Player } from "../types/Player";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -142,6 +142,29 @@ export const api = {
         .then((res) => res.data),
 
     me: async () => http.get("/auth/me").then((res) => res.data),
+  },
+
+  user: {
+    update: async (userId: number, username: string) =>
+      http
+        .patch(`/users/${userId}/update-user`, { username })
+        .then((res) => res.data),
+
+    updateProfilePic: async (userId: number, file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      return http
+        .patch(`/users/${userId}/profile-picture`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => res.data);
+    },
+
+    delete: async (userId: number) =>
+      http.delete(`/users/${userId}/delete`).then((res) => res.data),
   },
 };
 

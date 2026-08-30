@@ -2,5 +2,8 @@ export type User = {
   id: number;
   username: string;
   email: string;
-  role: "USER" | "ADMIN" | "SUPERADMIN";
+  profilePictureUrl: string;
+  enable: boolean;
+  createdAt: number;
+  updatedAt: number;
 };

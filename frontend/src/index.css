@@ -1130,7 +1130,119 @@
 }
 
 /* ========================== */
-/*      COMPONENTS STYLE      */
+/*      SETTINGS STYLES       */
+/* ========================== */
+
+.settings-container {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.settings-user-container {
+  width: 100%;
+}
+
+.settings-user-header {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 20px;
+}
+
+.settings-user-header h2 {
+  padding-left: 5px;
+}
+
+.settings-user-content {
+  height: 400px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-subtle);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.settings-user-profile-pic-container {
+  width: 350px;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-profile-picture {
+  width: 256px;
+  height: 256px;
+  position: relative;
+}
+
+.picture {
+  width: 256px;
+  height: 256px;
+  border-radius: 50%;
+  border: 2px solid black;
+}
+
+.picture-upload-overlay {
+  width: 256px;
+  height: 256px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #b9babd7c;
+  border: none;
+  border-radius: 50%;
+  padding: 5px;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.picture-upload-overlay:hover {
+  opacity: 1;
+}
+
+.user-profile-picture-title {
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+  justify-content: center;
+  gap: 5px;
+  font-size: 16px;
+}
+
+.settings-user-info-container {
+  width: 800px;
+  min-width: 500px;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 10px;
+}
+
+.settings-user-info-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.settings-user-info-item-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ========================== */
+/*      COMPONENTS STYLES     */
 /* ========================== */
 
 .input-item-container,
@@ -1212,4 +1324,76 @@
 .upload-menu-item:hover {
   background: var(--brand-bg);
   color: var(--brand-color);
+}
+
+.image-cropper-overlay {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+}
+
+.image-cropper-container {
+  width: 512px;
+  height: 512px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-card);
+  border-radius: 10px;
+}
+
+.image-cropper-header {
+  height: 40px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.image-cropper-close-btn {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.image-cropper-close-btn:hover {
+  transform: scale(1.1);
+}
+
+.image-cropper-close-btn:active {
+  transform: scale(1);
+}
+
+.image-cropper {
+  position: relative;
+  width: 384px;
+  height: 384px;
+  border-radius: 50%;
+  background-color: #b9babd7c;
+  margin: 10px 0px;
+}
+
+.image-cropper .reactEasyCrop_Container {
+  border: 1px solid black;
+  border-radius: 50%;
+}
+
+.image-cropper-btns {
+  height: 60px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--border-color);
 }

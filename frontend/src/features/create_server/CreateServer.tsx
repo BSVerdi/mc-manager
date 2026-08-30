@@ -1,16 +1,15 @@
-import { useState } from "react";
-import Select from "react-select";
-import { useServerVersions } from "../../hooks/useServerVersions";
 import { AnimatePresence, motion } from "framer-motion";
-import { createPortal } from "react-dom";
 import { X } from "lucide-react";
-import { api } from "../../lib/apiClient";
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { ramSizes, type Option } from "../../data/server";
 import InputItem from "../../components/InputItem";
 import SelectItem from "../../components/SelectItem";
+import { ramSizes, type Option } from "../../data/server";
+import { useServerVersions } from "../../hooks/useServerVersions";
+import { api } from "../../lib/apiClient";
 
-const Portal = ({ children }: { children: React.ReactNode }) => {
+export const Portal = ({ children }: { children: React.ReactNode }) => {
   const mountNode = document.getElementById("portal-root");
 
   if (!mountNode) return null;
