@@ -11,12 +11,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +28,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 @Service
-public class FileService {
+public class FileStorageService {
 
   private static final Set<String> BLOCKED_EXTENSIONS = Set.of(
           "jar", "class", "exe", "dll", "so", "mca", "dat", "zip", "gz"
@@ -35,20 +37,67 @@ public class FileService {
   @Value("${mcmanager.data-root-directory}")
   private String dataRootDirectory;
 
-  public FileService(ServerFilesService serverFileProvisioningService) {
+  public void createFolder(String scope, String targetPath) {
+    Path path = resolveSafePath(scope, targetPath);
+
+    try {
+      Files.createDirectories(path);
+    } catch (IOException e) {
+      throw new RuntimeException("Erro ao criar pasta.", e);
+    }
   }
 
-  public void saveFile(String targetPath, String fileName, MultipartFile multipartFile) throws IOException {
-    Path folderPath = getFolderPath(targetPath);
+  public void createFile(String scope, String fileName) {
+    Path path = resolveSafePath(scope, fileName);
 
+    try {
+      Files.createFile(path);
+    } catch (IOException e) {
+      throw new RuntimeException("Erro ao criar arquivo.", e);
+    }
+  }
+
+  public void saveFile(String scope, String targetPath, MultipartFile file) throws IOException {
+    Path filePath = resolveSafePath(scope, targetPath);
+
+    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+  }
+
+  public void saveFile(Path filePath, MultipartFile file) throws IOException {
+    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+  }
+
+  public void saveFile(String scope, String targetPath, InputStream in) throws IOException {
+    Path filePath = resolveSafePath(scope, targetPath);
+
+    Files.copy(in, filePath, StandardCopyOption.REPLACE_EXISTING);
+  }
+
+  public void delete(String scope, String targetPath) throws IOException {
+    Path target = resolveSafePath(scope, targetPath);
+
+    if (!Files.exists(target)) return;
+
+    if (Files.isDirectory(target)) {
+      deleteFolder(scope, targetPath);
+      return;
+    }
+
+    deleteFile(target);
+  }
+
+  public void deleteFile(String scope, String targetFilePath) throws IOException {
+    Path filePath = resolveSafePath(scope, targetFilePath);
+
+    Files.deleteIfExists(filePath);
   }
 
   public void deleteFile(Path filePath) throws IOException {
     Files.deleteIfExists(filePath);
   }
 
-  public void deleteFolder(String targetPath) throws IOException {
-    Path folderPath = getFolderPath(targetPath);
+  public void deleteFolder(String scope, String targetPath) throws IOException {
+    Path folderPath = getFolderPath(scope, targetPath);
 
     try (var walk = Files.walk(folderPath)) {
       walk.sorted(Comparator.reverseOrder())
@@ -62,10 +111,10 @@ public class FileService {
     }
   }
 
-  public List<FileEntryDTO> listFiles(String targetFolderPath) throws IOException {
-    Path folderPath = getFolderPath(targetFolderPath);
+  public List<FileEntryDTO> listFiles(String targetFolderPath, String path) throws IOException {
+    Path folderPath = getFolderPath(targetFolderPath, path);
 
-    try (Stream<Path> walk = Files.walk(folderPath)) {
+    try (Stream<Path> walk = Files.list(folderPath)) {
       var files = walk.map(this::toFileEntryDTO)
               .sorted(Comparator.comparing(FileEntryDTO::directory).reversed()
                       .thenComparing(FileEntryDTO::name))
@@ -75,36 +124,32 @@ public class FileService {
     }
   }
 
-  public FileContentDTO getFileContent(String targetFilePath) throws IOException {
-    Path filePath = getFilePath(targetFilePath);
+  public FileContentDTO getFileContent(String scope, String targetFilePath) throws IOException {
+    Path filePath = getFilePath(scope, targetFilePath);
 
     String fileName = filePath.getFileName().toString();
     String extension = extractExtension(fileName);
 
     if (!isEditable(filePath)) {
-      return new FileContentDTO(filePath.toString(), "", false, extension);
+      return new FileContentDTO(targetFilePath, "", false, extension);
     }
 
     String fileContent = Files.readString(filePath, StandardCharsets.UTF_8);
-    return new FileContentDTO(filePath.toString(), fileContent, true, extension);
+    return new FileContentDTO(targetFilePath, fileContent, true, extension);
   }
 
-  public void saveFileContent(String targetFilePath, FileContentDTO fileContentDTO) throws IOException {
-    Path filePath = getFilePath(targetFilePath);
-
-    if (Files.exists(filePath) && !Files.isRegularFile(filePath)) {
-      throw new IllegalArgumentException("O caminho informado não é um arquivo.");
-    }
+  public void saveFileContent(String scope, String targetFilePath, String content) throws IOException {
+    Path filePath = getFilePath(scope, targetFilePath);
 
     if (!isEditable(filePath)) {
       throw new IllegalArgumentException("O caminho informado não é um arquivo");
     }
 
-    Files.writeString(filePath, fileContentDTO.content(), StandardCharsets.UTF_8);
+    Files.writeString(filePath, content, StandardCharsets.UTF_8);
   }
 
-  public MediaDto downloadFile(String targetFilePath) throws IOException {
-    Path filePath = getFilePath(targetFilePath);
+  public MediaDto downloadFile(String scope, String targetFilePath) throws IOException {
+    Path filePath = getFilePath(scope, targetFilePath);
 
     Resource resource;
     try {
@@ -121,53 +166,45 @@ public class FileService {
     return new MediaDto(mediaType, resource, filePath.getFileName());
   }
 
-  public void downloadFolder(String targetFolderPath, OutputStream outputStream) throws IOException {
-    Path folderPath = getFolderPath(targetFolderPath);
+  public void downloadFolder(String scope, String targetFolderPath, OutputStream outputStream) throws IOException {
+    Path folderPath = getFolderPath(scope, targetFolderPath);
 
     try (ZipOutputStream zipOut = new ZipOutputStream(outputStream)) {
       zipFolder(folderPath, zipOut);
     }
   }
 
-  public void uploadFile(String targetFilePath, MultipartFile file) throws IOException {
-    Path filePath = getFilePath(targetFilePath);
+  public void uploadFile(String scope, String targetFilePath, MultipartFile file) throws IOException {
+    Path filePath = resolveSafePath(scope, targetFilePath);
 
     String originalFilename = file.getOriginalFilename();
-
     if (originalFilename == null || originalFilename.isBlank()) {
       throw new IllegalArgumentException("Nome de arquivo inválido.");
     }
 
-    String safeFileName = Paths.get(originalFilename).getFileName().toString();
-    Path expectedFilePath = Paths.get(filePath.getParent().toString(), safeFileName);
-
-    if (!targetFilePath.startsWith(dataRootDirectory)) {
-      throw new SecurityException("Nome do arquivo inválido: " + originalFilename);
-    }
-
-    file.transferTo(expectedFilePath.toFile());
+    saveFile(filePath, file);
   }
 
-  public void uploadFolder(String path, MultipartFile zipFile) throws IOException {
-    Path folderPath = getFolderPath(path);
+  public void uploadFolder(String scope, String targetFilePath, MultipartFile zipFile) throws IOException {
+    Path folderPath = getFolderPath(scope, targetFilePath);
 
     try (ZipInputStream zipIn = new ZipInputStream(zipFile.getInputStream(), StandardCharsets.UTF_8)) {
       unzipFolder(folderPath, zipIn);
     }
   }
 
-  private Path getFolderPath(String path) {
-    Path folderPath = resolveSafePath(path);
+  private Path getFolderPath(String scope, String path) {
+    Path folderPath = resolveSafePath(scope, path);
 
-    if (Files.isDirectory(folderPath)) {
+    if (!Files.isDirectory(folderPath)) {
       throw new IllegalArgumentException("O caminho informado não é um diretório");
     }
 
     return folderPath;
   }
 
-  private Path getFilePath(String path) {
-    Path filePath = resolveSafePath(path);
+  private Path getFilePath(String scope, String path) {
+    Path filePath = resolveSafePath(scope, path);
 
     if (!Files.isRegularFile(filePath)) {
       throw new IllegalArgumentException("O caminho informado não é um arquivo.");
@@ -251,15 +288,20 @@ public class FileService {
     return dotIndex >= 0 ? name.substring(dotIndex + 1).toLowerCase() : "";
   }
 
-  private Path resolveSafePath(String path) {
+  public Path resolveSafePath(String scopeRelativePath, String path) {
     Path base = Paths.get(dataRootDirectory).normalize().toAbsolutePath();
-    Path targetPath = base.resolve(path).normalize();
+    Path scope = base.resolve(scopeRelativePath).normalize();
 
-    if (!targetPath.startsWith(base)) {
+    if (!scope.startsWith(base)) {
       throw new SecurityException("Caminho fora do diretório do servidor");
+    }
+
+    Path targetPath = scope.resolve(path).normalize();
+
+    if (!targetPath.startsWith(scope)) {
+      throw new SecurityException("Caminho fora do escopo permitido");
     }
 
     return targetPath;
   }
-
 }

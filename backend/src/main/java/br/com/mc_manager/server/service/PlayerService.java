@@ -51,31 +51,37 @@ public class PlayerService {
     }
   }
 
+  @Transactional
   public void playerConnected(Long serverId, String nickname) {
     updateStatus(serverId, nickname, ServerPlayer::playerConnected);
   }
 
+  @Transactional
   public void playerDisconnected(Long serverId, String nickname) {
     updateStatus(serverId, nickname, ServerPlayer::playerDisconnected);
   }
 
+  @Transactional
   public void opPlayer(Long serverId, String nickname) {
     updateStatus(serverId, nickname, ServerPlayer::operator);
   }
 
+  @Transactional
   public void deopPlayer(Long serverId, String nickname) {
     updateStatus(serverId, nickname, ServerPlayer::deOperator);
   }
 
+  @Transactional
   public void banPlayer(Long serverId, String nickname) {
     updateStatus(serverId, nickname, ServerPlayer::banned);
   }
 
+  @Transactional
   public void unbanPlayer(Long serverId, String nickname) {
     updateStatus(serverId, nickname, ServerPlayer::unBanned);
   }
 
-  @Transactional
+
   private void updateStatus(Long serverId, String nickname, Consumer<ServerPlayer> action) {
     ServerPlayer serverPlayer = findServerPlayer(serverId, nickname);
 

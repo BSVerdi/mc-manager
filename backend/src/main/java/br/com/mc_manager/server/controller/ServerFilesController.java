@@ -4,14 +4,16 @@ import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
 import br.com.mc_manager.server.dto.MediaDto;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
-import br.com.mc_manager.server.service.FileService;
+import br.com.mc_manager.server.service.ServerFilesService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -20,12 +22,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/servers/{serverId}/files")
-public class FileController {
+public class ServerFilesController {
 
-  private final FileService fileService;
+  private final ServerFilesService serverFileService;
 
-  public FileController(FileService fileService) {
-    this.fileService = fileService;
+  public ServerFilesController(ServerFilesService serverFileService) {
+    this.serverFileService = serverFileService;
   }
 
   @GetMapping
@@ -33,8 +35,8 @@ public class FileController {
   public ResponseEntity<List<FileEntryDTO>> list(
           @PathVariable Long serverId,
           @RequestParam(defaultValue = "") String path
-  ) {
-    var files = fileService.listFiles(serverId, path);
+  ) throws IOException {
+    var files = serverFileService.listServerFiles(serverId, path);
 
     return ResponseEntity.ok(files);
   }
@@ -42,7 +44,7 @@ public class FileController {
   @GetMapping("/content")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
   public ResponseEntity<FileContentDTO> getContent(@PathVariable Long serverId, @RequestParam String path) throws IOException {
-    var content = fileService.getContent(serverId, path);
+    var content = serverFileService.getFileContent(serverId, path);
 
     return ResponseEntity.ok(content);
   }
@@ -50,7 +52,7 @@ public class FileController {
   @PutMapping("/content")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
   public ResponseEntity<Void> saveContent(@PathVariable Long serverId, @RequestParam String path, @RequestBody SaveFileRequestDTO request) throws IOException {
-    fileService.saveContent(serverId, path, request);
+    serverFileService.saveFileContent(serverId, path, request);
 
     return ResponseEntity.noContent().build();
   }
@@ -58,7 +60,7 @@ public class FileController {
   @GetMapping("/download")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
   public ResponseEntity<Resource> download(@PathVariable Long serverId, @RequestParam String path) throws IOException {
-    MediaDto media = fileService.download(serverId, path);
+    MediaDto media = serverFileService.downloadFile(serverId, path);
 
     String fileName = media.path().toString();
     String encoded = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replace("+", "%20");
@@ -72,9 +74,16 @@ public class FileController {
 
   @GetMapping("/download-zip")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
-  public void downloadZip(@PathVariable Long serverId, @RequestParam String path, HttpServletResponse response
+  public ResponseEntity<StreamingResponseBody> downloadZip(@PathVariable Long serverId, @RequestParam String path, HttpServletResponse response
   ) throws IOException {
-    fileService.downloadZip(serverId, path, response);
+    StreamingResponseBody responseBody = out -> {
+      serverFileService.downloadFolder(serverId, path, out);
+    };
+
+    return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType("application/zip"))
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"files.zip\"")
+            .body(responseBody);
   }
 
   @PostMapping("/upload")
@@ -84,7 +93,7 @@ public class FileController {
           @RequestParam(defaultValue = "") String path,
           @RequestParam("file") MultipartFile file
   ) throws IOException {
-    fileService.upload(serverId, path, file);
+    serverFileService.uploadFile(serverId, path, file);
 
     return ResponseEntity.noContent().build();
   }
@@ -96,7 +105,7 @@ public class FileController {
           @RequestParam String path,
           @RequestParam("file") MultipartFile file
   ) throws IOException {
-    fileService.uploadZip(serverId, path, file);
+    serverFileService.uploadFolder(serverId, path, file);
 
     return ResponseEntity.noContent().build();
   }
@@ -104,7 +113,7 @@ public class FileController {
   @DeleteMapping("/delete")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
   public ResponseEntity<Void> delete(@PathVariable Long serverId, @RequestParam String path) throws IOException {
-    fileService.delete(serverId, path);
+    serverFileService.delete(serverId, path);
 
     return ResponseEntity.noContent().build();
   }

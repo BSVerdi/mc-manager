@@ -19,9 +19,9 @@ public class ServerManagementService {
 
   private final ServerRepository serverRepository;
   private final UserService userService;
-  private final ServerFileProvisioningService provisioningService;
+  private final ServerFilesService provisioningService;
 
-  public ServerManagementService(ServerRepository serverRepository, UserService userService, ServerFileProvisioningService provisioningService) {
+  public ServerManagementService(ServerRepository serverRepository, UserService userService, ServerFilesService provisioningService) {
     this.serverRepository = serverRepository;
     this.userService = userService;
     this.provisioningService = provisioningService;
@@ -53,9 +53,9 @@ public class ServerManagementService {
     server = serverRepository.save(server);
 
     try {
-      provisioningService.provision(server);
+      provisioningService.createBaseServerFiles(server.getId(), server.getPort());
 
-      String javaVersion = provisioningService.downloadVanillaJar(server);
+      String javaVersion = provisioningService.downloadVanillaJar(server.getId(), server.getVersion());
 
       server.updateJavaVersion("JAVA_" + javaVersion);
     } catch (IOException e) {

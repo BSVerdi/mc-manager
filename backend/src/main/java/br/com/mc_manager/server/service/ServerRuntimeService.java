@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,7 +24,7 @@ public class ServerRuntimeService {
   private final Map<Long, ManagedServerProcess> instances = new ConcurrentHashMap<>();
 
   private final ServerRepository serverRepository;
-  private final ServerFileProvisioningService provisioningService;
+  private final ServerFilesService provisioningService;
   private final SimpMessagingTemplate template;
   private final PlayerService playerService;
 
@@ -34,7 +35,7 @@ public class ServerRuntimeService {
   @Value("${mcmanager.java-25}")
   private String java25;
 
-  public ServerRuntimeService(ServerRepository serverRepository, ServerFileProvisioningService provisioningService, SimpMessagingTemplate template, PlayerService playerService) {
+  public ServerRuntimeService(ServerRepository serverRepository, ServerFilesService provisioningService, SimpMessagingTemplate template, PlayerService playerService) {
     this.serverRepository = serverRepository;
     this.provisioningService = provisioningService;
     this.template = template;
@@ -54,23 +55,23 @@ public class ServerRuntimeService {
   }
 
   public void sendCommand(Long serverId, String command) {
-    getOrCreateInstance(serverId).sendCommand(command);
+    executeAnInstanceMethod(serverId, (server) -> server.sendCommand(command));
   }
 
   public void opPlayer(Long serverId, String nickname) {
-    getOrCreateInstance(serverId).opPlayer(nickname);
+    executeAnInstanceMethod(serverId, (server) -> server.opPlayer(nickname));
   }
 
   public void deopPlayer(Long serverId, String nickname) {
-    getOrCreateInstance(serverId).deOpPlayer(nickname);
+    executeAnInstanceMethod(serverId, (server) -> server.deOpPlayer(nickname));
   }
 
   public void banPlayer(Long serverId, String nickname) {
-    getOrCreateInstance(serverId).banPlayer(nickname);
+    executeAnInstanceMethod(serverId, (server) -> server.banPlayer(nickname));
   }
 
   public void unbanPlayer(Long serverId, String nickname) {
-    getOrCreateInstance(serverId).unbanPlayer(nickname);
+    executeAnInstanceMethod(serverId, (server) -> server.unbanPlayer(nickname));
   }
 
   public ServerStatus getStatus(Long serverId) {
@@ -134,7 +135,7 @@ public class ServerRuntimeService {
               () -> new IllegalStateException("Servidor " + id + " não encontrado")
       );
 
-      var directory = provisioningService.resolveServerDirectory(id);
+      var directory = provisioningService.getServerDirectory(id);
       var javaExecutablePath = selectJavaExecutablePath(config.getJavaVersion());
 
       return new ManagedServerProcess(
@@ -155,6 +156,13 @@ public class ServerRuntimeService {
       case "JAVA_25" -> java25;
       default -> java25;
     };
+  }
+
+  private void executeAnInstanceMethod(Long serverId, Consumer<ManagedServerProcess> action) {
+    ManagedServerProcess server = getExistingInstance(serverId)
+            .orElseThrow(() -> new IllegalStateException("Não é possível realizar a ação em um servidor fechado"));
+
+    action.accept(server);
   }
 
 }

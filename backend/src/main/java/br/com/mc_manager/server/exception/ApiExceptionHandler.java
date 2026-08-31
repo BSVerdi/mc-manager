@@ -83,6 +83,11 @@ public class ApiExceptionHandler {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
   }
 
+  @ExceptionHandler(IllegalStateException.class)
+  public ResponseEntity<String> code409IllegalState(IllegalStateException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+  }
+
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<String> code400MalFormedBody(HttpMessageNotReadableException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());

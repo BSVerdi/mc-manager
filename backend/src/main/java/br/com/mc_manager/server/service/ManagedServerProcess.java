@@ -194,7 +194,7 @@ public class ManagedServerProcess {
 
   public void unbanPlayer(String nickname) {
     playerService.unbanPlayer(server.getId(), nickname);
-    sendCommand("unban " + nickname);
+    sendCommand("pardon " + nickname);
   }
 
   public Integer getOnlinePlayersCount() {
