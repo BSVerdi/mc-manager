@@ -932,7 +932,7 @@
 }
 
 .player-commands {
-  width: 120px;
+  width: 200px;
   display: flex;
   justify-content: center;
   gap: 10px;
@@ -941,7 +941,7 @@
 .player-commands button {
   cursor: pointer;
   border: none;
-  width: 60px;
+  width: 80px;
   border-radius: 5px;
   transition: all 0.2s ease;
   color: var(--text-main);

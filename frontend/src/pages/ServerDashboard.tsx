@@ -16,7 +16,11 @@ export default function ServerDashboard() {
       <section className="server-content">
         <TopMenu />
         <section className="server-content-pages">
-          <Outlet context={{ serverId: numericServerId }} />
+          <Outlet
+            context={{
+              serverId: numericServerId,
+            }}
+          />
         </section>
       </section>
     </div>

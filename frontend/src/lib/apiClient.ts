@@ -68,6 +68,20 @@ export const api = {
           `/servers/${serverId}/players/${encodeURIComponent(nickname)}/deop`,
         )
         .then((res) => res.data),
+
+    ban: (serverId: number, nickname: string) =>
+      http
+        .patch(
+          `/servers/${serverId}/players/${encodeURIComponent(nickname)}/ban`,
+        )
+        .then((res) => res.data),
+
+    unban: (serverId: number, nickname: string) =>
+      http
+        .patch(
+          `/servers/${serverId}/players/${encodeURIComponent(nickname)}/unban`,
+        )
+        .then((res) => res.data),
   },
 
   files: {

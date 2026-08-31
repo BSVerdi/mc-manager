@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
-import type { Player } from "../types/Player";
-import { api } from "../lib/apiClient";
-import { useServerId } from "../hooks/useServerId";
 import { UserStar } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useServerId } from "../hooks/useServerId";
+import { useServerStatus } from "../hooks/useServerStatus";
+import { api } from "../lib/apiClient";
+import type { Player } from "../types/Player";
+import { Status } from "../types/Status";
 
 function PlayerAvatar({ name }: { name: string }) {
   const [imageFailed, setImageFailed] = useState(false);
@@ -23,6 +25,7 @@ function PlayerAvatar({ name }: { name: string }) {
 
 export default function PlayersList() {
   const serverId = useServerId();
+  const { status } = useServerStatus(serverId);
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
@@ -44,6 +47,12 @@ export default function PlayersList() {
     );
   };
 
+  const setBannedStatus = (nickname: string, banned: boolean) => {
+    setPlayers((old) =>
+      old.map((p) => (p.nickname === nickname ? { ...p, banned } : p)),
+    );
+  };
+
   const handleToggleOp = async (player: Player) => {
     const nextOperatorState = !player.operator;
 
@@ -53,6 +62,18 @@ export default function PlayersList() {
       api.player.opPlayer(serverId, player.nickname);
     } else {
       api.player.deopPlayer(serverId, player.nickname);
+    }
+  };
+
+  const handleToggleBan = async (player: Player) => {
+    const nextBanState = !player.banned;
+
+    setBannedStatus(player.nickname, nextBanState);
+
+    if (nextBanState) {
+      api.player.ban(serverId, player.nickname);
+    } else {
+      api.player.unban(serverId, player.nickname);
     }
   };
 
@@ -76,14 +97,18 @@ export default function PlayersList() {
                 <div className="player-commands">
                   <button
                     className={`operator-btn ${player.operator ? "active" : ""}`}
-                    onClick={() => {
-                      handleToggleOp(player);
-                      player.operator = false;
-                    }}
+                    onClick={() => handleToggleOp(player)}
+                    disabled={status === Status.ONLINE ? false : true}
                   >
                     {player.operator ? "de-OP" : "OP"}
                   </button>
-                  <button className="ban-btn">Banir</button>
+                  <button
+                    className="ban-btn"
+                    onClick={() => handleToggleBan(player)}
+                    disabled={status === Status.ONLINE ? false : true}
+                  >
+                    {player.banned ? "Desbanir" : "Banir"}
+                  </button>
                 </div>
               </div>
             </li>

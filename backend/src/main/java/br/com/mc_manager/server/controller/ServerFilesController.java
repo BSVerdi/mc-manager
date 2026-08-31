@@ -2,7 +2,7 @@ package br.com.mc_manager.server.controller;
 
 import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
-import br.com.mc_manager.server.dto.MediaDTO;
+import br.com.mc_manager.server.dto.MediaDto;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
 import br.com.mc_manager.server.service.FileService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -58,7 +58,7 @@ public class FileController {
   @GetMapping("/download")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
   public ResponseEntity<Resource> download(@PathVariable Long serverId, @RequestParam String path) throws IOException {
-    MediaDTO media = fileService.download(serverId, path);
+    MediaDto media = fileService.download(serverId, path);
 
     String fileName = media.path().toString();
     String encoded = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replace("+", "%20");
