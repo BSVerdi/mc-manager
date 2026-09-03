@@ -29,7 +29,7 @@ public class User implements UserDetails {
   private String name;
   private String email;
   private String password;
-  private String profilePictureUrl;
+  private String profilePictureUrl = null;
 
   private Boolean enabled;
   private Instant createdAt;
@@ -48,6 +48,7 @@ public class User implements UserDetails {
     this.password = encryptedPassword;
     this.profile = profile;
     this.enabled = true;
+    this.createdAt = Instant.now();
   }
 
   @Override

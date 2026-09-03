@@ -28,11 +28,11 @@ public class ServerRuntimeService {
   private final SimpMessagingTemplate template;
   private final PlayerService playerService;
 
-  @Value("${mcmanager.java-8}")
+  @Value("${mcmanager.java_8}")
   private String java8;
-  @Value("${mcmanager.java-21}")
+  @Value("${mcmanager.java_21}")
   private String java21;
-  @Value("${mcmanager.java-25}")
+  @Value("${mcmanager.java_25}")
   private String java25;
 
   public ServerRuntimeService(ServerRepository serverRepository, ServerFilesService provisioningService, SimpMessagingTemplate template, PlayerService playerService) {

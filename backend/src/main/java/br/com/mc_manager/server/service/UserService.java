@@ -72,7 +72,7 @@ public class UserService implements UserDetailsService {
   }
 
   private void deleteOldPicture(User user) throws IOException {
-    if (user.getProfilePictureUrl() != null) return;
+    if (user.getProfilePictureUrl() == null) return;
 
     String oldPicFileName = user.getProfilePictureUrl().replaceAll("images/", "");
     fileService.deleteFile("images/", oldPicFileName);

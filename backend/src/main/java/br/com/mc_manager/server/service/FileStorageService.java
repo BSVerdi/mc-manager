@@ -34,7 +34,7 @@ public class FileStorageService {
           "jar", "class", "exe", "dll", "so", "mca", "dat", "zip", "gz"
   );
   private static final long MAX_EDITABLE_SIZE = 2 * 1024 * 1024;
-  @Value("${mcmanager.data-root-directory}")
+  @Value("${mcmanager.data_root_directory}")
   private String dataRootDirectory;
 
   public void createFolder(String scope, String targetPath) {

@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-  @Value("${mcmanager.data-root-directory}")
+  @Value("${mcmanager.data_root_directory}")
   private String dataRootDirectory;
 
   @Override

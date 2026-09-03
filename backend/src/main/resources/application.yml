@@ -21,9 +21,9 @@ server:
   port: 8080
 
 mcmanager:
-  data-root-directory: ${DATA-ROOT-DIRECTORY}
-  java-8: ${JAVA8-PATH}
-  java-21: ${JAVA21-PATH}
-  java-25: ${JAVA25-PATH}
-  secret-key: ${JWT_SECRET}
+  data_root_directory: ${DATA_ROOT_DIRECTORY}
+  java_8: ${JAVA8_PATH:/opt/java/jdk8/bin/java}
+  java_21: ${JAVA21_PATH:/opt/java/jdk21/bin/java}
+  java_25: ${JAVA25_PATH:/opt/java/jdk25/bin/java}
+  secret_key: ${JWT_SECRET}
 

@@ -16,11 +16,10 @@ import java.time.temporal.ChronoUnit;
 @Service
 public class TokenService {
 
-  @Value("${mcmanager.secret-key}")
-  private String secret;
-
   private static final String ISSUER = "mc-manager";
   private static final String TYPE_CLAIM = "type";
+  @Value("${mcmanager.secret_key}")
+  private String secret;
 
   public String generateAccessToken(User user) {
     return generateToken(user, "access", 30);
