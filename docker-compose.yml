@@ -1,0 +1,53 @@
+services:
+  mysql:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: mc_manager
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_DB_URL: jdbc:mysql://mysql:3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      DATA_ROOT_DIRECTORY: /data
+      JAVA8_PATH: /opt/java/jdk8/bin/java
+      JAVA21_PATH: /opt/java/jdk21/bin/java
+      JAVA25_PATH: /opt/java/jdk25/bin/java
+    volumes:
+      - servers-data:/data/servers
+      - images:/data/images
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - images:/usr/share/nginx/images:ro
+
+volumes:
+  mysql-data:
+  servers-data:
+  images:
