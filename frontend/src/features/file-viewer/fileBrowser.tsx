@@ -5,18 +5,16 @@ import {
   FileTerminal,
   FileText,
   Folder,
-  FolderInput,
   ImageIcon,
   MoveLeft,
   Trash2,
-  Upload,
 } from "lucide-react";
-import type { Props } from "../../pages/FileViewer";
-import { api } from "../../lib/apiClient";
-import { useRef, useState } from "react";
-import { useServerId } from "../../hooks/useServerId";
-import { zipFolder } from "../../lib/zipFolder";
+import { useState } from "react";
 import UploadButton from "../../components/UploadButton";
+import { useServerId } from "../../hooks/useServerId";
+import { api } from "../../lib/apiClient";
+import { zipFolder } from "../../lib/zipFolder";
+import type { Props } from "../../pages/FileViewer";
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return "--";
@@ -27,7 +25,6 @@ function formatSize(bytes: number): string {
 export function FileBrowser({ browser, editor }: Props) {
   const [deleting, setDeleting] = useState<boolean>(false);
   const [zipping, setZipping] = useState<boolean>(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const serverId = useServerId();
 
   const getFileIcon = (extension: string): React.ReactNode => {
@@ -69,40 +66,6 @@ export function FileBrowser({ browser, editor }: Props) {
         ? `${browser.currentPath}/${name}`
         : name;
       editor.open(path);
-    }
-  };
-
-  const handleFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-
-    if (!file) return;
-
-    try {
-      await browser.upload(file);
-    } finally {
-      e.target.value = "";
-    }
-  };
-
-  const handleFolderSelected = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const fileList = e.target.files;
-
-    if (!fileList || fileList.length === 0) return;
-
-    setZipping(true);
-
-    try {
-      const zipFile = await zipFolder(fileList);
-
-      await browser.uploadZip(zipFile);
-    } catch (err) {
-      console.error("Erro ao compactar pasta: ", err);
-      alert("Erro ao compactar pasta");
-    } finally {
-      setZipping(false);
-      e.target.value = "";
     }
   };
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import type { ServerVersion } from "../types/Server";
 import { api } from "../lib/apiClient";
+import type { ServerVersion } from "../types/Server";
 
 export function useServerVersions() {
   const [serverVersions, setServerVersions] = useState<ServerVersion[]>([]);
@@ -10,7 +10,7 @@ export function useServerVersions() {
       .getReleasedVersions()
       .then(setServerVersions)
       .catch((err) =>
-        console.error("[useServerVersion] Erro ao carregar as versões"),
+        console.error("[useServerVersion] Erro ao carregar as versões.", err),
       );
   }, []);
 

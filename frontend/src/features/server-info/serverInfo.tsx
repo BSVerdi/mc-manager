@@ -1,12 +1,10 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { RotateCcw } from "lucide-react";
 import { StartServer } from "../../components/StartServer";
 import { useMetricsSocket } from "../../hooks/useMetricsSocket";
 import { useServerControl } from "../../hooks/useServerControl";
 import { useServerData } from "../../hooks/useServerData";
 import { useStatusSocket } from "../../hooks/useStatusSocket";
-import { api } from "../../lib/apiClient";
 import { Status } from "../../types/Status";
-import { RotateCcw } from "lucide-react";
 
 function formatUptime(totalSeconds: number): string {
   if (totalSeconds <= 0) return "--";

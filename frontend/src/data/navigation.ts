@@ -1,6 +1,5 @@
 import {
   Folder,
-  HardDrive,
   LayoutDashboard,
   Server,
   Settings,

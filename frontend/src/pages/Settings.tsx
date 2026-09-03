@@ -11,7 +11,7 @@ export default function Settings() {
   const { user } = useAuth();
 
   const [username, setUsername] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  // const [email, setEmail] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -103,7 +103,7 @@ export default function Settings() {
               type="email"
               title="Email:"
               defaultValue={user?.email}
-              setFunction={setEmail}
+              setFunction={() => {}}
               disabled={true}
             />
             <button className="form-submit-btn" type="submit">

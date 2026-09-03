@@ -1,7 +1,7 @@
 import { Save, X } from "lucide-react";
 import type { Props } from "../../pages/FileViewer";
 
-export function FileEditor({ browser, editor }: Props) {
+export function FileEditor({ editor }: Props) {
   if (!editor.file) return null;
 
   return (

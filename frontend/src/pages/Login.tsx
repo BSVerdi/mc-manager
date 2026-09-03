@@ -21,10 +21,10 @@ export default function Register() {
   };
 
   return (
-    <main>
+    <>
       <section className="auth-container login">
         <section className="auth-app-title">
-          <MonitorCog style={{ width: 64, height: 64 }} />
+          <MonitorCog style={{ width: 48, height: 48 }} />
           <h1>MC-Manager</h1>
         </section>
         <section className="auth-content">
@@ -53,6 +53,6 @@ export default function Register() {
           </span>
         </section>
       </section>
-    </main>
+    </>
   );
 }

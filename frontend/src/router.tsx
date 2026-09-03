@@ -1,20 +1,19 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import { AuthProvider } from "./context/AuthContext";
-import { PublicOnlyRoute } from "./components/PublicOnlyRoute";
 import { PrivateRoute } from "./components/PrivateRoute";
+import { PublicOnlyRoute } from "./components/PublicOnlyRoute";
+import { AuthProvider } from "./context/AuthContext";
+import AuthLayout from "./layouts/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
-import Home from "./pages/Home";
-import ServerDashboard from "./pages/ServerDashboard";
 import Console from "./pages/Console";
 import FileViewer from "./pages/FileViewer";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
 import PlayersList from "./pages/PlayerList";
-import AuthLayout from "./layouts/AuthLayout";
-import CreateServer from "./features/create_server/CreateServer";
-import Settings from "./pages/Settings";
+import Register from "./pages/Register";
+import ServerDashboard from "./pages/ServerDashboard";
 import ServerSettings from "./pages/ServerSettings";
+import Settings from "./pages/Settings";
 
 export default function Router() {
   return (

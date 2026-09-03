@@ -44,7 +44,7 @@ export default function ServerSettings() {
     await api.servers
       .delete(serverId)
       .catch((err) => {
-        console.error("Erro ao deletar servidor.");
+        console.error("Erro ao deletar servidor.", err);
         alert("Erro ao deletar servidor");
       })
       .finally(() => {
@@ -83,7 +83,7 @@ export default function ServerSettings() {
       </div>
 
       <div className="server-settings-danger-actions-container">
-        <h3 className="server-settings-danget-actions-title">
+        <h3 className="server-settings-danger-actions-title">
           <TriangleAlert />
           Danger Area
         </h3>

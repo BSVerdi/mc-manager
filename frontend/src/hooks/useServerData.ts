@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import type { Server } from "../types/Server";
 import { api } from "../lib/apiClient";
+import type { Server } from "../types/Server";
 
 export function useServerData(serverId: number) {
   const [server, setServer] = useState<Server>();
@@ -11,7 +11,10 @@ export function useServerData(serverId: number) {
       .get(serverId)
       .then(setServer)
       .catch((err) =>
-        console.error("[useServerData] Erro ao carregar os dados do servidor."),
+        console.error(
+          "[useServerData] Erro ao carregar os dados do servidor.",
+          err,
+        ),
       )
       .finally(() => setLoading(false));
   }, [serverId]);
