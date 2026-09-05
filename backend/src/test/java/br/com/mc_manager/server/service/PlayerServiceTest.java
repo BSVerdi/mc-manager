@@ -80,7 +80,7 @@ class PlayerServiceTest {
     // Assert
     assertNotNull(players);
     assertThat(players.size()).isEqualTo(1);
-    assertThat(players.get(0).nickname()).isEqualTo(player.getNickname());
+    assertThat(players.getFirst().nickname()).isEqualTo(player.getNickname());
   }
 
   @Nested
