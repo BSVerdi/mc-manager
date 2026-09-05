@@ -8,6 +8,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -70,7 +71,7 @@ public class TokenService {
 
       return decodedJWT.getSubject();
     } catch (JWTVerificationException ex) {
-      throw new RuntimeException("Erro ao verificar token JWT");
+      throw new BadCredentialsException("Token JWT inválido ou expirado: " + ex.getMessage(), ex);
     }
   }
 

@@ -3,6 +3,7 @@ package br.com.mc_manager.server.model;
 import br.com.mc_manager.server.dto.UpdateUserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jspecify.annotations.Nullable;
@@ -18,6 +19,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements UserDetails {

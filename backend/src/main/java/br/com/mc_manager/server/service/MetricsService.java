@@ -16,13 +16,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class MetricsService {
 
-  private final SystemInfo systemInfo = new SystemInfo();
+  private final SystemInfo systemInfo;
   private final Map<Long, OSProcess> previousTicks = new ConcurrentHashMap<>();
 
   private final SimpMessagingTemplate template;
   private final ServerRuntimeService serverManagerService;
 
-  public MetricsService(SimpMessagingTemplate template, ServerRuntimeService serverManagerService) {
+  public MetricsService(SystemInfo systemInfo, SimpMessagingTemplate template, ServerRuntimeService serverManagerService) {
+    this.systemInfo = systemInfo;
     this.template = template;
     this.serverManagerService = serverManagerService;
   }

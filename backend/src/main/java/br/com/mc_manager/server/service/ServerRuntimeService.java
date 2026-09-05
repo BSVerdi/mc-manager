@@ -4,7 +4,6 @@ import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.repository.ServerRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -12,21 +11,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
 public class ServerRuntimeService {
 
-  private final ExecutorService executor = Executors.newCachedThreadPool();
   private final Map<Long, ManagedServerProcess> instances = new ConcurrentHashMap<>();
 
   private final ServerRepository serverRepository;
-  private final ServerFilesService provisioningService;
-  private final SimpMessagingTemplate template;
-  private final PlayerService playerService;
+  private final ServerFilesService serverFilesService;
+  private final ManagedServerProcessFactory processFactory;
 
   @Value("${mcmanager.java_8}")
   private String java8;
@@ -35,11 +30,10 @@ public class ServerRuntimeService {
   @Value("${mcmanager.java_25}")
   private String java25;
 
-  public ServerRuntimeService(ServerRepository serverRepository, ServerFilesService provisioningService, SimpMessagingTemplate template, PlayerService playerService) {
+  public ServerRuntimeService(ServerRepository serverRepository, ServerFilesService serverFilesService, ManagedServerProcessFactory processFactory) {
     this.serverRepository = serverRepository;
-    this.provisioningService = provisioningService;
-    this.template = template;
-    this.playerService = playerService;
+    this.serverFilesService = serverFilesService;
+    this.processFactory = processFactory;
   }
 
   public void start(Long serverId) {
@@ -135,17 +129,10 @@ public class ServerRuntimeService {
               () -> new IllegalStateException("Servidor " + id + " não encontrado")
       );
 
-      var directory = provisioningService.getServerDirectory(id);
+      var directory = serverFilesService.getServerDirectory(id);
       var javaExecutablePath = selectJavaExecutablePath(config.getJavaVersion());
 
-      return new ManagedServerProcess(
-              config,
-              template,
-              executor,
-              javaExecutablePath,
-              directory,
-              playerService
-      );
+      return processFactory.create(config, javaExecutablePath, directory);
     });
   }
 

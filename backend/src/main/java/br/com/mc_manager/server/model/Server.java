@@ -4,6 +4,7 @@ import br.com.mc_manager.server.dto.CreateServerDTO;
 import br.com.mc_manager.server.dto.UpdateServerDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import java.util.Set;
 @Entity
 @Table(name = "servers")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Server {

@@ -28,11 +28,9 @@ public class ServerFilesService {
     String serverScope = "servers/";
 
     fileStorageService.createFolder(serverScope, serverId.toString());
-    System.out.println("criou");
 
     writeEula(serverId);
     writeServerProperties(serverId, serverPort);
-    System.out.println("criou arquivos");
   }
 
 
@@ -141,4 +139,5 @@ public class ServerFilesService {
     Path serverdirectory = fileStorageService.resolveSafePath(serverScope, "");
     return serverdirectory;
   }
+
 }

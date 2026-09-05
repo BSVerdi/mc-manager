@@ -20,8 +20,11 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import oshi.SystemInfo;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Configuration
 @EnableWebSecurity
@@ -97,6 +100,16 @@ public class SecurityConfig {
       response.setContentType("application/json");
       response.getWriter().write("{\"error\":\"Acesso negado\"}");
     };
+  }
+
+  @Bean
+  public SystemInfo systemInfo() {
+    return new SystemInfo();
+  }
+
+  @Bean
+  public ExecutorService executor() {
+    return Executors.newCachedThreadPool();
   }
 
 }

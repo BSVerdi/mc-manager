@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
 
 @RestController
@@ -44,9 +45,13 @@ public class ServerFilesController {
   @GetMapping("/content")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
   public ResponseEntity<FileContentDTO> getContent(@PathVariable Long serverId, @RequestParam String path) throws IOException {
-    var content = serverFileService.getFileContent(serverId, path);
+    try {
+      var content = serverFileService.getFileContent(serverId, path);
 
-    return ResponseEntity.ok(content);
+      return ResponseEntity.ok(content);
+    } catch (IOException e) {
+      throw new NoSuchFileException(e.getMessage());
+    }
   }
 
   @PutMapping("/content")
