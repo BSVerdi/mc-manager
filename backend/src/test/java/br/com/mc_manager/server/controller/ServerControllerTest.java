@@ -45,15 +45,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ServerControllerTest {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
+
   @Autowired
   private WebApplicationContext context;
+
   private MockMvc mockMvc;
+
   @MockitoBean
   private ServerRuntimeService runtimeService;
+
   @MockitoBean
   private ServerManagementService managementService;
+
   @MockitoBean
   private MinecraftMetaDataService metaDataService;
+
   @MockitoBean
   private ServerSecurityExpressions serverSecurityExpressions;
 
@@ -65,8 +71,6 @@ class ServerControllerTest {
             .defaultRequest(get("/").with(csrf()))
             .build();
 
-    // Por padrão, todo usuário autenticado é dono do servidor.
-    // Testes que precisam do cenário contrário sobrescrevem esse stub.
     given(serverSecurityExpressions.isOwner(anyLong(), any(Authentication.class))).willReturn(true);
   }
 
@@ -144,6 +148,7 @@ class ServerControllerTest {
     @Test
     @DisplayName("Sem autenticação retorna 401")
     void semAutenticacao_retorna401() throws Exception {
+      // Act & Assert
       mockMvc.perform(get("/api/servers/1"))
               .andExpect(status().isUnauthorized());
 
@@ -154,8 +159,10 @@ class ServerControllerTest {
     @WithMockUser
     @DisplayName("Autenticado mas não é dono retorna 403")
     void naoEhDono_retorna403() throws Exception {
+      // Arrange
       given(serverSecurityExpressions.isOwner(anyLong(), any(Authentication.class))).willReturn(false);
 
+      // Act & Assert
       mockMvc.perform(get("/api/servers/1"))
               .andExpect(status().isForbidden());
 
@@ -211,9 +218,11 @@ class ServerControllerTest {
     @Test
     @DisplayName("Sem autenticação retorna 401")
     void semAutenticacao_retorna401() throws Exception {
+      // Arrange
       CreateServerDTO createServerDto = createCreateServerDTOWithAllAttributes();
       String dtoJson = objectMapper.writeValueAsString(createServerDto);
 
+      // Act & Assert
       mockMvc.perform(post("/api/servers")
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(dtoJson))
@@ -254,9 +263,11 @@ class ServerControllerTest {
     @Test
     @DisplayName("Sem autenticação retorna 401")
     void semAutenticacao_retorna401() throws Exception {
+      // Arrange
       UpdateServerDTO updateServerDto = createUpdateServerDTOWithAllAttributes();
       String dtoJson = objectMapper.writeValueAsString(updateServerDto);
 
+      // Act & Assert
       mockMvc.perform(put("/api/servers/1")
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(dtoJson))
@@ -269,11 +280,13 @@ class ServerControllerTest {
     @WithMockUser
     @DisplayName("Autenticado mas não é dono retorna 403")
     void naoEhDono_retorna403() throws Exception {
+      // Arrange
       given(serverSecurityExpressions.isOwner(anyLong(), any(Authentication.class))).willReturn(false);
 
       UpdateServerDTO updateServerDto = createUpdateServerDTOWithAllAttributes();
       String dtoJson = objectMapper.writeValueAsString(updateServerDto);
 
+      // Act & Assert
       mockMvc.perform(put("/api/servers/1")
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(dtoJson))
@@ -305,6 +318,7 @@ class ServerControllerTest {
     @Test
     @DisplayName("Sem autenticação retorna 401")
     void semAutenticacao_retorna401() throws Exception {
+      // Act & Assert
       mockMvc.perform(delete("/api/servers/1"))
               .andExpect(status().isUnauthorized());
 
@@ -315,8 +329,10 @@ class ServerControllerTest {
     @WithMockUser
     @DisplayName("Autenticado mas não é dono retorna 403")
     void naoEhDono_retorna403() throws Exception {
+      // Arrange
       given(serverSecurityExpressions.isOwner(anyLong(), any(Authentication.class))).willReturn(false);
 
+      // Act & Assert
       mockMvc.perform(delete("/api/servers/1"))
               .andExpect(status().isForbidden());
 
@@ -346,6 +362,7 @@ class ServerControllerTest {
     @Test
     @DisplayName("Sem autenticação retorna 401")
     void semAutenticacao_retorna401() throws Exception {
+      // Act & Assert
       mockMvc.perform(post("/api/servers/1/start"))
               .andExpect(status().isUnauthorized());
 
@@ -356,8 +373,10 @@ class ServerControllerTest {
     @WithMockUser
     @DisplayName("Autenticado mas não é dono retorna 403")
     void naoEhDono_retorna403() throws Exception {
+      // Arrange
       given(serverSecurityExpressions.isOwner(anyLong(), any(Authentication.class))).willReturn(false);
 
+      // Act & Assert
       mockMvc.perform(post("/api/servers/1/start"))
               .andExpect(status().isForbidden());
 
@@ -387,6 +406,7 @@ class ServerControllerTest {
     @Test
     @DisplayName("Sem autenticação retorna 401")
     void semAutenticacao_retorna401() throws Exception {
+      // Act & Assert
       mockMvc.perform(post("/api/servers/1/stop"))
               .andExpect(status().isUnauthorized());
 
@@ -397,8 +417,10 @@ class ServerControllerTest {
     @WithMockUser
     @DisplayName("Autenticado mas não é dono retorna 403")
     void naoEhDono_retorna403() throws Exception {
+      // Arrange
       given(serverSecurityExpressions.isOwner(anyLong(), any(Authentication.class))).willReturn(false);
 
+      // Act & Assert
       mockMvc.perform(post("/api/servers/1/stop"))
               .andExpect(status().isForbidden());
 
@@ -428,6 +450,7 @@ class ServerControllerTest {
     @Test
     @DisplayName("Sem autenticação retorna 401")
     void semAutenticacao_retorna401() throws Exception {
+      // Act & Assert
       mockMvc.perform(post("/api/servers/1/restart"))
               .andExpect(status().isUnauthorized());
 
@@ -438,8 +461,10 @@ class ServerControllerTest {
     @WithMockUser
     @DisplayName("Autenticado mas não é dono retorna 403")
     void naoEhDono_retorna403() throws Exception {
+      // Arrange
       given(serverSecurityExpressions.isOwner(anyLong(), any(Authentication.class))).willReturn(false);
 
+      // Act & Assert
       mockMvc.perform(post("/api/servers/1/restart"))
               .andExpect(status().isForbidden());
 
@@ -474,6 +499,7 @@ class ServerControllerTest {
     @Test
     @DisplayName("Sem autenticação retorna 401")
     void semAutenticacao_retorna401() throws Exception {
+      // Act & Assert
       mockMvc.perform(get("/api/servers/1/status"))
               .andExpect(status().isUnauthorized());
 
@@ -484,8 +510,10 @@ class ServerControllerTest {
     @WithMockUser
     @DisplayName("Autenticado mas não é dono retorna 403")
     void naoEhDono_retorna403() throws Exception {
+      // Arrange
       given(serverSecurityExpressions.isOwner(anyLong(), any(Authentication.class))).willReturn(false);
 
+      // Act & Assert
       mockMvc.perform(get("/api/servers/1/status"))
               .andExpect(status().isForbidden());
 
@@ -524,8 +552,10 @@ class ServerControllerTest {
     @WithMockUser
     @DisplayName("Deve retornar lista vazia quando não há versões disponíveis")
     void deveRetornarListaVaziaQuandoSemVersoes() throws Exception {
+      // Arrange
       given(metaDataService.getMinecraftServerVersions()).willReturn(Collections.emptyList());
 
+      // Act & Assert
       mockMvc.perform(get("/api/servers/versions"))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.size()").value(0));
@@ -535,14 +565,13 @@ class ServerControllerTest {
     @WithMockUser
     @DisplayName("Rota /versions não é interpretada como {serverId} (guarda de colisão de rota)")
     void rotaVersionsNaoColideComServerId() throws Exception {
+      // Arrange
       given(metaDataService.getMinecraftServerVersions()).willReturn(Collections.emptyList());
 
+      // Act & Assert
       mockMvc.perform(get("/api/servers/versions"))
               .andExpect(status().isOk());
 
-      // Se a rota colidisse com GET /{serverId}, cairia em getServer("versions"),
-      // que tentaria converter "versions" para Long e falharia com 400,
-      // além de nunca chamar o serviço correto.
       verify(metaDataService).getMinecraftServerVersions();
       verifyNoInteractions(managementService);
     }
@@ -578,8 +607,10 @@ class ServerControllerTest {
     @WithMockUser
     @DisplayName("Deve retornar lista vazia quando não há versões lançadas")
     void deveRetornarListaVaziaQuandoSemVersoesLancadas() throws Exception {
+      // Arrange
       given(metaDataService.getReleasedMinecraftServerVersions()).willReturn(Collections.emptyList());
 
+      // Act & Assert
       mockMvc.perform(get("/api/servers/versions/released"))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.size()").value(0));
@@ -589,8 +620,10 @@ class ServerControllerTest {
     @WithMockUser
     @DisplayName("Rota /versions/released não é interpretada como {serverId} (guarda de colisão de rota)")
     void rotaVersionsReleasedNaoColideComServerId() throws Exception {
+      // Arrange
       given(metaDataService.getReleasedMinecraftServerVersions()).willReturn(Collections.emptyList());
 
+      // Act & Assert
       mockMvc.perform(get("/api/servers/versions/released"))
               .andExpect(status().isOk());
 

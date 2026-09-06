@@ -5,7 +5,6 @@ import br.com.mc_manager.server.dto.UserDetailsDTO;
 import br.com.mc_manager.server.factory.UserFactory;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -156,7 +155,7 @@ class UserServiceTest {
 
       // Act & Assert
       assertThatThrownBy(() -> userService.updateUser(999L, updateDto))
-              .isInstanceOf(EntityNotFoundException.class)
+              .isInstanceOf(NoSuchElementException.class)
               .hasMessage("Usuário não encontrado.");
 
       verify(userRepository, times(1)).findById(999L);
@@ -188,7 +187,7 @@ class UserServiceTest {
 
       // Act & Assert
       assertThatThrownBy(() -> userService.deleteUser(999L))
-              .isInstanceOf(EntityNotFoundException.class)
+              .isInstanceOf(NoSuchElementException.class)
               .hasMessage("Usuário não encontrado.");
 
       verify(userRepository, times(1)).findById(999L);
@@ -239,7 +238,7 @@ class UserServiceTest {
 
       // Act & Assert
       assertThatThrownBy(() -> userService.updateProfilePic(999L, multipartFile))
-              .isInstanceOf(EntityNotFoundException.class)
+              .isInstanceOf(NoSuchElementException.class)
               .hasMessage("Usuário não encontrado.");
     }
   }

@@ -4,7 +4,6 @@ import br.com.mc_manager.server.dto.UpdateUserDto;
 import br.com.mc_manager.server.dto.UserDetailsDTO;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -68,7 +68,7 @@ public class UserService implements UserDetailsService {
 
   private User getUserById(Long id) {
     return repository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
+            .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado."));
   }
 
   private void deleteOldPicture(User user) throws IOException {
@@ -87,4 +87,7 @@ public class UserService implements UserDetailsService {
     return "images/" + fileName;
   }
 
+  public void assertIsUser(Long userId, String email) throws SecurityException {
+    repository.findByIdAndEmailIgnoreCase(userId, email).orElseThrow(SecurityException::new);
+  }
 }

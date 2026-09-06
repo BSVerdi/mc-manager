@@ -5,6 +5,7 @@ import br.com.mc_manager.server.dto.UserDetailsDTO;
 import br.com.mc_manager.server.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,13 +22,15 @@ public class UserController {
   }
 
   @PatchMapping("/{id}/update-user")
+  @PreAuthorize("@userSecurity.isUser(#id, authentication)")
   public ResponseEntity<UserDetailsDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserDto dto) {
     var user = userService.updateUser(id, dto);
 
     return ResponseEntity.ok().body(user);
   }
 
-  @PatchMapping("/{id}/profile-picture")
+  @PostMapping("/{id}/profile-picture")
+  @PreAuthorize("@userSecurity.isUser(#id, authentication)")
   public ResponseEntity<UserDetailsDTO> updateProfilePic(@PathVariable Long id, @RequestParam(value = "file") MultipartFile file) throws IOException {
     var user = userService.updateProfilePic(id, file);
 
@@ -35,6 +38,7 @@ public class UserController {
   }
 
   @DeleteMapping("/{id}/delete")
+  @PreAuthorize("@userSecurity.isUser(#id, authentication)")
   public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
     userService.deleteUser(id);
 
