@@ -40,6 +40,9 @@ class ServerFilesServiceTest {
   @Mock
   private FileStorageService fileStorageService;
 
+  @Mock
+  private PathSecurityService pathSecurityService;
+
   @Nested
   @DisplayName("Operações de Criação")
   class CreateOperationsTests {
@@ -477,7 +480,7 @@ class ServerFilesServiceTest {
       // Arrange
       Long serverId = 1L;
 
-      when(fileStorageService.resolveSafePath(anyString(), eq(""))).thenReturn(
+      when(pathSecurityService.resolveSafePath(anyString(), eq(""))).thenReturn(
               Paths.get("servers/" + serverId + "/")
       );
 

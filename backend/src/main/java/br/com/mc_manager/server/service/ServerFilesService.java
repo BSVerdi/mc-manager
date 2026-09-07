@@ -18,10 +18,12 @@ public class ServerFilesService {
 
   private final MinecraftMetaDataService minecraftMetaDataService;
   private final FileStorageService fileStorageService;
+  private final PathSecurityService pathSecurityService;
 
-  public ServerFilesService(MinecraftMetaDataService minecraftMetaDataService, FileStorageService fileStorageService) {
+  public ServerFilesService(MinecraftMetaDataService minecraftMetaDataService, FileStorageService fileStorageService, PathSecurityService pathSecurityService) {
     this.minecraftMetaDataService = minecraftMetaDataService;
     this.fileStorageService = fileStorageService;
+    this.pathSecurityService = pathSecurityService;
   }
 
   public void createBaseServerFiles(Long serverId, Integer serverPort) throws IOException {
@@ -136,7 +138,7 @@ public class ServerFilesService {
   public Path getServerDirectory(Long id) {
     String serverScope = "servers/" + id + "/";
 
-    Path serverdirectory = fileStorageService.resolveSafePath(serverScope, "");
+    Path serverdirectory = pathSecurityService.resolveSafePath(serverScope, "");
     return serverdirectory;
   }
 

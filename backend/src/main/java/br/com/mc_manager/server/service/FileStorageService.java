@@ -3,7 +3,6 @@ package br.com.mc_manager.server.service;
 import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
 import br.com.mc_manager.server.dto.MediaDto;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -17,7 +16,6 @@ import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
@@ -34,11 +32,15 @@ public class FileStorageService {
           "jar", "class", "exe", "dll", "so", "mca", "dat", "zip", "gz"
   );
   private static final long MAX_EDITABLE_SIZE = 2 * 1024 * 1024;
-  @Value("${mcmanager.data_root_directory}")
-  private String dataRootDirectory;
+
+  private final PathSecurityService pathSecurityService;
+
+  public FileStorageService(PathSecurityService pathSecurityService) {
+    this.pathSecurityService = pathSecurityService;
+  }
 
   public void createFolder(String scope, String targetPath) {
-    Path path = resolveSafePath(scope, targetPath);
+    Path path = pathSecurityService.resolveSafePath(scope, targetPath);
 
     try {
       Files.createDirectories(path);
@@ -48,7 +50,7 @@ public class FileStorageService {
   }
 
   public void createFile(String scope, String fileName) {
-    Path path = resolveSafePath(scope, fileName);
+    Path path = pathSecurityService.resolveSafePath(scope, fileName);
 
     try {
       Files.createFile(path);
@@ -58,7 +60,7 @@ public class FileStorageService {
   }
 
   public void saveFile(String scope, String targetPath, MultipartFile file) throws IOException {
-    Path filePath = resolveSafePath(scope, targetPath);
+    Path filePath = pathSecurityService.resolveSafePath(scope, targetPath);
 
     Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
   }
@@ -68,13 +70,13 @@ public class FileStorageService {
   }
 
   public void saveFile(String scope, String targetPath, InputStream in) throws IOException {
-    Path filePath = resolveSafePath(scope, targetPath);
+    Path filePath = pathSecurityService.resolveSafePath(scope, targetPath);
 
     Files.copy(in, filePath, StandardCopyOption.REPLACE_EXISTING);
   }
 
   public void delete(String scope, String targetPath) throws IOException {
-    Path target = resolveSafePath(scope, targetPath);
+    Path target = pathSecurityService.resolveSafePath(scope, targetPath);
 
     if (!Files.exists(target)) return;
 
@@ -87,7 +89,7 @@ public class FileStorageService {
   }
 
   public void deleteFile(String scope, String targetFilePath) throws IOException {
-    Path filePath = resolveSafePath(scope, targetFilePath);
+    Path filePath = pathSecurityService.resolveSafePath(scope, targetFilePath);
 
     Files.deleteIfExists(filePath);
   }
@@ -97,7 +99,7 @@ public class FileStorageService {
   }
 
   public void deleteFolder(String scope, String targetPath) throws IOException {
-    Path folderPath = getFolderPath(scope, targetPath);
+    Path folderPath = pathSecurityService.getFolderPath(scope, targetPath);
 
     try (var walk = Files.walk(folderPath)) {
       walk.sorted(Comparator.reverseOrder())
@@ -112,7 +114,7 @@ public class FileStorageService {
   }
 
   public List<FileEntryDTO> listFiles(String targetFolderPath, String path) throws IOException {
-    Path folderPath = getFolderPath(targetFolderPath, path);
+    Path folderPath = pathSecurityService.getFolderPath(targetFolderPath, path);
 
     try (Stream<Path> walk = Files.list(folderPath)) {
       var files = walk.map(this::toFileEntryDTO)
@@ -125,7 +127,7 @@ public class FileStorageService {
   }
 
   public FileContentDTO getFileContent(String scope, String targetFilePath) throws IOException {
-    Path filePath = getFilePath(scope, targetFilePath);
+    Path filePath = pathSecurityService.getFilePath(scope, targetFilePath);
 
     String fileName = filePath.getFileName().toString();
     String extension = extractExtension(fileName);
@@ -139,7 +141,7 @@ public class FileStorageService {
   }
 
   public void saveFileContent(String scope, String targetFilePath, String content) throws IOException {
-    Path filePath = getFilePath(scope, targetFilePath);
+    Path filePath = pathSecurityService.getFilePath(scope, targetFilePath);
 
     if (!isEditable(filePath)) {
       throw new IllegalArgumentException("O caminho informado não é um arquivo");
@@ -149,7 +151,7 @@ public class FileStorageService {
   }
 
   public MediaDto downloadFile(String scope, String targetFilePath) throws IOException {
-    Path filePath = getFilePath(scope, targetFilePath);
+    Path filePath = pathSecurityService.getFilePath(scope, targetFilePath);
 
     Resource resource;
     try {
@@ -167,7 +169,7 @@ public class FileStorageService {
   }
 
   public void downloadFolder(String scope, String targetFolderPath, OutputStream outputStream) throws IOException {
-    Path folderPath = getFolderPath(scope, targetFolderPath);
+    Path folderPath = pathSecurityService.getFolderPath(scope, targetFolderPath);
 
     try (ZipOutputStream zipOut = new ZipOutputStream(outputStream)) {
       zipFolder(folderPath, zipOut);
@@ -175,7 +177,7 @@ public class FileStorageService {
   }
 
   public void uploadFile(String scope, String targetFilePath, MultipartFile file) throws IOException {
-    Path filePath = resolveSafePath(scope, targetFilePath);
+    Path filePath = pathSecurityService.resolveSafePath(scope, targetFilePath);
 
     String originalFilename = file.getOriginalFilename();
     if (originalFilename == null || originalFilename.isBlank()) {
@@ -186,31 +188,11 @@ public class FileStorageService {
   }
 
   public void uploadFolder(String scope, String targetFilePath, MultipartFile zipFile) throws IOException {
-    Path folderPath = getFolderPath(scope, targetFilePath);
+    Path folderPath = pathSecurityService.getFolderPath(scope, targetFilePath);
 
     try (ZipInputStream zipIn = new ZipInputStream(zipFile.getInputStream(), StandardCharsets.UTF_8)) {
       unzipFolder(folderPath, zipIn);
     }
-  }
-
-  private Path getFolderPath(String scope, String path) {
-    Path folderPath = resolveSafePath(scope, path);
-
-    if (!Files.isDirectory(folderPath)) {
-      throw new IllegalArgumentException("O caminho informado não é um diretório");
-    }
-
-    return folderPath;
-  }
-
-  private Path getFilePath(String scope, String path) {
-    Path filePath = resolveSafePath(scope, path);
-
-    if (!Files.isRegularFile(filePath)) {
-      throw new IllegalArgumentException("O caminho informado não é um arquivo.");
-    }
-
-    return filePath;
   }
 
   private void zipFolder(Path folderPath, ZipOutputStream zipOut) throws IOException {
@@ -286,22 +268,5 @@ public class FileStorageService {
     int dotIndex = name.lastIndexOf('.');
 
     return dotIndex >= 0 ? name.substring(dotIndex + 1).toLowerCase() : "";
-  }
-
-  public Path resolveSafePath(String scopeRelativePath, String path) {
-    Path base = Paths.get(dataRootDirectory).normalize().toAbsolutePath();
-    Path scope = base.resolve(scopeRelativePath).normalize();
-
-    if (!scope.startsWith(base)) {
-      throw new SecurityException("Caminho fora do diretório do servidor");
-    }
-
-    Path targetPath = scope.resolve(path).normalize();
-
-    if (!targetPath.startsWith(scope)) {
-      throw new SecurityException("Caminho fora do escopo permitido");
-    }
-
-    return targetPath;
   }
 }

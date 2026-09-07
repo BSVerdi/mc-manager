@@ -78,7 +78,7 @@ class MinecraftMetaDataServiceTest {
     @Test
     @DisplayName("Deve propagar NullPointerException quando a resposta do manifesto é nula")
     void devePropagarNullPointerExceptionQuandoRespostaNula() {
-      // Arrange — response.versions() é chamado sobre um retorno nulo do RestClient
+      // Arrange
       given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
               .willReturn(null);
 
@@ -153,7 +153,7 @@ class MinecraftMetaDataServiceTest {
       // Act
       service.getMinecraftServerVersionDetails("26.2");
 
-      // Assert — duas URLs diferentes devem ter sido consultadas
+      // Assert
       verify(restClient.get()).uri(VERSION_MANIFEST_URL);
       verify(restClient.get()).uri(versionUrl);
     }
@@ -245,11 +245,14 @@ class MinecraftMetaDataServiceTest {
     @Test
     @DisplayName("Deve retornar lista vazia quando o manifesto não tem versões")
     void deveRetornarListaVaziaQuandoManifestoVazio() {
+      // Arrange
       given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
               .willReturn(new ManifestEntryDto(Collections.emptyList()));
 
+      // Act
       List<MinecraftVersionDto> releases = service.getReleasedMinecraftServerVersions();
 
+      // Assert
       assertThat(releases).isEmpty();
     }
   }
@@ -295,8 +298,7 @@ class MinecraftMetaDataServiceTest {
     @Test
     @DisplayName("Deve retornar null quando o RestClient não encontra o jar (corpo nulo)")
     void deveRetornarNullQuandoRestClientNaoEncontraJar() {
-      // Arrange — o serviço não faz nenhuma validação própria; se o RestClient
-      // retornar um corpo nulo, o serviço apenas repassa esse null adiante.
+      // Arrange
       String jarUrl = "https://piston-data.mojang.com/v1/versions/inexistente/server.jar";
       given(restClient.get().uri(jarUrl).retrieve().body(InputStream.class))
               .willReturn(null);
