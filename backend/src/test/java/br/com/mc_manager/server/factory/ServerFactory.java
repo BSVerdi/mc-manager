@@ -16,7 +16,7 @@ public class ServerFactory {
             .build();
   }
 
-  public static Server createServerWithAllAttributesWithOwner(User owner) {
+  public static Server createServerWithOwner(User owner) {
     return Server.builder()
             .id(1L)
             .name("Example Server")
@@ -27,12 +27,22 @@ public class ServerFactory {
             .build();
   }
 
-  public static Server createServerWithAllAttributesWithId(Long id) {
+  public static Server createServerWithId(Long id) {
     return Server.builder()
             .id(id)
             .name("Example Server")
             .javaVersion("JAVA_21")
             .version("26.2")
+            .port(25565)
+            .build();
+  }
+
+  public static Server createServerWithMaxRam(String maxRam) {
+    return Server.builder()
+            .id(1L)
+            .name("Example Server")
+            .javaVersion("26.2")
+            .maxRam(maxRam)
             .port(25565)
             .build();
   }

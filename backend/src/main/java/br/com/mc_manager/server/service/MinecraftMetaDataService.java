@@ -16,7 +16,11 @@ public class MinecraftMetaDataService {
   private static final String VERSION_MANIFEST_URL =
           "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
-  private static final RestClient restClient = RestClient.create();
+  private final RestClient restClient;
+
+  public MinecraftMetaDataService(RestClient restClient) {
+    this.restClient = restClient;
+  }
 
   @Cacheable("minecraft_manifest")
   public List<MinecraftVersionDto> getMinecraftServerVersions() {

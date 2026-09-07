@@ -27,7 +27,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static br.com.mc_manager.server.factory.ServerFactory.createServerWithAllAttributes;
-import static br.com.mc_manager.server.factory.ServerFactory.createServerWithAllAttributesWithOwner;
+import static br.com.mc_manager.server.factory.ServerFactory.createServerWithOwner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -171,7 +171,7 @@ class ServerManagementServiceTest {
       // Preparar DTO e servidor para criação
       createServerDTO = new CreateServerDTO("Example Server", 25565, null, null, "26.2");
       when(serverRepository.existsByPort(anyInt())).thenReturn(false);
-      mockServerCriado = createServerWithAllAttributesWithOwner(owner);
+      mockServerCriado = createServerWithOwner(owner);
       mockServers.add(mockServerCriado);
     }
 
@@ -254,7 +254,7 @@ class ServerManagementServiceTest {
     @BeforeEach
     void setUpAtualizacao() {
       // Preparar servidor existente para atualização
-      mockServerExistente = createServerWithAllAttributesWithOwner(owner);
+      mockServerExistente = createServerWithOwner(owner);
       when(serverRepository.findById(anyLong())).thenReturn(Optional.of(mockServerExistente));
     }
 
@@ -363,7 +363,7 @@ class ServerManagementServiceTest {
     @BeforeEach
     void setUpOwnership() {
       // Preparar servidor com owner para validação
-      mockServerOwnerizado = createServerWithAllAttributesWithOwner(owner);
+      mockServerOwnerizado = createServerWithOwner(owner);
 
       when(serverRepository.findByIdWithOwner(anyLong())).thenReturn(Optional.of(mockServerOwnerizado));
     }

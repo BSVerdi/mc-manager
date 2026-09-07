@@ -18,7 +18,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 import static br.com.mc_manager.server.factory.ServerFactory.createServerWithAllAttributes;
-import static br.com.mc_manager.server.factory.ServerFactory.createServerWithAllAttributesWithId;
+import static br.com.mc_manager.server.factory.ServerFactory.createServerWithId;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -315,7 +315,7 @@ class ServerRuntimeServiceTest {
   class TesteReinicializacaoComConfigAtualizada {
 
     private final Long serverId = 1L;
-    private final Server serverConfig = createServerWithAllAttributesWithId(1L);
+    private final Server serverConfig = createServerWithId(1L);
     private final Path serverDirectory = Path.of("/test/");
 
     @Test
@@ -379,8 +379,8 @@ class ServerRuntimeServiceTest {
 
     private final Long serverId1 = 1L;
     private final Long serverId2 = 2L;
-    private final Server config1 = createServerWithAllAttributesWithId(1L);
-    private final Server config2 = createServerWithAllAttributesWithId(2L);
+    private final Server config1 = createServerWithId(1L);
+    private final Server config2 = createServerWithId(2L);
 
     @Test
     @DisplayName("Deve criar instâncias independentes para diferentes servidores")
