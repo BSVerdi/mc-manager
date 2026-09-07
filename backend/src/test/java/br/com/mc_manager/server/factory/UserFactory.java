@@ -17,4 +17,16 @@ public class UserFactory {
             .build();
   }
 
+  public static User createUserWithAttributes(Long id, String name, String email) {
+    return User.builder()
+            .id(id)
+            .name(name)
+            .email(email)
+            .password("encodedPassword")
+            .profilePictureUrl("profilePictureUrl")
+            .profile(Profile.USER)
+            .enabled(true)
+            .build();
+  }
+
 }

@@ -17,7 +17,7 @@ public class UserSecurityExpression {
     String username = authentication.getName();
 
     try {
-      userService.assertIsUser(userId, authentication.getName());
+      userService.assertIsUser(userId, username);
 
       return true;
     } catch (SecurityException e) {
