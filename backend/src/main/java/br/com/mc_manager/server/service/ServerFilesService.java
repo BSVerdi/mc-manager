@@ -18,11 +18,13 @@ public class ServerFilesService {
 
   private final MinecraftMetaDataService minecraftMetaDataService;
   private final FileStorageService fileStorageService;
+  private final FileArchiveService fileArchiveService;
   private final PathSecurityService pathSecurityService;
 
-  public ServerFilesService(MinecraftMetaDataService minecraftMetaDataService, FileStorageService fileStorageService, PathSecurityService pathSecurityService) {
+  public ServerFilesService(MinecraftMetaDataService minecraftMetaDataService, FileStorageService fileStorageService, FileArchiveService fileArchiveService, PathSecurityService pathSecurityService) {
     this.minecraftMetaDataService = minecraftMetaDataService;
     this.fileStorageService = fileStorageService;
+    this.fileArchiveService = fileArchiveService;
     this.pathSecurityService = pathSecurityService;
   }
 
@@ -113,7 +115,7 @@ public class ServerFilesService {
   public void downloadFolder(Long serverId, String path, OutputStream outputStream) throws IOException {
     String serverScope = "servers/" + serverId + "/";
 
-    fileStorageService.downloadFolder(serverScope, path, outputStream);
+    fileArchiveService.downloadFolder(serverScope, path, outputStream);
   }
 
   public void uploadFile(Long serverId, String path, MultipartFile file) throws IOException {
@@ -126,7 +128,7 @@ public class ServerFilesService {
   public void uploadFolder(Long serverId, String path, MultipartFile file) throws IOException {
     String serverScope = "servers/" + serverId + "/";
 
-    fileStorageService.uploadFolder(serverScope, path, file);
+    fileArchiveService.uploadFolder(serverScope, path, file);
   }
 
   public void delete(Long serverId, String path) throws IOException {

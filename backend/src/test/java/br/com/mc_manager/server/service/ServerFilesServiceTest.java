@@ -43,6 +43,9 @@ class ServerFilesServiceTest {
   @Mock
   private PathSecurityService pathSecurityService;
 
+  @Mock
+  private FileArchiveService fileArchiveService;
+
   @Nested
   @DisplayName("Operações de Criação")
   class CreateOperationsTests {
@@ -254,7 +257,7 @@ class ServerFilesServiceTest {
         serverFilesService.downloadFolder(serverId, path, outputStream);
 
         // Assert
-        verify(fileStorageService).downloadFolder("servers/" + serverId + "/", path, outputStream);
+        verify(fileArchiveService).downloadFolder("servers/" + serverId + "/", path, outputStream);
       }
     }
 
@@ -265,7 +268,7 @@ class ServerFilesServiceTest {
       Long serverId = 1L;
 
       try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-        doThrow(IOException.class).when(fileStorageService).downloadFolder(anyString(), anyString(), any(OutputStream.class));
+        doThrow(IOException.class).when(fileArchiveService).downloadFolder(anyString(), anyString(), any(OutputStream.class));
 
         // Act & Assert
         assertThrows(IOException.class, () -> {
@@ -334,7 +337,7 @@ class ServerFilesServiceTest {
       serverFilesService.uploadFolder(serverId, path, mockFile);
 
       // Assert
-      verify(fileStorageService).uploadFolder("servers/" + serverId + "/", path, mockFile);
+      verify(fileArchiveService).uploadFolder("servers/" + serverId + "/", path, mockFile);
     }
 
     @Test
@@ -344,7 +347,7 @@ class ServerFilesServiceTest {
       Long serverId = 1L;
       String path = "servers/";
 
-      doThrow(IOException.class).when(fileStorageService).uploadFolder(anyString(), anyString(), any(MockMultipartFile.class));
+      doThrow(IOException.class).when(fileArchiveService).uploadFolder(anyString(), anyString(), any(MockMultipartFile.class));
 
       // Act & Assert
       assertThrows(IOException.class, () -> {

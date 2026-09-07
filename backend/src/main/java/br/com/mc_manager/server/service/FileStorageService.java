@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 @Service
@@ -168,14 +166,6 @@ public class FileStorageService {
     return new MediaDto(mediaType, resource, filePath.getFileName());
   }
 
-  public void downloadFolder(String scope, String targetFolderPath, OutputStream outputStream) throws IOException {
-    Path folderPath = pathSecurityService.getFolderPath(scope, targetFolderPath);
-
-    try (ZipOutputStream zipOut = new ZipOutputStream(outputStream)) {
-      zipFolder(folderPath, zipOut);
-    }
-  }
-
   public void uploadFile(String scope, String targetFilePath, MultipartFile file) throws IOException {
     Path filePath = pathSecurityService.resolveSafePath(scope, targetFilePath);
 
@@ -185,14 +175,6 @@ public class FileStorageService {
     }
 
     saveFile(filePath, file);
-  }
-
-  public void uploadFolder(String scope, String targetFilePath, MultipartFile zipFile) throws IOException {
-    Path folderPath = pathSecurityService.getFolderPath(scope, targetFilePath);
-
-    try (ZipInputStream zipIn = new ZipInputStream(zipFile.getInputStream(), StandardCharsets.UTF_8)) {
-      unzipFolder(folderPath, zipIn);
-    }
   }
 
   private void zipFolder(Path folderPath, ZipOutputStream zipOut) throws IOException {
@@ -212,29 +194,6 @@ public class FileStorageService {
     }
 
     zipOut.finish();
-  }
-
-  private void unzipFolder(Path folderPath, ZipInputStream zipIn) throws IOException {
-    ZipEntry entry;
-
-    while ((entry = zipIn.getNextEntry()) != null) {
-      String entryName = entry.getName().replace('\\', '/');
-
-      Path targetFilePath = folderPath.resolve(entryName).normalize();
-
-      if (!targetFilePath.startsWith(folderPath)) {
-        throw new SecurityException("Entrada de zip inválida: " + entryName);
-      }
-
-      if (entry.isDirectory()) {
-        Files.createDirectories(targetFilePath);
-      } else {
-        Files.createDirectories(targetFilePath.getParent());
-        Files.copy(zipIn, targetFilePath);
-      }
-
-      zipIn.closeEntry();
-    }
   }
 
   private boolean isEditable(Path target) throws IOException {
