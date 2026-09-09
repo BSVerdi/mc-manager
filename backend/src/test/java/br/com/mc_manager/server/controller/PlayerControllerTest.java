@@ -4,7 +4,7 @@ import br.com.mc_manager.server.dto.PlayerDTO;
 import br.com.mc_manager.server.factory.PlayerDtoFactory;
 import br.com.mc_manager.server.security.expression.ServerSecurityExpressions;
 import br.com.mc_manager.server.service.PlayerService;
-import br.com.mc_manager.server.service.ServerRuntimeService;
+import br.com.mc_manager.server.service.runtime.ServerRuntimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

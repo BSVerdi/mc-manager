@@ -4,6 +4,7 @@ import br.com.mc_manager.server.dto.UpdateUserDto;
 import br.com.mc_manager.server.dto.UserDetailsDTO;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.UserRepository;
+import br.com.mc_manager.server.service.files.FileStorageService;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,6 +16,8 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
+import static br.com.mc_manager.server.service.files.util.FileNameUtils.extractExtension;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -79,7 +82,7 @@ public class UserService implements UserDetailsService {
   }
 
   private String saveProfilePic(MultipartFile file) throws IOException {
-    String extension = fileService.extractExtension(file.getOriginalFilename());
+    String extension = extractExtension(file.getOriginalFilename());
     String fileName = UUID.randomUUID() + "." + extension;
 
     fileService.saveFile("images/", fileName, file);

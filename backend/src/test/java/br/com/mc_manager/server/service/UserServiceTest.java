@@ -5,6 +5,7 @@ import br.com.mc_manager.server.dto.UserDetailsDTO;
 import br.com.mc_manager.server.factory.UserFactory;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.UserRepository;
+import br.com.mc_manager.server.service.files.FileStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -6,6 +6,7 @@ import br.com.mc_manager.server.dto.UpdateServerDTO;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.ServerRepository;
+import br.com.mc_manager.server.service.files.ServerFilesService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

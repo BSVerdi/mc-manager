@@ -6,6 +6,7 @@ import br.com.mc_manager.server.dto.UpdateServerDTO;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.ServerRepository;
+import br.com.mc_manager.server.service.files.ServerFilesService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -8,7 +8,7 @@ import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.security.expression.ServerSecurityExpressions;
 import br.com.mc_manager.server.service.MinecraftMetaDataService;
 import br.com.mc_manager.server.service.ServerManagementService;
-import br.com.mc_manager.server.service.ServerRuntimeService;
+import br.com.mc_manager.server.service.runtime.ServerRuntimeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

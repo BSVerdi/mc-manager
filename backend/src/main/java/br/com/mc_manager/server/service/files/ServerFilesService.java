@@ -1,9 +1,10 @@
-package br.com.mc_manager.server.service;
+package br.com.mc_manager.server.service.files;
 
 import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
 import br.com.mc_manager.server.dto.MediaDto;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
+import br.com.mc_manager.server.service.MinecraftMetaDataService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,12 +20,14 @@ public class ServerFilesService {
   private final MinecraftMetaDataService minecraftMetaDataService;
   private final FileStorageService fileStorageService;
   private final FileArchiveService fileArchiveService;
+  private final FileContentService fileContentService;
   private final PathSecurityService pathSecurityService;
 
-  public ServerFilesService(MinecraftMetaDataService minecraftMetaDataService, FileStorageService fileStorageService, FileArchiveService fileArchiveService, PathSecurityService pathSecurityService) {
+  public ServerFilesService(MinecraftMetaDataService minecraftMetaDataService, FileStorageService fileStorageService, FileArchiveService fileArchiveService, FileContentService fileContentService, PathSecurityService pathSecurityService) {
     this.minecraftMetaDataService = minecraftMetaDataService;
     this.fileStorageService = fileStorageService;
     this.fileArchiveService = fileArchiveService;
+    this.fileContentService = fileContentService;
     this.pathSecurityService = pathSecurityService;
   }
 
@@ -46,7 +49,7 @@ public class ServerFilesService {
     String serverScope = "servers/" + serverId + "/";
 
     fileStorageService.createFile(serverScope, "server.properties");
-    fileStorageService.saveFileContent(
+    fileContentService.saveFileContent(
             serverScope,
             "server.properties",
             "server-port=" + port + "\nmotd=Servidor gerenciado pelo mc-manager\n"
@@ -57,7 +60,7 @@ public class ServerFilesService {
     String serverScope = "servers/" + serverId + "/";
 
     fileStorageService.createFile(serverScope, "eula.txt");
-    fileStorageService.saveFileContent(
+    fileContentService.saveFileContent(
             serverScope,
             "eula.txt",
             "# Gerado automaticamente pelo mc-manager\neula=true\n"
@@ -91,7 +94,7 @@ public class ServerFilesService {
   public FileContentDTO getFileContent(Long serverId, String path) throws IOException {
     String serverScope = "servers/" + serverId + "/";
 
-    FileContentDTO fileContent = fileStorageService.getFileContent(serverScope, path);
+    FileContentDTO fileContent = fileContentService.getFileContent(serverScope, path);
 
     return fileContent;
   }
@@ -100,7 +103,7 @@ public class ServerFilesService {
   public void saveFileContent(Long serverId, String path, SaveFileRequestDTO request) throws IOException {
     String serverScope = "servers/" + serverId + "/";
 
-    fileStorageService.saveFileContent(serverScope, path, request.content());
+    fileContentService.saveFileContent(serverScope, path, request.content());
   }
 
   public MediaDto downloadFile(Long serverId, String path) throws IOException {

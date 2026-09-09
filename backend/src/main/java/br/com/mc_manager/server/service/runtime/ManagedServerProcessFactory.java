@@ -1,4 +1,4 @@
-package br.com.mc_manager.server.service;
+package br.com.mc_manager.server.service.runtime;
 
 import br.com.mc_manager.server.model.Server;
 

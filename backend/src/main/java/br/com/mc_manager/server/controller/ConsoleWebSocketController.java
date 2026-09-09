@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.controller;
 
-import br.com.mc_manager.server.service.ServerRuntimeService;
+import br.com.mc_manager.server.service.runtime.ServerRuntimeService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;

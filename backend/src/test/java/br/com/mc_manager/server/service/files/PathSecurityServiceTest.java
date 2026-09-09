@@ -1,4 +1,4 @@
-package br.com.mc_manager.server.service;
+package br.com.mc_manager.server.service.files;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -7,13 +7,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.createFile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @ExtendWith(MockitoExtension.class)
 class PathSecurityServiceTest {
@@ -36,14 +38,10 @@ class PathSecurityServiceTest {
     dataDirectory = scopeDirectory.resolve("dados");
     documentFile = scopeDirectory.resolve("documento.txt");
 
-    Files.createDirectories(dataDirectory);
-    Files.createFile(documentFile);
+    createDirectories(dataDirectory);
+    createFile(documentFile);
 
-    ReflectionTestUtils.setField(
-            service,
-            "dataRootDirectory",
-            baseDirectory.toString()
-    );
+    setField(service, "dataRootDirectory", baseDirectory.toString());
   }
 
   @Nested
@@ -51,31 +49,26 @@ class PathSecurityServiceTest {
 
     @Test
     void deveResolverCaminhoValido() {
-      Path result = service.resolveSafePath(
-              "escopos/api",
-              "dados.json"
-      );
+      // Act
+      Path result = service.resolveSafePath("escopos/api", "dados.json");
 
-      assertThat(result)
-              .isEqualTo(scopeDirectory.resolve("dados.json"));
+      // Arrange
+      assertThat(result).isEqualTo(scopeDirectory.resolve("dados.json"));
     }
 
     @Test
     void deveLancarSecurityExceptionQuandoScopeSaiDoDiretorioBase() {
-      assertThatThrownBy(() ->
-              service.resolveSafePath(
-                      "..",
-                      "arquivo.txt"
-              )
-      )
+      // Act & Assert
+      assertThatThrownBy(() -> service.resolveSafePath("..", "arquivo.txt"))
               .isInstanceOf(SecurityException.class)
               .hasMessage("Caminho fora do diretório do servidor");
     }
 
     @Test
     void deveLancarSecurityExceptionQuandoScopeSaiDoDiretorioBaseAtravesDeTraversal() {
-      assertThatThrownBy(() ->
-              service.resolveSafePath(
+      // Act & Assert
+      assertThatThrownBy(
+              () -> service.resolveSafePath(
                       "escopos/api/../../../../",
                       "arquivo.txt"
               )
@@ -86,8 +79,9 @@ class PathSecurityServiceTest {
 
     @Test
     void deveLancarSecurityExceptionQuandoPathSaiDoEscopoPermitido() {
-      assertThatThrownBy(() ->
-              service.resolveSafePath(
+      // Act & Assert
+      assertThatThrownBy(
+              () -> service.resolveSafePath(
                       "escopos/api",
                       "../../arquivo.txt"
               )
@@ -98,8 +92,9 @@ class PathSecurityServiceTest {
 
     @Test
     void deveLancarSecurityExceptionQuandoPathTentaAcessarDiretorioPai() {
-      assertThatThrownBy(() ->
-              service.resolveSafePath(
+      // Act & Assert
+      assertThatThrownBy(
+              () -> service.resolveSafePath(
                       "escopos/api",
                       "../documento.txt"
               )
@@ -110,57 +105,51 @@ class PathSecurityServiceTest {
 
     @Test
     void deveNormalizarCaminhoComCurrentDirectory() {
-      Path result = service.resolveSafePath(
-              "escopos/./api",
-              "./dados.json"
-      );
+      // Act
+      Path result = service.resolveSafePath("escopos/./api", "./dados.json");
 
-      assertThat(result)
-              .isEqualTo(scopeDirectory.resolve("dados.json"));
+      // Assert
+      assertThat(result).isEqualTo(scopeDirectory.resolve("dados.json"));
     }
 
     @Test
     void deveNormalizarParentDirectorySemSairDoEscopo() {
-      Path result = service.resolveSafePath(
-              "escopos/api",
-              "dados/../documento.txt"
-      );
+      // Act
+      Path result = service.resolveSafePath("escopos/api", "dados/../documento.txt");
 
-      assertThat(result)
-              .isEqualTo(documentFile);
+      // Assert
+      assertThat(result).isEqualTo(documentFile);
     }
 
     @Test
     void devePermitirScopeVazio() {
-      Path result = service.resolveSafePath(
-              "",
-              ""
-      );
+      // Act
+      Path result = service.resolveSafePath("", "");
 
-      assertThat(result)
-              .isEqualTo(baseDirectory);
+      // Assert
+      assertThat(result).isEqualTo(baseDirectory);
     }
 
     @Test
     void deveLancarNullPointerExceptionQuandoScopeForNull() {
-      assertThatThrownBy(() ->
-              service.resolveSafePath(
+      // Act & Assert
+      assertThatThrownBy(
+              () -> service.resolveSafePath(
                       null,
                       "arquivo.txt"
               )
-      )
-              .isInstanceOf(NullPointerException.class);
+      ).isInstanceOf(NullPointerException.class);
     }
 
     @Test
     void deveLancarNullPointerExceptionQuandoPathForNull() {
-      assertThatThrownBy(() ->
-              service.resolveSafePath(
+      // Act & Assert
+      assertThatThrownBy(
+              () -> service.resolveSafePath(
                       "escopos/api",
                       null
               )
-      )
-              .isInstanceOf(NullPointerException.class);
+      ).isInstanceOf(NullPointerException.class);
     }
   }
 
@@ -169,22 +158,19 @@ class PathSecurityServiceTest {
 
     @Test
     void deveRetornarDiretorioValido() {
-      Path result = service.getFolderPath(
-              "escopos/api",
-              "dados"
-      );
+      // Act
+      Path result = service.getFolderPath("escopos/api", "dados");
 
-      assertThat(result)
-              .isEqualTo(dataDirectory);
-
-      assertThat(Files.isDirectory(result))
-              .isTrue();
+      // Assert
+      assertThat(result).isEqualTo(dataDirectory);
+      assertThat(Files.isDirectory(result)).isTrue();
     }
 
     @Test
     void deveLancarIllegalArgumentExceptionQuandoCaminhoForArquivo() {
-      assertThatThrownBy(() ->
-              service.getFolderPath(
+      // Act & Assert
+      assertThatThrownBy(
+              () -> service.getFolderPath(
                       "escopos/api",
                       "documento.txt"
               )
@@ -195,8 +181,9 @@ class PathSecurityServiceTest {
 
     @Test
     void deveLancarSecurityExceptionQuandoCaminhoSairDoEscopo() {
-      assertThatThrownBy(() ->
-              service.getFolderPath(
+      // Act & Assert
+      assertThatThrownBy(
+              () -> service.getFolderPath(
                       "escopos/api",
                       "../documento.txt"
               )
@@ -207,8 +194,9 @@ class PathSecurityServiceTest {
 
     @Test
     void deveLancarSecurityExceptionQuandoScopeForInvalido() {
-      assertThatThrownBy(() ->
-              service.getFolderPath(
+      // Act & Assert
+      assertThatThrownBy(
+              () -> service.getFolderPath(
                       "..",
                       "arquivo.txt"
               )
@@ -223,22 +211,19 @@ class PathSecurityServiceTest {
 
     @Test
     void deveRetornarArquivoValido() {
-      Path result = service.getFilePath(
-              "escopos/api",
-              "documento.txt"
-      );
+      // Act
+      Path result = service.getFilePath("escopos/api", "documento.txt");
 
-      assertThat(result)
-              .isEqualTo(documentFile);
-
-      assertThat(Files.isRegularFile(result))
-              .isTrue();
+      // Assert
+      assertThat(result).isEqualTo(documentFile);
+      assertThat(Files.isRegularFile(result)).isTrue();
     }
 
     @Test
     void deveLancarIllegalArgumentExceptionQuandoCaminhoForDiretorio() {
-      assertThatThrownBy(() ->
-              service.getFilePath(
+      // Act & Assert
+      assertThatThrownBy(
+              () -> service.getFilePath(
                       "escopos/api",
                       "dados"
               )
@@ -249,8 +234,9 @@ class PathSecurityServiceTest {
 
     @Test
     void deveLancarSecurityExceptionQuandoCaminhoSairDoEscopo() {
-      assertThatThrownBy(() ->
-              service.getFilePath(
+      // Act & Assert
+      assertThatThrownBy(
+              () -> service.getFilePath(
                       "escopos/api",
                       "../dados/arquivo.txt"
               )
@@ -261,8 +247,9 @@ class PathSecurityServiceTest {
 
     @Test
     void deveLancarSecurityExceptionQuandoScopeForInvalido() {
-      assertThatThrownBy(() ->
-              service.getFilePath(
+      // Act & Assert
+      assertThatThrownBy(
+              () -> service.getFilePath(
                       "..",
                       "arquivo.txt"
               )

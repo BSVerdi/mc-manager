@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.controller;
 
-import br.com.mc_manager.server.service.ServerRuntimeService;
+import br.com.mc_manager.server.service.runtime.ServerRuntimeService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

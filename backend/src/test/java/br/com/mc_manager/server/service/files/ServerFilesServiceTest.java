@@ -1,4 +1,4 @@
-package br.com.mc_manager.server.service;
+package br.com.mc_manager.server.service.files;
 
 import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
@@ -8,6 +8,7 @@ import br.com.mc_manager.server.dto.MinecraftManifest.JavaVersionDto;
 import br.com.mc_manager.server.dto.MinecraftManifest.MinecraftServerDownloadDto;
 import br.com.mc_manager.server.dto.MinecraftManifest.MinecraftVersionDetailsDto;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
+import br.com.mc_manager.server.service.MinecraftMetaDataService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -41,10 +42,13 @@ class ServerFilesServiceTest {
   private FileStorageService fileStorageService;
 
   @Mock
-  private PathSecurityService pathSecurityService;
+  private FileArchiveService fileArchiveService;
 
   @Mock
-  private FileArchiveService fileArchiveService;
+  private FileContentService fileContentService;
+
+  @Mock
+  private PathSecurityService pathSecurityService;
 
   @Nested
   @DisplayName("Operações de Criação")
@@ -63,7 +67,7 @@ class ServerFilesServiceTest {
       // Assert - Verificar que todas as operações foram chamadas
       verify(fileStorageService).createFolder("servers/", "1");
       verify(fileStorageService, atLeastOnce()).createFile(anyString(), anyString());
-      verify(fileStorageService, atLeastOnce()).saveFileContent(anyString(), anyString(), any());
+      verify(fileContentService, atLeastOnce()).saveFileContent(anyString(), anyString(), any());
     }
 
     @Test
@@ -366,7 +370,7 @@ class ServerFilesServiceTest {
       serverFilesService.saveFileContent(serverId, path, mockRequest);
 
       // Assert
-      verify(fileStorageService).saveFileContent("servers/" + serverId + "/", "config/new-config.yml", mockRequest.content());
+      verify(fileContentService).saveFileContent("servers/" + serverId + "/", "config/new-config.yml", mockRequest.content());
     }
 
     @Test
@@ -376,7 +380,7 @@ class ServerFilesServiceTest {
       Long serverId = 1L;
       String path = "servers/";
 
-      doThrow(IOException.class).when(fileStorageService).saveFileContent(anyString(), anyString(), any());
+      doThrow(IOException.class).when(fileContentService).saveFileContent(anyString(), anyString(), any());
 
       // Act & Assert
       assertThrows(IOException.class, () -> {
@@ -409,14 +413,14 @@ class ServerFilesServiceTest {
       Long serverId = 1L;
       String path = "config/config.yml";
 
-      when(fileStorageService.getFileContent(anyString(), anyString())).thenReturn(mockFileContent);
+      when(fileContentService.getFileContent(anyString(), anyString())).thenReturn(mockFileContent);
 
       // Act
       FileContentDTO response = serverFilesService.getFileContent(serverId, path);
 
       // Assert
       assertNotNull(response);
-      verify(fileStorageService).getFileContent("servers/" + serverId + "/", path);
+      verify(fileContentService).getFileContent("servers/" + serverId + "/", path);
     }
 
     @Test
@@ -426,7 +430,7 @@ class ServerFilesServiceTest {
       Long serverId = 1L;
       String path = "config/config.yml";
 
-      when(fileStorageService.getFileContent(anyString(), anyString())).thenReturn(
+      when(fileContentService.getFileContent(anyString(), anyString())).thenReturn(
               new FileContentDTO("servers/", null, false, "jar")
       );
 

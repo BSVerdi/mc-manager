@@ -1,4 +1,4 @@
-package br.com.mc_manager.server.service;
+package br.com.mc_manager.server.service.files;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -23,6 +23,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import static java.nio.file.Files.createDirectories;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -50,8 +51,8 @@ class FileArchiveServiceTest {
     sourceDirectory = tempDir.resolve("source");
     targetDirectory = tempDir.resolve("target");
 
-    Files.createDirectories(sourceDirectory);
-    Files.createDirectories(targetDirectory);
+    createDirectories(sourceDirectory);
+    createDirectories(targetDirectory);
   }
 
   private byte[] createZip(String entryName, String content) throws IOException {
@@ -140,7 +141,7 @@ class FileArchiveServiceTest {
     void deveCompactarArquivosDeSubdiretorios() throws Exception {
       // Arrange
       Path subDirectory = sourceDirectory.resolve("subpasta");
-      Files.createDirectories(subDirectory);
+      createDirectories(subDirectory);
 
       Files.writeString(sourceDirectory.resolve("arquivo.txt"), "arquivo principal");
       Files.writeString(subDirectory.resolve("outro.txt"), "arquivo interno");

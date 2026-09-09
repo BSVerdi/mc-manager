@@ -1,4 +1,4 @@
-package br.com.mc_manager.server.service;
+package br.com.mc_manager.server.service.files;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

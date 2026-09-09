@@ -1,8 +1,9 @@
-package br.com.mc_manager.server.service;
+package br.com.mc_manager.server.service.runtime;
 
 import br.com.mc_manager.server.dto.LogLineDTO;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.ServerStatus;
+import br.com.mc_manager.server.service.PlayerService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.*;

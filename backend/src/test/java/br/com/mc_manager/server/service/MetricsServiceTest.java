@@ -1,6 +1,7 @@
 package br.com.mc_manager.server.service;
 
 import br.com.mc_manager.server.dto.ServerMetricsDTO;
+import br.com.mc_manager.server.service.runtime.ServerRuntimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

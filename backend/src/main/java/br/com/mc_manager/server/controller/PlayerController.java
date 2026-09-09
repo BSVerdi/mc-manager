@@ -2,7 +2,7 @@ package br.com.mc_manager.server.controller;
 
 import br.com.mc_manager.server.dto.PlayerDTO;
 import br.com.mc_manager.server.service.PlayerService;
-import br.com.mc_manager.server.service.ServerRuntimeService;
+import br.com.mc_manager.server.service.runtime.ServerRuntimeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

@@ -4,7 +4,7 @@ import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
 import br.com.mc_manager.server.dto.MediaDto;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
-import br.com.mc_manager.server.service.ServerFilesService;
+import br.com.mc_manager.server.service.files.ServerFilesService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;

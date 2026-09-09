@@ -7,7 +7,7 @@ import br.com.mc_manager.server.dto.StatusResponseDto;
 import br.com.mc_manager.server.dto.UpdateServerDTO;
 import br.com.mc_manager.server.service.MinecraftMetaDataService;
 import br.com.mc_manager.server.service.ServerManagementService;
-import br.com.mc_manager.server.service.ServerRuntimeService;
+import br.com.mc_manager.server.service.runtime.ServerRuntimeService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -4,7 +4,7 @@ import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
 import br.com.mc_manager.server.dto.MediaDto;
 import br.com.mc_manager.server.security.expression.ServerSecurityExpressions;
-import br.com.mc_manager.server.service.ServerFilesService;
+import br.com.mc_manager.server.service.files.ServerFilesService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

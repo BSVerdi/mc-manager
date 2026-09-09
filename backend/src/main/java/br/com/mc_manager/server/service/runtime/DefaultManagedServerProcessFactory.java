@@ -1,6 +1,7 @@
-package br.com.mc_manager.server.service;
+package br.com.mc_manager.server.service.runtime;
 
 import br.com.mc_manager.server.model.Server;
+import br.com.mc_manager.server.service.PlayerService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
