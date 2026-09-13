@@ -19,17 +19,18 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
   protected final ExecutorService executor;
   protected final PlayerService playerService;
   protected final Clock clock;
-
-  protected final ProcessLifecycle lifecycle;
-  protected final ConsoleGateway consoleGateway;
-  protected final MetricsCollector metricsCollector;
   protected final ServerStatusBroadcaster broadcaster;
   protected final ServerConsoleLineProcessor lineProcessor;
-
   protected final long maxRamMb;
 
   protected final AtomicReference<ServerStatus> status = new AtomicReference<>(ServerStatus.OFFLINE);
+
+  protected ProcessLifecycle lifecycle;
+  protected ConsoleGateway consoleGateway;
+  protected MetricsCollector metricsCollector;
+
   protected volatile Instant startedAt;
+  private volatile Runnable unexpectedExitCallback;
 
   public AbstractManagedServerProcess(
           Server server,
@@ -47,6 +48,10 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
     this.broadcaster = new ServerStatusBroadcaster(server.getId(), template, clock);
     this.lineProcessor = new ServerConsoleLineProcessor(server.getId(), broadcaster, playerService);
 
+
+  }
+
+  public final void init() {
     this.lifecycle = createLifecycle();
     this.consoleGateway = createConsoleGateway();
     this.metricsCollector = createMetricsCollector();
@@ -212,6 +217,11 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
     sendCommand("pardon " + nickname);
   }
 
+  @Override
+  public void onUnexpectedExit(Runnable callback) {
+    this.unexpectedExitCallback = callback;
+  }
+
   private void handleUnexpectedExit() {
     if (status.compareAndSet(ServerStatus.ONLINE, ServerStatus.OFFLINE)
             || status.compareAndSet(ServerStatus.STARTING, ServerStatus.OFFLINE)
@@ -219,6 +229,12 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
       startedAt = null;
       broadcaster.consoleLine("[CONSOLE] Processo encerrado inesperadamente");
       broadcaster.status(status.get());
+
+      lifecycle.cleanup();
+
+      if (unexpectedExitCallback != null) {
+        unexpectedExitCallback.run();
+      }
     }
   }
 }

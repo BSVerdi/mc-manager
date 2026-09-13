@@ -26,6 +26,9 @@ public class DockerMetricsCollector implements MetricsCollector {
   private final Supplier<Integer> onlinePlayersSupplier;
   private final Clock clock;
   private final long maxRamMb;
+  
+  private final AtomicReference<Long> lastTotalUsageNanos = new AtomicReference<>(null);
+  private final AtomicReference<Instant> lastSampleTime = new AtomicReference<>(null);
 
   DockerMetricsCollector(
           Server server,
@@ -47,7 +50,6 @@ public class DockerMetricsCollector implements MetricsCollector {
   long getMaxRamMb() {
     return maxRamMb;
   }
-
 
   @Override
   public ServerMetricsDTO collect() {
@@ -98,17 +100,40 @@ public class DockerMetricsCollector implements MetricsCollector {
   }
 
   private double calculateCpuPercent(Statistics stats) {
-    long cpuDelta = stats.getCpuStats().getCpuUsage().getTotalUsage()
-            - stats.getPreCpuStats().getCpuUsage().getTotalUsage();
+    Long totalUsageNanos = safeGet(() ->
+            stats.getCpuStats().getCpuUsage().getTotalUsage()
+    );
 
-    long systemDelta = stats.getCpuStats().getSystemCpuUsage()
-            - stats.getPreCpuStats().getSystemCpuUsage();
+    if (totalUsageNanos == null) return 0.0;
 
-    if (systemDelta <= 0 || cpuDelta <= 0) return 0.0;
+    Instant now = clock.instant();
 
-    long onlineCpus = stats.getCpuStats().getOnlineCpus() != null ? stats.getCpuStats().getOnlineCpus() : 1;
+    Long previousUsageNanos = lastTotalUsageNanos.getAndSet(totalUsageNanos);
+    Instant previousTime = lastSampleTime.getAndSet(now);
 
-    return (cpuDelta / (double) systemDelta) * onlineCpus * 100.0;
+    if (previousUsageNanos == null || previousTime == null) return 0.0;
+
+    long cpuDeltaNanos = totalUsageNanos - previousUsageNanos;
+    long elapsedNanos = Duration.between(previousTime, now).toNanos();
+
+    if (cpuDeltaNanos <= 0 || elapsedNanos <= 0) return 0.0;
+
+    long onlineCpus = stats.getCpuStats().getOnlineCpus() != null
+            ? stats.getCpuStats().getOnlineCpus()
+            : 1;
+
+    double percent = (cpuDeltaNanos / (double) elapsedNanos) * 100.0 / onlineCpus;
+
+    // Protecao contra picos irreais causados por delays no scheduling da JVM/thread
+    return Math.min(percent, 100.0 * onlineCpus);
+  }
+
+  private Long safeGet(Supplier<Long> supplier) {
+    try {
+      return supplier.get();
+    } catch (NullPointerException e) {
+      return null;
+    }
   }
 
   private void closeQuietly(ResultCallback<Statistics> calback) {

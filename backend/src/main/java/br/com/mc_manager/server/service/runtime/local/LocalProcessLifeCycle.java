@@ -66,6 +66,10 @@ public class LocalProcessLifeCycle implements ProcessLifecycle {
   }
 
   @Override
+  public void cleanup() {
+  }
+
+  @Override
   public void onExit(Runnable callback) {
     this.onExitCallback = callback;
   }

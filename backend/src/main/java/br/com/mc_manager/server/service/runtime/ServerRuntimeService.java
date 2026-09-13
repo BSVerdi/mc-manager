@@ -44,7 +44,11 @@ public class ServerRuntimeService {
   }
 
   public void stop(Long serverId) {
-    getOrCreateInstance(serverId).stop();
+    getExistingInstance(serverId).ifPresentOrElse(
+            instance -> instance.stopThen(() -> discard(serverId)),
+            () -> {
+            }
+    );
   }
 
   public void restart(Long serverId) {
@@ -139,7 +143,10 @@ public class ServerRuntimeService {
       var directory = serverFilesService.getServerDirectory(id);
       var javaExecutablePath = selectJavaExecutablePath(config.getJavaVersion());
 
-      return processFactory.create(config, javaExecutablePath, directory);
+      var instance = processFactory.create(config, javaExecutablePath, directory);
+      instance.onUnexpectedExit(() -> discard(serverId));
+
+      return instance;
     });
   }
 

@@ -35,7 +35,7 @@ public class LocalManagedServerProcessFactory implements ManagedServerProcessFac
 
   @Override
   public ManagedServerProcess create(Server config, String javaExecutablePath, Path directory) {
-    return new LocalManagedServerProcess(
+    LocalManagedServerProcess process = new LocalManagedServerProcess(
             config,
             template,
             executor,
@@ -46,5 +46,8 @@ public class LocalManagedServerProcessFactory implements ManagedServerProcessFac
             processFactory,
             clock
     );
+
+    process.init();
+    return process;
   }
 }

@@ -4,6 +4,7 @@ import br.com.mc_manager.server.service.runtime.ProcessLifecycle;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.WaitResponse;
 
 public class DockerProcessLifecycle implements ProcessLifecycle {
@@ -35,6 +36,15 @@ public class DockerProcessLifecycle implements ProcessLifecycle {
     if (!isRunning()) return;
 
     dockerClient.stopContainerCmd(containerId).withTimeout(timeoutSeconds).exec();
+    dockerClient.removeContainerCmd(containerId).withForce(true).exec();
+  }
+
+  @Override
+  public void cleanup() {
+    try {
+      dockerClient.removeContainerCmd(containerId).withForce(true).exec();
+    } catch (NotFoundException ignored) {
+    }
   }
 
   @Override

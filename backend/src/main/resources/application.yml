@@ -22,9 +22,14 @@ server:
 
 mcmanager:
   data_root_directory: ${DATA_ROOT_DIRECTORY}
+  host_data_root_directory: ${HOST_SERVERS_DATA_PATH}
+
   java_8: ${JAVA8_PATH:/opt/java/jdk8/bin/java}
   java_21: ${JAVA21_PATH:/opt/java/jdk21/bin/java}
   java_25: ${JAVA25_PATH:/opt/java/jdk25/bin/java}
+
   secret_key: ${JWT_SECRET}
   base_domain: ${BASE_DOMAIN}
+
+
 

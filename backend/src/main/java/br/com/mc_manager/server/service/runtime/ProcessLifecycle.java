@@ -7,5 +7,7 @@ public interface ProcessLifecycle {
 
   void stop(int timeoutSeconds);
 
+  void cleanup();
+
   void onExit(Runnable callback);
 }

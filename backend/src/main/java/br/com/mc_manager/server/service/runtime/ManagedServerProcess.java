@@ -37,4 +37,6 @@ public interface ManagedServerProcess {
   void banPlayer(String nickname);
 
   void unbanPlayer(String nickname);
+
+  void onUnexpectedExit(Runnable callback);
 }

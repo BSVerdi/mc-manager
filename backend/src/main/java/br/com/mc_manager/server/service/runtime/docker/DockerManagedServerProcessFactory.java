@@ -9,6 +9,7 @@ import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Volume;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -25,25 +26,36 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
   private static final String NETWORK_NAME = "mc-network";
   private static final String LABEL_ENABLE = "infrarust.enable";
   private static final String LABEL_DOMAIN = "infrarust.domains";
-
+  private static final Map<String, String> JAVA_IMAGES = Map.of(
+          "JAVA_8", "eclipse-temurin:8-jre",
+          "JAVA_21", "eclipse-temurin:21-jre",
+          "JAVA_25", "eclipse-temurin:25-jre"
+  );
   private final DockerClient dockerClient;
   private final SimpMessagingTemplate template;
   private final ExecutorService executor;
   private final PlayerService playerService;
   private final Clock clock;
+  private final Path hostServerDirectory;
+
 
   public DockerManagedServerProcessFactory(
           DockerClient dockerClient,
           SimpMessagingTemplate template,
           ExecutorService executor,
           PlayerService playerService,
-          Clock clock
+          Clock clock,
+
+          @Value("${mcmanager.host_data_root_directory}")
+          String hostServerDirectory
+
   ) {
     this.dockerClient = dockerClient;
     this.template = template;
     this.executor = executor;
     this.playerService = playerService;
     this.clock = clock;
+    this.hostServerDirectory = Path.of(hostServerDirectory);
   }
 
   @Override
@@ -52,6 +64,8 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
       throw new IllegalStateException("Servidor " + config.getId() + "não possui domínio configurado");
     }
 
+    Path hostPath = hostServerDirectory.resolve(String.valueOf(config.getId()));
+
     Map<String, String> labels = Map.of(
             LABEL_ENABLE, "true",
             LABEL_DOMAIN, config.getDomain()
@@ -59,10 +73,10 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
 
     HostConfig hostConfig = HostConfig.newHostConfig()
             .withNetworkMode(NETWORK_NAME)
-            .withBinds(new Bind(directory.toString(), new Volume("/data")));
+            .withBinds(new Bind(hostPath.toString(), new Volume("/data")));
 
-    String javaVersion = config.getJavaVersion().replace("JAVA_", "");
-    String containerImage = "eclipse-temurin:" + javaVersion + "-jre";
+    String javaVersion = config.getJavaVersion();
+    String containerImage = JAVA_IMAGES.get(javaVersion);
 
     CreateContainerResponse container = dockerClient.createContainerCmd(containerImage)
             .withName("mc-" + config.getId())
@@ -72,14 +86,14 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
             .withAttachStdin(true)
             .withStdinOpen(true)
             .withCmd(
-                    "Java",
+                    "java",
                     "-Xms" + config.getMinRam(),
                     "-Xmx" + config.getMaxRam(),
                     "-jar", "server.jar",
                     "nogui"
             ).exec();
 
-    return new DockerManagedServerProcess(
+    DockerManagedServerProcess process = new DockerManagedServerProcess(
             config,
             template,
             executor,
@@ -88,5 +102,8 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
             playerService,
             clock
     );
+
+    process.init();
+    return process;
   }
 }
