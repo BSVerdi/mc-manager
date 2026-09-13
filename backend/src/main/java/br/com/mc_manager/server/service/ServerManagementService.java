@@ -21,11 +21,13 @@ public class ServerManagementService {
   private final ServerRepository serverRepository;
   private final UserService userService;
   private final ServerFilesService provisioningService;
+  private final ServerDomainGenerator domainGenerator;
 
-  public ServerManagementService(ServerRepository serverRepository, UserService userService, ServerFilesService provisioningService) {
+  public ServerManagementService(ServerRepository serverRepository, UserService userService, ServerFilesService provisioningService, ServerDomainGenerator domainGenerator) {
     this.serverRepository = serverRepository;
     this.userService = userService;
     this.provisioningService = provisioningService;
+    this.domainGenerator = domainGenerator;
   }
 
   public List<ServerResponseDTO> listServers(String username) {
@@ -52,6 +54,9 @@ public class ServerManagementService {
     Server server = new Server(dto, owner);
 
     server = serverRepository.save(server);
+
+    String domain = domainGenerator.generate(server);
+    server.updateDomain(domain);
 
     try {
       provisioningService.createBaseServerFiles(server.getId(), server.getPort());

@@ -13,6 +13,8 @@ public class ServerFactory {
             .javaVersion("JAVA_21")
             .version("26.2")
             .port(25565)
+            .maxRam("2G")
+            .minRam("1G")
             .build();
   }
 

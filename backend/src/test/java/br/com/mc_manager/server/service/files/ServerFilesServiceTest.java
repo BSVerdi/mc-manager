@@ -101,7 +101,7 @@ class ServerFilesServiceTest {
       serverFilesService.deleteServerFiles(serverId);
 
       // Assert
-      verify(fileStorageService).deleteFolder("servers/" + serverId, "/");
+      verify(fileStorageService).deleteFolder("servers/" + serverId + "/", "");
     }
 
     @Test

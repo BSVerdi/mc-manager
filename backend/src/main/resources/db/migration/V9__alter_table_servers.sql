@@ -1,0 +1,2 @@
+ALTER TABLE servers
+    ADD COLUMN domain VARCHAR(255)

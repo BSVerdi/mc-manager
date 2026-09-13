@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: ${MYSQL_DB_URL}/mc_manager_test?createDatabaseIfNotExist=true
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  servlet:
+    multipart:
+      max-file-size: 2GB
+      max-request-size: 2GB
+
+  flyway:
+    enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+mcmanager:
+  secret_key: test.secret
+  base_domain: test.local
+  data_root_directory: ./target/test-data
+  java_8: /usr/lib/jvm/java-8/bin/java
+  java_21: /usr/lib/jvm/java-21/bin/java
+  java_25: /usr/lib/jvm/java-25/bin/java

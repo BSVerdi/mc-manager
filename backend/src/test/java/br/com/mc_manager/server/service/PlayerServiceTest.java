@@ -44,14 +44,11 @@ class PlayerServiceTest {
   @Mock
   private ServerPlayerRepository serverPlayerRepository;
 
-  private List<Server> mockServers;
   private List<Player> mockPlayers;
   private List<ServerPlayer> mockServerPlayers;
 
   @BeforeEach
   void setUp() {
-    // Preparar objetos mocks para testes
-    mockServers = new ArrayList<>();
     mockPlayers = new ArrayList<>();
     mockServerPlayers = new ArrayList<>();
   }

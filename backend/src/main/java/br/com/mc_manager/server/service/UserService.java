@@ -63,6 +63,7 @@ public class UserService implements UserDetailsService {
       deleteOldPicture(user);
 
       String path = saveProfilePic(file);
+
       user.updateProfilePicUrl(path);
     }
 

@@ -1,5 +1,6 @@
 package br.com.mc_manager.server.service.runtime;
 
+import br.com.mc_manager.server.dto.ServerMetricsDTO;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.repository.ServerRepository;
@@ -16,6 +17,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
+
 public class ServerRuntimeService {
 
   private final Map<Long, ManagedServerProcess> instances = new ConcurrentHashMap<>();
@@ -58,7 +60,7 @@ public class ServerRuntimeService {
   }
 
   public void deopPlayer(Long serverId, String nickname) {
-    executeAnInstanceMethod(serverId, (server) -> server.deOpPlayer(nickname));
+    executeAnInstanceMethod(serverId, (server) -> server.deopPlayer(nickname));
   }
 
   public void banPlayer(Long serverId, String nickname) {
@@ -81,9 +83,9 @@ public class ServerRuntimeService {
             .orElse(0);
   }
 
-  public Long getProcessPid(Long serverId) {
+  public ServerMetricsDTO getMetrics(Long serverId) {
     return getExistingInstance(serverId)
-            .map(ManagedServerProcess::getProcessPid)
+            .map(ManagedServerProcess::getMetrics)
             .orElse(null);
   }
 
@@ -92,16 +94,20 @@ public class ServerRuntimeService {
   }
 
   public Long getMaxRamMb(Long serverId) {
-    return getExistingInstance(serverId).map(ManagedServerProcess::getMaxRamMb).orElse(0L);
+    return getExistingInstance(serverId)
+            .map(ManagedServerProcess::getMaxRamMb)
+            .orElse(0L);
   }
 
   public Instant getStartedAt(Long serverId) {
-    return getExistingInstance(serverId).map(ManagedServerProcess::getStartedAt).orElse(null);
+    return getExistingInstance(serverId)
+            .map(ManagedServerProcess::getStartedAt)
+            .orElse(Instant.now());
   }
 
   public Set<Long> getActiveServersIds() {
     return instances.entrySet().stream()
-            .filter(entry -> entry.getValue().getProcessPid() != null)
+            .filter(entry -> entry.getValue().isRunning())
             .map(Map.Entry::getKey)
             .collect(Collectors.toSet());
   }
@@ -109,7 +115,7 @@ public class ServerRuntimeService {
   public void restartWithUpdatedConfig(Long serverId) {
     var current = getExistingInstance(serverId).orElse(null);
 
-    if (current == null || current.getProcessPid() == null) {
+    if (current == null || !current.isRunning()) {
       discard(serverId);
       return;
     }

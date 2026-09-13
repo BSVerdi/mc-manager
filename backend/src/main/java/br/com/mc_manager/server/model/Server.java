@@ -30,6 +30,7 @@ public class Server {
   private String minRam;
   private String maxRam;
   private Integer port;
+  private String domain;
 
   @ManyToOne(fetch = FetchType.LAZY)
   private User owner;
@@ -81,4 +82,7 @@ public class Server {
     this.javaVersion = javaVersion;
   }
 
+  public void updateDomain(String domain) {
+    this.domain = domain;
+  }
 }

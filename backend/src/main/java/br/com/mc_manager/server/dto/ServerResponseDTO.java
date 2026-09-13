@@ -3,7 +3,7 @@ package br.com.mc_manager.server.dto;
 import br.com.mc_manager.server.model.Server;
 
 public record ServerResponseDTO(
-        Long id, String name, Integer port, String minRam, String maxRam, String version
+        Long id, String name, Integer port, String minRam, String maxRam, String version, String domain
 ) {
   public ServerResponseDTO(Server server) {
     this(
@@ -12,7 +12,8 @@ public record ServerResponseDTO(
             server.getPort(),
             server.getMinRam(),
             server.getMaxRam(),
-            server.getVersion()
+            server.getVersion(),
+            server.getDomain()
     );
   }
 }

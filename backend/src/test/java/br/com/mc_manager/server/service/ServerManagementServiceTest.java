@@ -50,6 +50,9 @@ class ServerManagementServiceTest {
   private ServerFilesService provisioningService;
 
   @Mock
+  private ServerDomainGenerator serverDomainGenerator;
+
+  @Mock
   private User owner;
 
   private Principal principal;
@@ -180,6 +183,7 @@ class ServerManagementServiceTest {
     @DisplayName("create - Cria servidor novo com sucesso")
     void create_criaServidorNovoComSucesso() throws Exception {
       // Arrange
+      when(serverDomainGenerator.generate(any())).thenReturn("ExampleServer-1");
       when(serverRepository.save(any())).thenReturn(mockServerCriado);
       when(userService.currentUser(any())).thenReturn(owner);
       doNothing().when(provisioningService).createBaseServerFiles(anyLong(), anyInt());
@@ -213,6 +217,7 @@ class ServerManagementServiceTest {
     @DisplayName("create - Apaga servidor do repositório em caso de erro de IO")
     void create_erroAoCriarArquivos_deletaServidor() throws Exception {
       // Arrange
+      when(serverDomainGenerator.generate(any())).thenReturn("ExampleServer-1");
       when(userService.currentUser(any())).thenReturn(owner);
       when(serverRepository.save(any())).thenReturn(mockServerCriado);
 
@@ -229,6 +234,7 @@ class ServerManagementServiceTest {
     @DisplayName("create - Salva e atualiza versão Java com sucesso")
     void create_salvaEAtualizaVersaoJava() throws Exception {
       // Arrange
+      when(serverDomainGenerator.generate(any())).thenReturn("ExampleServer-1");
       when(userService.currentUser(any())).thenReturn(owner);
       when(serverRepository.save(any())).thenReturn(mockServerCriado);
 
@@ -432,7 +438,7 @@ class ServerManagementServiceTest {
         when(provisioningServiceMock.downloadVanillaJar(anyLong(), anyString())).thenReturn("17");
         when(serverRepository.save(any())).thenReturn(server);
 
-        serverManagementService = new ServerManagementService(serverRepository, userService, provisioningServiceMock);
+        serverManagementService = new ServerManagementService(serverRepository, userService, provisioningServiceMock, serverDomainGenerator);
 
         // Executar criação de servidor
         CreateServerDTO dto = new CreateServerDTO("Example Server", 25565, null, null, "26.2");

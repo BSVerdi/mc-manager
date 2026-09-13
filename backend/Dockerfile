@@ -3,7 +3,7 @@ WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn clean verify -DskipTests
 
 FROM eclipse-temurin:8-jdk-alpine AS jdk8
 FROM eclipse-temurin:21-jdk-alpine AS jdk21

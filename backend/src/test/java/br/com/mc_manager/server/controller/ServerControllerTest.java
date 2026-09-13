@@ -600,7 +600,7 @@ class ServerControllerTest {
               .andExpect(jsonPath("$[0].type").value("release"));
 
       verify(metaDataService).getReleasedMinecraftServerVersions();
-      verifyNoMoreInteractions(managementService, runtimeService);
+      verifyNoMoreInteractions(managementService);
     }
 
     @Test

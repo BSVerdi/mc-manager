@@ -42,7 +42,7 @@ public class ServerFilesService {
 
 
   public void deleteServerFiles(Long serverId) throws IOException {
-    fileStorageService.deleteFolder("servers/" + serverId, "/");
+    fileStorageService.deleteFolder("servers/" + serverId + "/", "");
   }
 
   private void writeServerProperties(Long serverId, Integer port) throws IOException {
@@ -113,7 +113,6 @@ public class ServerFilesService {
 
     return downloadFile;
   }
-
 
   public void downloadFolder(Long serverId, String path, OutputStream outputStream) throws IOException {
     String serverScope = "servers/" + serverId + "/";
