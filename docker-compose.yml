@@ -36,8 +36,8 @@ services:
       JAVA25_PATH: /opt/java/jdk25/bin/java
       HOST_SERVERS_DATA_PATH: ${HOST_SERVERS_DATA_PATH}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./data/servers:/data/servers
+      - /var/run/docker.sock.raw:/var/run/docker.sock
+      - ${HOST_SERVERS_DATA_PATH}:/data/servers
       - images:/data/images
     ports:
       - "8080:8080"
