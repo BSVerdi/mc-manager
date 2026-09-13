@@ -40,6 +40,7 @@ export default function Header({ opened, setOpened, user }: HeaderProps) {
       <motion.div
         animate={{ rotate: opened ? 0 : 180 }}
         transition={{ duration: 0.1 }}
+        className="side-menu-state-container"
       >
         <ChevronsLeft
           className="side-menu-state-btn"

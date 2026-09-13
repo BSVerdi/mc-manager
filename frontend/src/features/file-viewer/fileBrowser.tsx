@@ -10,6 +10,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
+import LoadingScreen from "../../components/LoadingScreen";
 import UploadButton from "../../components/UploadButton";
 import { useServerId } from "../../hooks/useServerId";
 import { api } from "../../lib/apiClient";
@@ -88,6 +89,7 @@ export function FileBrowser({ browser, editor }: Props) {
 
   return (
     <section className="file-grid-container">
+      <LoadingScreen isVisible={zipping} />
       <section className="file-grid-header">
         <div>
           <a onClick={() => browser.goToBreadcrumb(-1)}>root</a>

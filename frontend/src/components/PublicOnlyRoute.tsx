@@ -1,11 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import LoadingScreen from "./LoadingScreen";
 
 export function PublicOnlyRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <p>Carregando...</p>;
+    return <LoadingScreen isVisible={loading} />;
   }
 
   if (user) {

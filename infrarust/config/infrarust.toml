@@ -1,0 +1,10 @@
+bind = "0.0.0.0:25565"
+servers_dir = "./servers"
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+network = "mc-network"
+poll_interval = "30s"
+reconnect_delay = "5s"
+
+[web]

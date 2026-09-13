@@ -169,7 +169,7 @@ export const api = {
       formData.append("file", file);
 
       return http
-        .patch(`/users/${userId}/profile-picture`, formData, {
+        .post(`/users/${userId}/profile-picture`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

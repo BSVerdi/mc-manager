@@ -13,6 +13,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
 
   backend:
     build:
@@ -22,19 +24,45 @@ services:
       mysql:
         condition: service_healthy
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       MYSQL_DB_URL: jdbc:mysql://mysql:3306
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
+      BASE_DOMAIN: ${BASE_DOMAIN}
       DATA_ROOT_DIRECTORY: /data
       JAVA8_PATH: /opt/java/jdk8/bin/java
       JAVA21_PATH: /opt/java/jdk21/bin/java
       JAVA25_PATH: /opt/java/jdk25/bin/java
+      HOST_SERVERS_DATA_PATH: ${HOST_SERVERS_DATA_PATH}
     volumes:
-      - servers-data:/data/servers
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/servers:/data/servers
       - images:/data/images
     ports:
       - "8080:8080"
+    networks:
+      - app-network
+      - mc-network
+
+  infrarust:
+    image: ghcr.io/shadowner/infrarust:latest
+    user: "0:0"
+    command:
+      - "--config"
+      - "/app/config/infrarust.toml"
+      - "--servers-dir"
+      - "/app/config/servers"
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "25565:25565"
+    volumes:
+      - /var/run/docker.sock.raw:/var/run/docker.sock
+      - ./infrarust/config:/app/config:ro
+    networks:
+      - mc-network
 
   frontend:
     build:
@@ -46,8 +74,17 @@ services:
       - "80:80"
     volumes:
       - images:/usr/share/nginx/images:ro
+    networks:
+      - app-network
 
 volumes:
   mysql-data:
-  servers-data:
   images:
+
+networks:
+  app-network:
+    driver: bridge
+
+  mc-network:
+    name: mc-network
+    external: true
