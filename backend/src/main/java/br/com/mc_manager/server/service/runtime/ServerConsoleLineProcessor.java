@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public class ServerConsoleLineProcessor implements Consumer<String> {
 
   private static final Pattern LEVEL_PREFIX_PATTERN =
-          Pattern.compile("^(?:\\[\\d{2}:\\d{2}:\\d{2}]|.*?) (\\[.*].*)$");
+          Pattern.compile(".*? (\\[.*].*)$");
   private static final Pattern JOIN_PATTERN =
           Pattern.compile("^(?:\\[.*]).* (\\w+)\\[/[^\\]]+] logged in with entity id \\d+ at \\(.*\\)");
   private static final Pattern LEAVE_PATTERN =

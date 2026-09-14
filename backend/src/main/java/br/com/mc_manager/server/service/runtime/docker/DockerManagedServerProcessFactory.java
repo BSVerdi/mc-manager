@@ -26,6 +26,7 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
   private static final String NETWORK_NAME = "mc-network";
   private static final String LABEL_ENABLE = "infrarust.enable";
   private static final String LABEL_DOMAIN = "infrarust.domains";
+  private static final String LABEL_PORT = "infrarust.port";
   private static final Map<String, String> JAVA_IMAGES = Map.of(
           "JAVA_8", "eclipse-temurin:8-jre",
           "JAVA_21", "eclipse-temurin:21-jre",

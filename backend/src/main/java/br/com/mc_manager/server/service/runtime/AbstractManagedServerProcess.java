@@ -47,8 +47,6 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
 
     this.broadcaster = new ServerStatusBroadcaster(server.getId(), template, clock);
     this.lineProcessor = new ServerConsoleLineProcessor(server.getId(), broadcaster, playerService);
-
-
   }
 
   public final void init() {
