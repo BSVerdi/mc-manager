@@ -77,7 +77,7 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
 
     String javaVersion = config.getJavaVersion();
     String containerImage = JAVA_IMAGES.get(javaVersion);
-    String containerName = config.getDomain().split(".")[1];
+    String containerName = config.getDomain().substring(0, config.getDomain().indexOf("."));
 
     CreateContainerResponse container = dockerClient.createContainerCmd(containerImage)
             .withName(containerName)
