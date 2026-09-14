@@ -27,6 +27,7 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
   private static final String LABEL_ENABLE = "infrarust.enable";
   private static final String LABEL_DOMAIN = "infrarust.domains";
   private static final String LABEL_PORT = "infrarust.port";
+  private static final String LABEL_PROXY_MODE = "infrarust.proxy_mode";
   private static final Map<String, String> JAVA_IMAGES = Map.of(
           "JAVA_8", "eclipse-temurin:8-jre",
           "JAVA_21", "eclipse-temurin:21-jre",
@@ -69,7 +70,9 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
 
     Map<String, String> labels = Map.of(
             LABEL_ENABLE, "true",
-            LABEL_DOMAIN, config.getDomain()
+            LABEL_DOMAIN, config.getDomain(),
+            LABEL_PORT, config.getPort().toString(),
+            LABEL_PROXY_MODE, "client_only"
     );
 
     HostConfig hostConfig = HostConfig.newHostConfig()
