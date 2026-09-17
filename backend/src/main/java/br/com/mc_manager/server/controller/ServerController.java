@@ -1,10 +1,10 @@
 package br.com.mc_manager.server.controller;
 
-import br.com.mc_manager.server.dto.CreateServerDTO;
 import br.com.mc_manager.server.dto.MinecraftManifest.MinecraftVersionDto;
-import br.com.mc_manager.server.dto.ServerResponseDTO;
 import br.com.mc_manager.server.dto.StatusResponseDto;
-import br.com.mc_manager.server.dto.UpdateServerDTO;
+import br.com.mc_manager.server.dto.server.CreateServerDTO;
+import br.com.mc_manager.server.dto.server.ServerDetailsDto;
+import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 import br.com.mc_manager.server.service.MinecraftMetaDataService;
 import br.com.mc_manager.server.service.ServerManagementService;
 import br.com.mc_manager.server.service.runtime.ServerRuntimeService;
@@ -32,7 +32,7 @@ public class ServerController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ServerResponseDTO>> listServers(Principal principal) {
+  public ResponseEntity<List<ServerDetailsDto>> listServers(Principal principal) {
     var servers = managementService.listServers(principal.getName());
 
     return ResponseEntity.ok().body(servers);
@@ -40,14 +40,14 @@ public class ServerController {
 
   @GetMapping("/{serverId}")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
-  public ResponseEntity<ServerResponseDTO> getServer(@PathVariable Long serverId) {
+  public ResponseEntity<ServerDetailsDto> getServer(@PathVariable Long serverId) {
     var server = managementService.getServer(serverId);
 
     return ResponseEntity.ok().body(server);
   }
 
   @PostMapping
-  public ResponseEntity<ServerResponseDTO> createServer(
+  public ResponseEntity<ServerDetailsDto> createServer(
           @Valid @RequestBody CreateServerDTO dto,
           Principal principal,
           UriComponentsBuilder uriBuilder
@@ -61,7 +61,7 @@ public class ServerController {
 
   @PutMapping("/{serverId}")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
-  public ResponseEntity<ServerResponseDTO> update(
+  public ResponseEntity<ServerDetailsDto> update(
           @PathVariable Long serverId,
           @Valid @RequestBody UpdateServerDTO dto
   ) {

@@ -5,6 +5,7 @@ import br.com.mc_manager.server.model.ServerStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.time.Clock;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ServerBroadcaster {
@@ -20,12 +21,18 @@ public class ServerBroadcaster {
   }
 
   public void status(ServerStatus status) {
-    template.convertAndSend("/topic/status/" + serverId, status);
+    template.convertAndSend("/topic/" + serverId + "/status", status);
   }
 
   public void consoleLine(String message) {
-    template.convertAndSend("/topic/console/" + serverId,
+    template.convertAndSend("/topic/" + serverId + "/console/",
             new LogLineDTO(idCounter.incrementAndGet(), message, clock.instant().toString())
     );
   }
+
+  public void players(Set<String> onlinePlayers) {
+    template.convertAndSend("/topic/" + serverId + "/players", onlinePlayers);
+  }
+
 }
+

@@ -1,9 +1,9 @@
 package br.com.mc_manager.server.controller;
 
-import br.com.mc_manager.server.dto.CreateServerDTO;
 import br.com.mc_manager.server.dto.MinecraftManifest.MinecraftVersionDto;
-import br.com.mc_manager.server.dto.ServerResponseDTO;
-import br.com.mc_manager.server.dto.UpdateServerDTO;
+import br.com.mc_manager.server.dto.server.CreateServerDTO;
+import br.com.mc_manager.server.dto.server.ServerDetailsDto;
+import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.security.expression.ServerSecurityExpressions;
 import br.com.mc_manager.server.service.MinecraftMetaDataService;
@@ -81,8 +81,8 @@ class ServerControllerTest {
     @DisplayName("Deve listar servidores com sucesso para usuário autenticado")
     void deveListarServidores() throws Exception {
       // Arrange
-      ServerResponseDTO server1 = createServerResponseDtoWithAttributes(1L, "Server 1");
-      ServerResponseDTO server2 = createServerResponseDtoWithAttributes(2L, "Server 2");
+      ServerDetailsDto server1 = createServerResponseDtoWithAttributes(1L, "Server 1");
+      ServerDetailsDto server2 = createServerResponseDtoWithAttributes(2L, "Server 2");
 
       given(managementService.listServers(anyString())).willReturn(Arrays.asList(server1, server2));
 
@@ -129,7 +129,7 @@ class ServerControllerTest {
     void deveRetornarServidorExistente() throws Exception {
       // Arrange
       Long serverId = 1L;
-      ServerResponseDTO expectedServer = createServerResponseDtoWithAllAttributes();
+      ServerDetailsDto expectedServer = createServerResponseDtoWithAllAttributes();
 
       given(managementService.getServer(serverId)).willReturn(expectedServer);
 
@@ -178,7 +178,7 @@ class ServerControllerTest {
     void deveCriarServidorComSucesso() throws Exception {
       // Arrange
       CreateServerDTO createServerDto = createCreateServerDTOWithAllAttributes();
-      ServerResponseDTO createdServerDto = createServerResponseDtoWithAllAttributes();
+      ServerDetailsDto createdServerDto = createServerResponseDtoWithAllAttributes();
 
       given(managementService.create(any(CreateServerDTO.class), any())).willReturn(createdServerDto);
 
@@ -240,7 +240,7 @@ class ServerControllerTest {
     void deveAtualizarESReiniciarServidor() throws Exception {
       // Arrange
       UpdateServerDTO updateServerDto = createUpdateServerDTOWithAllAttributes();
-      ServerResponseDTO updatedServer = createServerResponseDtoWithAttributes(1L, "Updated Server");
+      ServerDetailsDto updatedServer = createServerResponseDtoWithAttributes(1L, "Updated Server");
 
       given(managementService.update(any(Long.class), any(UpdateServerDTO.class))).willReturn(updatedServer);
 

@@ -1,8 +1,8 @@
 package br.com.mc_manager.server.service;
 
-import br.com.mc_manager.server.dto.CreateServerDTO;
-import br.com.mc_manager.server.dto.ServerResponseDTO;
-import br.com.mc_manager.server.dto.UpdateServerDTO;
+import br.com.mc_manager.server.dto.server.CreateServerDTO;
+import br.com.mc_manager.server.dto.server.ServerDetailsDto;
+import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.ServerRepository;
@@ -30,26 +30,22 @@ public class ServerManagementService {
     this.domainGenerator = domainGenerator;
   }
 
-  public List<ServerResponseDTO> listServers(String username) {
+  public List<ServerDetailsDto> listServers(String username) {
     return serverRepository
             .findByOwnerEmail(username)
             .stream()
-            .map(ServerResponseDTO::new)
+            .map(ServerDetailsDto::new)
             .toList();
   }
 
-  public ServerResponseDTO getServer(Long id) {
+  public ServerDetailsDto getServer(Long id) {
     var server = serverRepository.findById(id).orElseThrow();
 
-    return new ServerResponseDTO(server);
+    return new ServerDetailsDto(server);
   }
 
   @Transactional
-  public ServerResponseDTO create(CreateServerDTO dto, Principal principal) {
-    if (serverRepository.existsByPort(dto.port())) {
-      throw new IllegalArgumentException("A porta " + dto.port() + " já está em uso");
-    }
-
+  public ServerDetailsDto create(CreateServerDTO dto, Principal principal) {
     User owner = userService.currentUser(principal);
     Server server = new Server(dto, owner);
 
@@ -70,16 +66,16 @@ public class ServerManagementService {
       throw new RuntimeException("Erro ao criar arquivos do servidor", e);
     }
 
-    return new ServerResponseDTO(server);
+    return new ServerDetailsDto(server);
   }
 
-  public ServerResponseDTO update(Long id, UpdateServerDTO dto) {
+  public ServerDetailsDto update(Long id, UpdateServerDTO dto) {
     Server server = serverRepository.findById(id).orElseThrow();
 
     server.update(dto);
     serverRepository.save(server);
 
-    return new ServerResponseDTO(server);
+    return new ServerDetailsDto(server);
   }
 
   public void delete(Long id) {

@@ -1,7 +1,7 @@
 package br.com.mc_manager.server.model;
 
-import br.com.mc_manager.server.dto.CreateServerDTO;
-import br.com.mc_manager.server.dto.UpdateServerDTO;
+import br.com.mc_manager.server.dto.server.CreateServerDTO;
+import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +29,7 @@ public class Server {
   private String javaVersion;
   private String minRam;
   private String maxRam;
-  private Integer port;
+  private int port;
   private String domain;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -43,7 +43,7 @@ public class Server {
   public Server(CreateServerDTO dto, User owner) {
     this.name = dto.name();
     this.version = dto.version();
-    this.port = dto.port();
+    this.port = 25565;
 
     if (dto.minRam() != null) {
       this.minRam = dto.minRam();
@@ -84,5 +84,9 @@ public class Server {
 
   public void updateDomain(String domain) {
     this.domain = domain;
+  }
+
+  public void updatePort(int port) {
+    this.port = port;
   }
 }

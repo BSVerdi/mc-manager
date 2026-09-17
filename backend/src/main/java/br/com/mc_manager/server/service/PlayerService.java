@@ -34,21 +34,30 @@ public class PlayerService {
     return players.stream().map(PlayerDTO::new).toList();
   }
 
+  @Transactional
   public void saveServerPlayer(Long serverId, String nickname) {
     Player player = playerRepository.findByNickname(nickname)
-            .orElseGet(() -> playerRepository.save(
-                    new Player(nickname, PLAYER_ICON_BASE_URL + nickname + "/48")
-            ));
+            .orElseGet(() -> savePlayer(nickname));
 
     ServerPlayerId serverPlayerId = new ServerPlayerId(serverId, player.getId());
     boolean alreadyLinked = serverPlayerRepository.existsById(serverPlayerId);
 
     if (!alreadyLinked) {
-      Server server = serverRepository.findById(serverId).orElseThrow();
-      ServerPlayer memberShip = new ServerPlayer(server, player);
-
-      serverPlayerRepository.save(memberShip);
+      saveServerPlayerMembership(player, serverId);
     }
+  }
+
+  private Player savePlayer(String nickname) {
+    Player player = new Player(nickname, PLAYER_ICON_BASE_URL + nickname + "/48");
+
+    return playerRepository.save(player);
+  }
+
+  private void saveServerPlayerMembership(Player player, Long serverId) {
+    Server server = serverRepository.findById(serverId).orElseThrow();
+    ServerPlayer memberShip = new ServerPlayer(server, player);
+
+    serverPlayerRepository.save(memberShip);
   }
 
   @Transactional

@@ -72,7 +72,7 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
     Map<String, String> labels = Map.of(
             LABEL_ENABLE, "true",
             LABEL_DOMAIN, config.getDomain(),
-            LABEL_PORT, config.getPort().toString(),
+            LABEL_PORT, "25565",
             LABEL_PROXY_MODE, "passthrough"
     );
 

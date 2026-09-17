@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.service.runtime.local;
 
-import br.com.mc_manager.server.dto.ServerMetricsDTO;
+import br.com.mc_manager.server.dto.server.ServerMetricsDTO;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.service.runtime.MetricsCollector;
 import oshi.SystemInfo;

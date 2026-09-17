@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.service.runtime.docker;
 
-import br.com.mc_manager.server.dto.ServerMetricsDTO;
+import br.com.mc_manager.server.dto.server.ServerMetricsDTO;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.service.runtime.MetricsCollector;
 import com.github.dockerjava.api.DockerClient;
@@ -26,7 +26,7 @@ public class DockerMetricsCollector implements MetricsCollector {
   private final Supplier<Integer> onlinePlayersSupplier;
   private final Clock clock;
   private final long maxRamMb;
-  
+
   private final AtomicReference<Long> lastTotalUsageNanos = new AtomicReference<>(null);
   private final AtomicReference<Instant> lastSampleTime = new AtomicReference<>(null);
 

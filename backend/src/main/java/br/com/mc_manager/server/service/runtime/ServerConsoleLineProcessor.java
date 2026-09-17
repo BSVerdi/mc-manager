@@ -40,15 +40,12 @@ public class ServerConsoleLineProcessor implements Consumer<String> {
   }
 
   public void disconnectAllPlayers() {
-    onlinePlayers.forEach(name -> playerService.playerDisconnected(serverId, name));
+    onlinePlayers.forEach(nickname -> playerService.playerDisconnected(serverId, nickname));
     onlinePlayers.clear();
   }
 
   private String stripDatePrefix(String rawLine) {
-    System.out.println("rawLine: " + rawLine);
     Matcher matcher = LEVEL_PREFIX_PATTERN.matcher(rawLine);
-
-    System.out.println("matcher.matches(): " + matcher.matches());
 
     return matcher.matches() ? matcher.group("message") : rawLine;
   }
@@ -57,11 +54,13 @@ public class ServerConsoleLineProcessor implements Consumer<String> {
     Matcher joinMatcher = JOIN_PATTERN.matcher(clean);
 
     if (joinMatcher.matches()) {
-      String playerName = joinMatcher.group(1);
+      String playerNickname = joinMatcher.group(1);
 
-      playerService.saveServerPlayer(serverId, playerName);
-      playerService.playerConnected(serverId, playerName);
-      onlinePlayers.add(playerName);
+      playerService.saveServerPlayer(serverId, playerNickname);
+      playerService.playerConnected(serverId, playerNickname);
+      onlinePlayers.add(playerNickname);
+
+      broadcaster.players(onlinePlayers);
 
       return;
     }
@@ -71,6 +70,8 @@ public class ServerConsoleLineProcessor implements Consumer<String> {
       String playerNickname = leaveMatcher.group(1);
       playerService.playerDisconnected(serverId, playerNickname);
       onlinePlayers.remove(playerNickname);
+
+      broadcaster.players(onlinePlayers);
     }
   }
 }

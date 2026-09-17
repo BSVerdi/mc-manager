@@ -1,11 +1,11 @@
-package br.com.mc_manager.server.dto;
+package br.com.mc_manager.server.dto.server;
 
 import br.com.mc_manager.server.model.Server;
 
-public record ServerResponseDTO(
+public record ServerDetailsDto(
         Long id, String name, Integer port, String minRam, String maxRam, String version, String domain
 ) {
-  public ServerResponseDTO(Server server) {
+  public ServerDetailsDto(Server server) {
     this(
             server.getId(),
             server.getName(),

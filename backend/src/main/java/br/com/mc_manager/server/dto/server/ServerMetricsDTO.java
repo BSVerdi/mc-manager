@@ -1,4 +1,4 @@
-package br.com.mc_manager.server.dto;
+package br.com.mc_manager.server.dto.server;
 
 public record ServerMetricsDTO(
         Long serverId,

@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.service;
 
-import br.com.mc_manager.server.dto.ServerMetricsDTO;
+import br.com.mc_manager.server.dto.server.ServerMetricsDTO;
 import br.com.mc_manager.server.service.runtime.ServerRuntimeService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;

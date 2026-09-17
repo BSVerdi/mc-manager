@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.service.runtime.docker;
 
-import br.com.mc_manager.server.dto.ServerMetricsDTO;
+import br.com.mc_manager.server.dto.server.ServerMetricsDTO;
 import br.com.mc_manager.server.model.Server;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
