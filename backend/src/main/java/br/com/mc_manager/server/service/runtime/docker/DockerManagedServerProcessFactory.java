@@ -7,6 +7,7 @@ import br.com.mc_manager.server.service.runtime.ManagedServerProcessFactory;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.Bind;
+import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Volume;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,7 +73,7 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
             LABEL_ENABLE, "true",
             LABEL_DOMAIN, config.getDomain(),
             LABEL_PORT, config.getPort().toString(),
-            LABEL_PROXY_MODE, "client_only"
+            LABEL_PROXY_MODE, "passthrough"
     );
 
     HostConfig hostConfig = HostConfig.newHostConfig()
@@ -87,6 +88,7 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
             .withName(containerName)
             .withHostConfig(hostConfig)
             .withLabels(labels)
+            .withExposedPorts(ExposedPort.tcp(25565))
             .withWorkingDir("/data")
             .withAttachStdin(true)
             .withStdinOpen(true)
