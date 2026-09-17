@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -20,6 +19,7 @@ import java.nio.file.Path;
 import java.time.Clock;
 import java.util.concurrent.ExecutorService;
 
+import static br.com.mc_manager.server.factory.ServerFactory.createServerWithAllAttributes;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,19 +45,21 @@ class DockerManagedServerProcessFactoryTest {
   @Mock
   private Clock clock;
 
-  @InjectMocks
-  private DockerManagedServerProcessFactory factory;
-
+  @Mock
   private CreateContainerResponse containerResponse;
 
-  private Server createValidServer() {
-    Server server = mock(Server.class);
-    given(server.getId()).willReturn(1L);
-    given(server.getDomain()).willReturn("meuservidor.com");
-    given(server.getJavaVersion()).willReturn("JAVA_21");
-    given(server.getMinRam()).willReturn("512M");
-    given(server.getMaxRam()).willReturn("1G");
-    return server;
+  private DockerManagedServerProcessFactory factory;
+
+  @BeforeEach
+  void setUp() {
+    factory = new DockerManagedServerProcessFactory(
+            dockerClient,
+            template,
+            executor,
+            playerService,
+            clock,
+            "./host/target/test"
+    );
   }
 
   @Nested
@@ -97,17 +99,12 @@ class DockerManagedServerProcessFactoryTest {
   @DisplayName("Criação do Container")
   class CriacaoDoContainerTests {
 
+    private Server server;
+
     @BeforeEach
     void setUp() {
-      containerResponse = mock(CreateContainerResponse.class);
-      given(containerResponse.getId()).willReturn("container-123");
-    }
+      server = createServerWithAllAttributes();
 
-    @Test
-    @DisplayName("retorna DockerManagedServerProcess com sucesso")
-    void deveRetornarProcessoComSucesso() {
-      // Arrange
-      Server server = createValidServer();
       given(dockerClient.createContainerCmd("eclipse-temurin:21-jre")
               .withName("mc-1")
               .withHostConfig(any())
@@ -118,7 +115,11 @@ class DockerManagedServerProcessFactoryTest {
               .withCmd("Java", "-Xms512M", "-Xmx1G", "-jar", "server.jar", "nogui")
               .exec())
               .willReturn(containerResponse);
+    }
 
+    @Test
+    @DisplayName("retorna DockerManagedServerProcess com sucesso")
+    void deveRetornarProcessoComSucesso() {
       // Act
       ManagedServerProcess result = factory.create(server, "/usr/bin/java", Path.of("/data"));
 
@@ -129,19 +130,6 @@ class DockerManagedServerProcessFactoryTest {
     @Test
     @DisplayName("usa imagem correta quando javaVersion tem prefixo JAVA_")
     void deveUsarImagemCorretaQuandoJavaVersionTemPrefixo() {
-      // Arrange
-      Server server = createValidServer();
-      given(dockerClient.createContainerCmd("eclipse-temurin:21-jre")
-              .withName("mc-1")
-              .withHostConfig(any())
-              .withLabels(any())
-              .withWorkingDir("/data")
-              .withAttachStdin(true)
-              .withStdinOpen(true)
-              .withCmd("Java", "-Xms512M", "-Xmx1G", "-jar", "server.jar", "nogui")
-              .exec())
-              .willReturn(containerResponse);
-
       // Act
       ManagedServerProcess result = factory.create(server, "/usr/bin/java", Path.of("/data"));
 
@@ -152,25 +140,6 @@ class DockerManagedServerProcessFactoryTest {
     @Test
     @DisplayName("usa imagem correta quando javaVersion já vem sem prefixo")
     void deveUsarImagemCorretaQuandoJavaVersionSemPrefixo() {
-      // Arrange
-      Server server = mock(Server.class);
-      given(server.getId()).willReturn(1L);
-      given(server.getDomain()).willReturn("meuservidor.com");
-      given(server.getJavaVersion()).willReturn("21");
-      given(server.getMinRam()).willReturn("512M");
-      given(server.getMaxRam()).willReturn("1G");
-
-      given(dockerClient.createContainerCmd("eclipse-temurin:21-jre")
-              .withName("mc-1")
-              .withHostConfig(any())
-              .withLabels(any())
-              .withWorkingDir("/data")
-              .withAttachStdin(true)
-              .withStdinOpen(true)
-              .withCmd("Java", "-Xms512M", "-Xmx1G", "-jar", "server.jar", "nogui")
-              .exec())
-              .willReturn(containerResponse);
-
       // Act
       ManagedServerProcess result = factory.create(server, "/usr/bin/java", Path.of("/data"));
 
@@ -181,19 +150,6 @@ class DockerManagedServerProcessFactoryTest {
     @Test
     @DisplayName("define nome do container com o id do servidor")
     void deveDefinirNomeDoContainerComIdDoServidor() {
-      // Arrange
-      Server server = createValidServer();
-      given(dockerClient.createContainerCmd("eclipse-temurin:21-jre")
-              .withName("mc-1")
-              .withHostConfig(any())
-              .withLabels(any())
-              .withWorkingDir("/data")
-              .withAttachStdin(true)
-              .withStdinOpen(true)
-              .withCmd("Java", "-Xms512M", "-Xmx1G", "-jar", "server.jar", "nogui")
-              .exec())
-              .willReturn(containerResponse);
-
       // Act
       ManagedServerProcess result = factory.create(server, "/usr/bin/java", Path.of("/data"));
 
@@ -204,19 +160,6 @@ class DockerManagedServerProcessFactoryTest {
     @Test
     @DisplayName("define labels de infraestrutura corretamente")
     void deveDefinirLabelsDeInfraestrutura() {
-      // Arrange
-      Server server = createValidServer();
-      given(dockerClient.createContainerCmd("eclipse-temurin:21-jre")
-              .withName("mc-1")
-              .withHostConfig(any())
-              .withLabels(any())
-              .withWorkingDir("/data")
-              .withAttachStdin(true)
-              .withStdinOpen(true)
-              .withCmd("Java", "-Xms512M", "-Xmx1G", "-jar", "server.jar", "nogui")
-              .exec())
-              .willReturn(containerResponse);
-
       // Act
       ManagedServerProcess result = factory.create(server, "/usr/bin/java", Path.of("/data"));
 
@@ -227,19 +170,6 @@ class DockerManagedServerProcessFactoryTest {
     @Test
     @DisplayName("define comando com flags de RAM corretamente")
     void deveDefinirComandoComFlagsDeRam() {
-      // Arrange
-      Server server = createValidServer();
-      given(dockerClient.createContainerCmd("eclipse-temurin:21-jre")
-              .withName("mc-1")
-              .withHostConfig(any())
-              .withLabels(any())
-              .withWorkingDir("/data")
-              .withAttachStdin(true)
-              .withStdinOpen(true)
-              .withCmd("Java", "-Xms512M", "-Xmx1G", "-jar", "server.jar", "nogui")
-              .exec())
-              .willReturn(containerResponse);
-
       // Act
       ManagedServerProcess result = factory.create(server, "/usr/bin/java", Path.of("/data"));
 
@@ -250,19 +180,6 @@ class DockerManagedServerProcessFactoryTest {
     @Test
     @DisplayName("define workingDir, attachStdin e stdinOpen corretamente")
     void deveDefinirWorkingDirEAttachStdin() {
-      // Arrange
-      Server server = createValidServer();
-      given(dockerClient.createContainerCmd("eclipse-temurin:21-jre")
-              .withName("mc-1")
-              .withHostConfig(any())
-              .withLabels(any())
-              .withWorkingDir("/data")
-              .withAttachStdin(true)
-              .withStdinOpen(true)
-              .withCmd("Java", "-Xms512M", "-Xmx1G", "-jar", "server.jar", "nogui")
-              .exec())
-              .willReturn(containerResponse);
-
       // Act
       ManagedServerProcess result = factory.create(server, "/usr/bin/java", Path.of("/data"));
 

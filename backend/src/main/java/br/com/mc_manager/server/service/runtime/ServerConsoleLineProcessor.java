@@ -11,18 +11,18 @@ import java.util.regex.Pattern;
 public class ServerConsoleLineProcessor implements Consumer<String> {
 
   private static final Pattern LEVEL_PREFIX_PATTERN =
-          Pattern.compile(".*? (\\[.*].*)$");
+          Pattern.compile("^\\[\\d{2}:\\d{2}:\\d{2}\\] (?<message>\\[[^\\]]*\\](?::\\s*)?.*)$");
   private static final Pattern JOIN_PATTERN =
           Pattern.compile("^(?:\\[.*]).* (\\w+)\\[/[^\\]]+] logged in with entity id \\d+ at \\(.*\\)");
   private static final Pattern LEAVE_PATTERN =
           Pattern.compile("^(?:\\[.*]).* (\\w+) lost connection: .*$");
 
   private final Long serverId;
-  private final ServerStatusBroadcaster broadcaster;
+  private final ServerBroadcaster broadcaster;
   private final PlayerService playerService;
   private final Set<String> onlinePlayers = ConcurrentHashMap.newKeySet();
 
-  public ServerConsoleLineProcessor(Long serverId, ServerStatusBroadcaster broadcaster, PlayerService playerService) {
+  public ServerConsoleLineProcessor(Long serverId, ServerBroadcaster broadcaster, PlayerService playerService) {
     this.serverId = serverId;
     this.broadcaster = broadcaster;
     this.playerService = playerService;
@@ -45,9 +45,12 @@ public class ServerConsoleLineProcessor implements Consumer<String> {
   }
 
   private String stripDatePrefix(String rawLine) {
+    System.out.println("rawLine: " + rawLine);
     Matcher matcher = LEVEL_PREFIX_PATTERN.matcher(rawLine);
 
-    return matcher.matches() ? matcher.group(1) : rawLine;
+    System.out.println("matcher.matches(): " + matcher.matches());
+
+    return matcher.matches() ? matcher.group("message") : rawLine;
   }
 
   private void trackPlayerEvents(String clean) {

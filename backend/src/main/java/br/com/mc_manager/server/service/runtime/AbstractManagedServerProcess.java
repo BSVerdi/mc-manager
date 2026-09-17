@@ -19,7 +19,7 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
   protected final ExecutorService executor;
   protected final PlayerService playerService;
   protected final Clock clock;
-  protected final ServerStatusBroadcaster broadcaster;
+  protected final ServerBroadcaster broadcaster;
   protected final ServerConsoleLineProcessor lineProcessor;
   protected final long maxRamMb;
 
@@ -45,7 +45,7 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
     this.clock = clock;
     this.maxRamMb = toMb(server.getMaxRam());
 
-    this.broadcaster = new ServerStatusBroadcaster(server.getId(), template, clock);
+    this.broadcaster = new ServerBroadcaster(server.getId(), template, clock);
     this.lineProcessor = new ServerConsoleLineProcessor(server.getId(), broadcaster, playerService);
   }
 

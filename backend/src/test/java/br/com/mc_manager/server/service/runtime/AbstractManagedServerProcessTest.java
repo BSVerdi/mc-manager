@@ -62,7 +62,6 @@ class AbstractManagedServerProcessTest {
     when(server.getId()).thenReturn(1L);
     when(server.getMaxRam()).thenReturn("1G");
 
-    // Captura o callback passado a lifecycle.onExit(...) durante a construção
     lenient().when(executor.submit(any(Runnable.class))).thenAnswer(invocation -> {
       Runnable task = invocation.getArgument(0);
       task.run();
@@ -79,6 +78,7 @@ class AbstractManagedServerProcessTest {
     TestManagedServerProcess.staticMetricsCollector = metricsCollector;
 
     managedProcess = new TestManagedServerProcess(server, template, executor, playerService, FIXED_CLOCK);
+    managedProcess.init();
   }
 
   private static class TestManagedServerProcess extends AbstractManagedServerProcess {

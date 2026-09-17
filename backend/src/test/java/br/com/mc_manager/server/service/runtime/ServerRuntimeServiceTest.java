@@ -5,6 +5,7 @@ import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.repository.ServerRepository;
 import br.com.mc_manager.server.service.files.ServerFilesService;
+import com.github.dockerjava.api.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -163,17 +164,14 @@ class ServerRuntimeServiceTest {
       serverRuntimeService.stop(SERVER_ID);
 
       // Assert
-      verify(managedServerProcess).stop();
+      verify(managedServerProcess).stopThen(any(Runnable.class));
     }
 
     @Test
     @DisplayName("deverLancarExcecaoQuandoServidorNaoEncontrado")
     void deverLancarExcecaoQuandoServidorNaoEncontrado() {
-      // Arrange
-      when(serverRepository.findById(SERVER_ID)).thenReturn(Optional.empty());
-
       // Act & Assert
-      assertThrows(IllegalStateException.class, () -> serverRuntimeService.stop(SERVER_ID));
+      assertThrows(NotFoundException.class, () -> serverRuntimeService.stop(SERVER_ID));
     }
   }
 

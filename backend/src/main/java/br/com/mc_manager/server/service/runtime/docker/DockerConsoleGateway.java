@@ -54,7 +54,7 @@ public class DockerConsoleGateway implements ConsoleGateway {
             .exec(new ResultCallback.Adapter<Frame>() {
               @Override
               public void onNext(Frame frame) {
-                online.accept(new String(frame.getPayload(), StandardCharsets.UTF_8));
+                online.accept(new String(frame.getPayload(), StandardCharsets.UTF_8).trim());
               }
             });
   }

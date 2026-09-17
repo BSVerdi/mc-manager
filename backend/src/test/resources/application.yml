@@ -20,7 +20,10 @@ spring:
 mcmanager:
   secret_key: test.secret
   base_domain: test.local
+
+  host_data_root_directory: ./host/target/data
   data_root_directory: ./target/test-data
+
   java_8: /usr/lib/jvm/java-8/bin/java
   java_21: /usr/lib/jvm/java-21/bin/java
   java_25: /usr/lib/jvm/java-25/bin/java

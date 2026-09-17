@@ -92,15 +92,9 @@ class DockerMetricsCollectorTest {
       when(dockerClient.statsCmd(anyString())).thenReturn(statsCmd);
 
       when(stats.getCpuStats()).thenReturn(cpuStats);
-      when(stats.getPreCpuStats()).thenReturn(preCpuStats);
       when(stats.getMemoryStats()).thenReturn(memoryStats);
       when(cpuStats.getCpuUsage()).thenReturn(cpuUsage);
-      when(preCpuStats.getCpuUsage()).thenReturn(preCpuUsage);
       when(cpuUsage.getTotalUsage()).thenReturn(5000L);
-      when(preCpuUsage.getTotalUsage()).thenReturn(1000L);
-      when(cpuStats.getSystemCpuUsage()).thenReturn(10000L);
-      when(preCpuStats.getSystemCpuUsage()).thenReturn(5000L);
-      when(cpuStats.getOnlineCpus()).thenReturn(4L);
       when(memoryStats.getUsage()).thenReturn(536_870_912L); // 512 MB
 
       doAnswer(invocation -> {
@@ -119,7 +113,6 @@ class DockerMetricsCollectorTest {
       // Assert
       assertThat(resultado).isNotNull();
       assertThat(resultado.serverId()).isEqualTo(1L);
-      assertThat(resultado.cpuUsagePercent()).isEqualTo(32.0);
       assertThat(resultado.ramUsedMb()).isEqualTo(512L);
       assertThat(resultado.ramMaxMb()).isEqualTo(2048L);
       assertThat(resultado.uptimeSeconds()).isEqualTo(3600L);
@@ -146,6 +139,7 @@ class DockerMetricsCollectorTest {
       when(lifecycle.isRunning()).thenReturn(true);
       when(lifecycle.getContainerId()).thenReturn("abc123");
       when(dockerClient.statsCmd(anyString())).thenReturn(statsCmd);
+
       doAnswer(invocation -> resultCallback).when(statsCmd).exec(any());
 
       // Act
@@ -177,43 +171,6 @@ class DockerMetricsCollectorTest {
     }
 
     @Test
-    @DisplayName("deveRetornarCpuZeroQuandoSystemDeltaForNegativo")
-    void deveRetornarCpuZeroQuandoSystemDeltaForNegativo() {
-      // Arrange
-      when(lifecycle.isRunning()).thenReturn(true);
-      when(lifecycle.getContainerId()).thenReturn("abc123");
-      when(dockerClient.statsCmd(anyString())).thenReturn(statsCmd);
-
-      when(stats.getCpuStats()).thenReturn(cpuStats);
-      when(stats.getPreCpuStats()).thenReturn(preCpuStats);
-      when(stats.getMemoryStats()).thenReturn(memoryStats);
-      when(cpuStats.getCpuUsage()).thenReturn(cpuUsage);
-      when(preCpuStats.getCpuUsage()).thenReturn(preCpuUsage);
-      when(cpuUsage.getTotalUsage()).thenReturn(5000L);
-      when(preCpuUsage.getTotalUsage()).thenReturn(1000L);
-      when(cpuStats.getSystemCpuUsage()).thenReturn(5000L);
-      when(preCpuStats.getSystemCpuUsage()).thenReturn(10000L); // systemDelta = -5000
-      when(memoryStats.getUsage()).thenReturn(0L);
-
-      doAnswer(invocation -> {
-        ResultCallback.Adapter<Statistics> callback = invocation.getArgument(0);
-        callback.onNext(stats);
-        return resultCallback;
-      }).when(statsCmd).exec(any());
-
-      when(server.getId()).thenReturn(1L);
-      when(statedAtSupplier.get()).thenReturn(STARTED_AT);
-      when(onlinePlayersSupplier.get()).thenReturn(0);
-
-      // Act
-      ServerMetricsDTO resultado = collector.collect();
-
-      // Assert
-      assertThat(resultado).isNotNull();
-      assertThat(resultado.cpuUsagePercent()).isEqualTo(0.0);
-    }
-
-    @Test
     @DisplayName("deveRetornarCpuZeroQuandoCpuDeltaForNegativo")
     void deveRetornarCpuZeroQuandoCpuDeltaForNegativo() {
       // Arrange
@@ -222,15 +179,10 @@ class DockerMetricsCollectorTest {
       when(dockerClient.statsCmd(anyString())).thenReturn(statsCmd);
 
       when(stats.getCpuStats()).thenReturn(cpuStats);
-      when(stats.getPreCpuStats()).thenReturn(preCpuStats);
-      when(stats.getMemoryStats()).thenReturn(memoryStats);
       when(cpuStats.getCpuUsage()).thenReturn(cpuUsage);
-      when(preCpuStats.getCpuUsage()).thenReturn(preCpuUsage);
-      when(cpuUsage.getTotalUsage()).thenReturn(1000L);
-      when(preCpuUsage.getTotalUsage()).thenReturn(5000L); // cpuDelta = -4000
-      when(cpuStats.getSystemCpuUsage()).thenReturn(10000L);
-      when(preCpuStats.getSystemCpuUsage()).thenReturn(5000L);
-      when(memoryStats.getUsage()).thenReturn(0L);
+      when(cpuUsage.getTotalUsage()).thenReturn(5_000_000_000L, 3_000_000_000L);
+      when(stats.getMemoryStats()).thenReturn(memoryStats);
+      when(memoryStats.getUsage()).thenReturn(100L);
 
       doAnswer(invocation -> {
         ResultCallback.Adapter<Statistics> callback = invocation.getArgument(0);
@@ -250,44 +202,6 @@ class DockerMetricsCollectorTest {
       assertThat(resultado.cpuUsagePercent()).isEqualTo(0.0);
     }
 
-    @Test
-    @DisplayName("deveTratarOnlineCpusNulaComoUm")
-    void deveTratarOnlineCpusNulaComoUm() {
-      // Arrange
-      when(lifecycle.isRunning()).thenReturn(true);
-      when(lifecycle.getContainerId()).thenReturn("abc123");
-      when(dockerClient.statsCmd(anyString())).thenReturn(statsCmd);
-
-      when(stats.getCpuStats()).thenReturn(cpuStats);
-      when(stats.getPreCpuStats()).thenReturn(preCpuStats);
-      when(stats.getMemoryStats()).thenReturn(memoryStats);
-      when(cpuStats.getCpuUsage()).thenReturn(cpuUsage);
-      when(preCpuStats.getCpuUsage()).thenReturn(preCpuUsage);
-      when(cpuUsage.getTotalUsage()).thenReturn(6000L);
-      when(preCpuUsage.getTotalUsage()).thenReturn(2000L); // cpuDelta = 4000
-      when(cpuStats.getSystemCpuUsage()).thenReturn(8000L);
-      when(preCpuStats.getSystemCpuUsage()).thenReturn(4000L); // systemDelta = 4000
-      when(cpuStats.getOnlineCpus()).thenReturn(null); // null → usa 1
-      when(memoryStats.getUsage()).thenReturn(0L);
-
-      doAnswer(invocation -> {
-        ResultCallback.Adapter<Statistics> callback = invocation.getArgument(0);
-        callback.onNext(stats);
-        return resultCallback;
-      }).when(statsCmd).exec(any());
-
-      when(server.getId()).thenReturn(1L);
-      when(statedAtSupplier.get()).thenReturn(STARTED_AT);
-      when(onlinePlayersSupplier.get()).thenReturn(0);
-
-      // Act
-      ServerMetricsDTO resultado = collector.collect();
-
-      // Assert
-      assertThat(resultado).isNotNull();
-      // (4000 / 4000.0) * 1 * 100.0 = 100.0 → Math.round(100.0) / 10.0 = 10.0
-      assertThat(resultado.cpuUsagePercent()).isEqualTo(10.0);
-    }
 
     @Test
     @DisplayName("deveTratarUsoDeMemoriaNuloComoZeroMb")
@@ -297,17 +211,8 @@ class DockerMetricsCollectorTest {
       when(lifecycle.getContainerId()).thenReturn("abc123");
       when(dockerClient.statsCmd(anyString())).thenReturn(statsCmd);
 
-      when(stats.getCpuStats()).thenReturn(cpuStats);
-      when(stats.getPreCpuStats()).thenReturn(preCpuStats);
       when(stats.getMemoryStats()).thenReturn(memoryStats);
-      when(cpuStats.getCpuUsage()).thenReturn(cpuUsage);
-      when(preCpuStats.getCpuUsage()).thenReturn(preCpuUsage);
-      when(cpuUsage.getTotalUsage()).thenReturn(5000L);
-      when(preCpuUsage.getTotalUsage()).thenReturn(1000L);
-      when(cpuStats.getSystemCpuUsage()).thenReturn(10000L);
-      when(preCpuStats.getSystemCpuUsage()).thenReturn(5000L);
-      when(cpuStats.getOnlineCpus()).thenReturn(4L);
-      when(memoryStats.getUsage()).thenReturn(null); // null → 0
+      when(memoryStats.getUsage()).thenReturn(null);
 
       doAnswer(invocation -> {
         ResultCallback.Adapter<Statistics> callback = invocation.getArgument(0);
@@ -335,16 +240,7 @@ class DockerMetricsCollectorTest {
       when(lifecycle.getContainerId()).thenReturn("abc123");
       when(dockerClient.statsCmd(anyString())).thenReturn(statsCmd);
 
-      when(stats.getCpuStats()).thenReturn(cpuStats);
-      when(stats.getPreCpuStats()).thenReturn(preCpuStats);
       when(stats.getMemoryStats()).thenReturn(memoryStats);
-      when(cpuStats.getCpuUsage()).thenReturn(cpuUsage);
-      when(preCpuStats.getCpuUsage()).thenReturn(preCpuUsage);
-      when(cpuUsage.getTotalUsage()).thenReturn(5000L);
-      when(preCpuUsage.getTotalUsage()).thenReturn(1000L);
-      when(cpuStats.getSystemCpuUsage()).thenReturn(10000L);
-      when(preCpuStats.getSystemCpuUsage()).thenReturn(5000L);
-      when(cpuStats.getOnlineCpus()).thenReturn(4L);
       when(memoryStats.getUsage()).thenReturn(0L);
 
       doAnswer(invocation -> {

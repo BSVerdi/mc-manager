@@ -5,6 +5,7 @@ import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.repository.ServerRepository;
 import br.com.mc_manager.server.service.files.ServerFilesService;
+import com.github.dockerjava.api.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +48,7 @@ public class ServerRuntimeService {
     getExistingInstance(serverId).ifPresentOrElse(
             instance -> instance.stopThen(() -> discard(serverId)),
             () -> {
+              throw new NotFoundException("Server not found");
             }
     );
   }

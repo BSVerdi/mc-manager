@@ -23,20 +23,20 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class ServerStatusBroadcasterTest {
+class ServerBroadcasterTest {
 
   private static final Long SERVER_ID = 42L;
   private static final Clock FIXED_CLOCK =
           Clock.fixed(Instant.parse("2025-01-15T10:30:00Z"), ZoneOffset.UTC);
-  
+
   @Mock
   private SimpMessagingTemplate template;
 
-  private ServerStatusBroadcaster broadcaster;
+  private ServerBroadcaster broadcaster;
 
   @BeforeEach
   void setUp() {
-    broadcaster = new ServerStatusBroadcaster(SERVER_ID, template, FIXED_CLOCK);
+    broadcaster = new ServerBroadcaster(SERVER_ID, template, FIXED_CLOCK);
   }
 
   @Nested

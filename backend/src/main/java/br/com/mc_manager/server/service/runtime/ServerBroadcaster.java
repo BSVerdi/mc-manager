@@ -7,13 +7,13 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.time.Clock;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class ServerStatusBroadcaster {
+public class ServerBroadcaster {
   private final Long serverId;
   private final SimpMessagingTemplate template;
   private final Clock clock;
   private final AtomicLong idCounter = new AtomicLong();
 
-  public ServerStatusBroadcaster(Long serverId, SimpMessagingTemplate template, Clock clock) {
+  public ServerBroadcaster(Long serverId, SimpMessagingTemplate template, Clock clock) {
     this.serverId = serverId;
     this.template = template;
     this.clock = clock;

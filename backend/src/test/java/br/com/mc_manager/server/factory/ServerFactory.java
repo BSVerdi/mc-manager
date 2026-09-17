@@ -11,6 +11,7 @@ public class ServerFactory {
             .id(1L)
             .name("Example Server")
             .javaVersion("JAVA_21")
+            .domain("example.com.br")
             .version("26.2")
             .port(25565)
             .maxRam("2G")
@@ -23,6 +24,7 @@ public class ServerFactory {
             .id(1L)
             .name("Example Server")
             .javaVersion("JAVA_21")
+            .domain("example.com.br")
             .version("26.2")
             .port(25565)
             .owner(owner)
@@ -34,6 +36,7 @@ public class ServerFactory {
             .id(id)
             .name("Example Server")
             .javaVersion("JAVA_21")
+            .domain("example.com.br")
             .version("26.2")
             .port(25565)
             .build();
@@ -44,6 +47,7 @@ public class ServerFactory {
             .id(1L)
             .name("Example Server")
             .javaVersion("26.2")
+            .domain("example.com.br")
             .maxRam(maxRam)
             .port(25565)
             .build();

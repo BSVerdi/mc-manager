@@ -124,7 +124,6 @@ public class DockerMetricsCollector implements MetricsCollector {
 
     double percent = (cpuDeltaNanos / (double) elapsedNanos) * 100.0 / onlineCpus;
 
-    // Protecao contra picos irreais causados por delays no scheduling da JVM/thread
     return Math.min(percent, 100.0 * onlineCpus);
   }
 

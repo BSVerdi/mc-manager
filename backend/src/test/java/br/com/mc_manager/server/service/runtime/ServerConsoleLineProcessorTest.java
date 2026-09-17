@@ -25,7 +25,7 @@ class ServerConsoleLineProcessorTest {
   private Long serverId = 1L;
 
   @Mock
-  private ServerStatusBroadcaster broadcaster;
+  private ServerBroadcaster broadcaster;
 
   @Mock
   private PlayerService playerService;

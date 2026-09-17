@@ -63,7 +63,7 @@ public class DockerManagedServerProcessFactory implements ManagedServerProcessFa
   @Override
   public ManagedServerProcess create(Server config, String javaExecutablePath, Path directory) {
     if (config.getDomain() == null || config.getDomain().isBlank()) {
-      throw new IllegalStateException("Servidor " + config.getId() + "não possui domínio configurado");
+      throw new IllegalStateException("Servidor " + config.getId() + " não possui domínio configurado");
     }
 
     Path hostPath = hostServerDirectory.resolve(String.valueOf(config.getId()));
