@@ -59,9 +59,7 @@ public class ServerConsoleLineProcessor implements Consumer<String> {
       playerService.saveServerPlayer(serverId, playerNickname);
       playerService.playerConnected(serverId, playerNickname);
       onlinePlayers.add(playerNickname);
-
-      broadcaster.players(onlinePlayers);
-
+      
       return;
     }
 
@@ -70,8 +68,6 @@ public class ServerConsoleLineProcessor implements Consumer<String> {
       String playerNickname = leaveMatcher.group(1);
       playerService.playerDisconnected(serverId, playerNickname);
       onlinePlayers.remove(playerNickname);
-
-      broadcaster.players(onlinePlayers);
     }
   }
 }

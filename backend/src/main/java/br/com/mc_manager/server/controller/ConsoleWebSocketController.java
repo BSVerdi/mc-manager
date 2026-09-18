@@ -15,7 +15,7 @@ public class ConsoleWebSocketController {
     this.serverManagerService = serverManagerService;
   }
 
-  @MessageMapping("/command/{serverId}")
+  @MessageMapping("/{serverId}/command")
   public void handleCommand(
           @DestinationVariable Long serverId,
           String command

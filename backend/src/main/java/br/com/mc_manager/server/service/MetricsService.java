@@ -32,7 +32,7 @@ public class MetricsService {
 
     if (metrics == null) return;
 
-    template.convertAndSend("/topic/metrics/" + serverId, metrics);
+    template.convertAndSend("/topic/" + serverId + "/metrics/", metrics);
   }
 
 }
