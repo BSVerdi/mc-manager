@@ -32,11 +32,11 @@ public class ServerDtoFactory {
   }
 
   public static CreateServerDTO createCreateServerDTOWithAllAttributes() {
-    return new CreateServerDTO("Example Server", 25565, "1G", "2G", "26.2");
+    return new CreateServerDTO("Example Server", "1G", "2G", "26.2");
   }
 
   public static CreateServerDTO createCreateServerDTOWithNullAttributes() {
-    return new CreateServerDTO(null, null, null, null, null);
+    return new CreateServerDTO(null, null, null, null);
   }
 
   public static UpdateServerDTO createUpdateServerDTOWithAllAttributes() {

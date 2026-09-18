@@ -53,7 +53,7 @@ class ServerBroadcasterTest {
       broadcaster.status(status);
 
       // Assert
-      verify(template).convertAndSend("/topic/status/42", status);
+      verify(template).convertAndSend("/topic/42/status", status);
     }
   }
 
@@ -72,7 +72,7 @@ class ServerBroadcasterTest {
       broadcaster.consoleLine(message);
 
       // Assert
-      verify(template).convertAndSend("/topic/console/42", expected);
+      verify(template).convertAndSend("/topic/42/console", expected);
     }
 
     @Test
@@ -88,7 +88,7 @@ class ServerBroadcasterTest {
 
       // Assert
       ArgumentCaptor<LogLineDTO> captor = forClass(LogLineDTO.class);
-      verify(template, times(2)).convertAndSend(eq("/topic/console/42"), captor.capture());
+      verify(template, times(2)).convertAndSend(eq("/topic/42/console"), captor.capture());
       assertThat(captor.getAllValues()).containsExactly(first, second);
     }
 
@@ -102,7 +102,7 @@ class ServerBroadcasterTest {
       broadcaster.consoleLine("");
 
       // Assert
-      verify(template).convertAndSend("/topic/console/42", expected);
+      verify(template).convertAndSend("/topic/42/console", expected);
     }
 
     @Test
@@ -115,7 +115,7 @@ class ServerBroadcasterTest {
       broadcaster.consoleLine(null);
 
       // Assert
-      verify(template).convertAndSend("/topic/console/42", expected);
+      verify(template).convertAndSend("/topic/42/console", expected);
     }
   }
 }

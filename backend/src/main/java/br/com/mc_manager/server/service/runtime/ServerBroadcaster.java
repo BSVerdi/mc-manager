@@ -24,7 +24,7 @@ public class ServerBroadcaster {
   }
 
   public void consoleLine(String message) {
-    template.convertAndSend("/topic/" + serverId + "/console/",
+    template.convertAndSend("/topic/" + serverId + "/console",
             new LogLineDTO(idCounter.incrementAndGet(), message, clock.instant().toString())
     );
   }

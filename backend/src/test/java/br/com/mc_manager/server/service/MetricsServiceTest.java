@@ -55,8 +55,8 @@ class MetricsServiceTest {
       metricsService.broadcastAllMetrics();
 
       // Assert
-      verify(template).convertAndSend(eq("/topic/metrics/1"), eq(dtoServidor1));
-      verify(template).convertAndSend(eq("/topic/metrics/2"), eq(dtoServidor2));
+      verify(template).convertAndSend(eq("/topic/1/metrics"), eq(dtoServidor1));
+      verify(template).convertAndSend(eq("/topic/2/metrics"), eq(dtoServidor2));
     }
 
     @Test
@@ -70,7 +70,7 @@ class MetricsServiceTest {
       metricsService.broadcastAllMetrics();
 
       // Assert
-      verify(template, times(1)).convertAndSend(eq("/topic/metrics/1"), eq(dtoServidor1));
+      verify(template, times(1)).convertAndSend(eq("/topic/1/metrics"), eq(dtoServidor1));
       verifyNoMoreInteractions(template);
     }
 
@@ -124,7 +124,7 @@ class MetricsServiceTest {
       metricsService.broadcastAllMetrics();
 
       // Assert
-      verify(template, times(1)).convertAndSend(eq("/topic/metrics/1"), eq(dtoServidor1));
+      verify(template, times(1)).convertAndSend(eq("/topic/1/metrics"), eq(dtoServidor1));
       verifyNoMoreInteractions(template);
     }
   }

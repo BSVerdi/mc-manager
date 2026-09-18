@@ -173,8 +173,7 @@ class ServerManagementServiceTest {
     @BeforeEach
     void setUpCriacao() {
       // Preparar DTO e servidor para criação
-      createServerDTO = new CreateServerDTO("Example Server", 25565, null, null, "26.2");
-      when(serverRepository.existsByPort(anyInt())).thenReturn(false);
+      createServerDTO = new CreateServerDTO("Example Server", null, null, "26.2");
       mockServerCriado = createServerWithOwner(owner);
       mockServers.add(mockServerCriado);
     }
@@ -199,18 +198,6 @@ class ServerManagementServiceTest {
       // Verificar chamadas aos mocks
       verify(serverRepository).save(any(Server.class));
       verify(provisioningService).createBaseServerFiles(anyLong(), anyInt());
-    }
-
-    @Test
-    @DisplayName("create - Lança IllegalArgumentException quando porta já está em uso")
-    void create_portaJaEmUso_lancaIllegalArgumentException() {
-      // Arrange
-      when(serverRepository.existsByPort(anyInt())).thenReturn(true);
-
-      // Act & Assert
-      assertThrows(IllegalArgumentException.class, () -> {
-        serverManagementService.create(createServerDTO, principal);
-      });
     }
 
     @Test
@@ -441,7 +428,7 @@ class ServerManagementServiceTest {
         serverManagementService = new ServerManagementService(serverRepository, userService, provisioningServiceMock, serverDomainGenerator);
 
         // Executar criação de servidor
-        CreateServerDTO dto = new CreateServerDTO("Example Server", 25565, null, null, "26.2");
+        CreateServerDTO dto = new CreateServerDTO("Example Server", null, null, "26.2");
         ServerDetailsDto response = serverManagementService.create(dto, principal);
 
         verify(provisioningServiceMock).createBaseServerFiles(anyLong(), anyInt());
