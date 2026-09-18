@@ -7,10 +7,6 @@ import { api } from "../lib/apiClient";
 import type { Player } from "../types/player";
 import { Status } from "../types/status";
 
-interface PlayerListProps {
-  onlinePlayers: number;
-}
-
 function PlayerAvatar({ name }: { name: string }) {
   const [imageFailed, setImageFailed] = useState(false);
 
