@@ -10,10 +10,15 @@ import java.util.regex.Pattern;
 
 public class ServerConsoleLineProcessor implements Consumer<String> {
 
+  // 2026-09-18 04:54:30 ou [08:23:24] seguido do conteudo [INFO] Breninjos lost connection: disconnect.quitting
   private static final Pattern LEVEL_PREFIX_PATTERN =
-          Pattern.compile("^\\[\\d{2}:\\d{2}:\\d{2}\\] (?<message>\\[[^\\]]*\\](?::\\s*)?.*)$");
+          Pattern.compile("^(?:\\[\\d{2}:\\d{2}:\\d{2}\\]|\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\s*(?<message>\\[[^\\]]*].*)$");
+
+  // [INFO] Breninjos[/111.111.111.111] logged in with entity id 855 at (0 67.0, 0)
   private static final Pattern JOIN_PATTERN =
           Pattern.compile("^(?:\\[.*]).* (\\w+)\\[/[^\\]]+] logged in with entity id \\d+ at \\(.*\\)");
+
+  // [INFO] Breninjos lost connection: disconnect.quitting
   private static final Pattern LEAVE_PATTERN =
           Pattern.compile("^(?:\\[.*]).* (\\w+) lost connection: .*$");
 
@@ -59,7 +64,7 @@ public class ServerConsoleLineProcessor implements Consumer<String> {
       playerService.saveServerPlayer(serverId, playerNickname);
       playerService.playerConnected(serverId, playerNickname);
       onlinePlayers.add(playerNickname);
-      
+
       return;
     }
 
