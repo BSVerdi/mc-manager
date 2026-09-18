@@ -6,7 +6,7 @@ import {
   stompClient,
   topics,
 } from "../lib/stompClient";
-import type { Log } from "../types/Log";
+import type { Log } from "../types/log";
 
 const MAX_LINES = 2000;
 

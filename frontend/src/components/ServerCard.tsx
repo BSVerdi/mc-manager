@@ -1,8 +1,8 @@
 import { HardDrive } from "lucide-react";
-import { useServerStatus } from "../hooks/useServerStatus";
-import type { Server } from "../types/Server";
 import { NavLink } from "react-router-dom";
-import { Status } from "../types/Status";
+import { useServerStatus } from "../hooks/useServerStatus";
+import type { Server } from "../types/server";
+import { Status } from "../types/status";
 import { StartServer } from "./StartServer";
 
 export function ServerCard({ server }: { server: Server }) {

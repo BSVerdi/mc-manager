@@ -2,8 +2,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronsLeft, LogOut, Settings } from "lucide-react";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
+import defaultProfilePic from "../assets/big-steve-face.png";
 import { api } from "../lib/apiClient";
-import type { User } from "../types/User";
+import type { User } from "../types/user";
 
 interface HeaderProps {
   opened: boolean;
@@ -57,7 +58,14 @@ export default function Header({ opened, setOpened, user }: HeaderProps) {
           className="user-pfp-container"
           onClick={toggleUserSettings}
         >
-          <img src={user?.profilePictureUrl} className="user-pfp"></img>
+          <img
+            src={
+              user?.profilePictureUrl
+                ? user?.profilePictureUrl
+                : defaultProfilePic
+            }
+            className="user-pfp"
+          ></img>
         </motion.button>
         <AnimatePresence>
           {userSettings && (

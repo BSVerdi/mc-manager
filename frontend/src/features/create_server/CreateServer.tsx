@@ -41,9 +41,7 @@ export default function CreateServer({ isOpen, setIsOpen }: CreateServerProps) {
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.SubmitEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     if (submitting) return;
 
     setSubmitting(true);
@@ -89,7 +87,7 @@ export default function CreateServer({ isOpen, setIsOpen }: CreateServerProps) {
               <div className="create-server-header">
                 <h2>Create New Server</h2>
               </div>
-              <form onSubmit={handleSubmit} className="create-server-form">
+              <form className="create-server-form">
                 <InputItem
                   title="Server Name:"
                   type="text"
@@ -125,7 +123,11 @@ export default function CreateServer({ isOpen, setIsOpen }: CreateServerProps) {
                     />
                   </div>
                 </div>
-                <button className="form-submit-btn" type="submit">
+                <button
+                  className="form-submit-btn"
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                >
                   Create Server
                 </button>
               </form>

@@ -1,13 +1,13 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
-import type { FileContent, FileEntry } from "../types/File";
-import type { Player } from "../types/Player";
+import type { FileContent, FileEntry } from "../types/file";
+import type { Player } from "../types/player";
 import {
   type CreateServerRequest,
   type Server,
   type ServerVersion,
   type UpdateServerRequest,
-} from "../types/Server";
-import type { Status } from "../types/Status";
+} from "../types/server";
+import type { Status } from "../types/status";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 

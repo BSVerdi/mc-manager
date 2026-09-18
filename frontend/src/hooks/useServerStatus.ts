@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/apiClient";
-import { Status } from "../types/Status";
+import { Status } from "../types/status";
 
 export function useServerStatus(serverId: number) {
   const [status, setStatus] = useState<Status>(Status.OFFLINE);

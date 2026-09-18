@@ -33,7 +33,7 @@ export default function SideMenu({ opened }: SideMenuProps) {
     <motion.nav
       layout
       initial={false}
-      animate={{ width: opened ? "270px" : "60px" }}
+      animate={{ width: opened ? "300px" : "60px" }}
       transition={{ duration: 0.15 }}
       className="side-menu"
     >

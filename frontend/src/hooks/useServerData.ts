@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/apiClient";
-import type { Server } from "../types/Server";
+import type { Server } from "../types/server";
 
 export function useServerData(serverId: number) {
   const [server, setServer] = useState<Server>();

@@ -1,10 +1,15 @@
 import { UserStar } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useOnlinePlayers } from "../hooks/useOnlinePlayers";
 import { useServerId } from "../hooks/useServerId";
 import { useServerStatus } from "../hooks/useServerStatus";
 import { api } from "../lib/apiClient";
-import type { Player } from "../types/Player";
-import { Status } from "../types/Status";
+import type { Player } from "../types/player";
+import { Status } from "../types/status";
+
+interface PlayerListProps {
+  onlinePlayers: number;
+}
 
 function PlayerAvatar({ name }: { name: string }) {
   const [imageFailed, setImageFailed] = useState(false);
@@ -25,6 +30,7 @@ function PlayerAvatar({ name }: { name: string }) {
 
 export default function PlayersList() {
   const serverId = useServerId();
+  const onlinePlayers = useOnlinePlayers();
   const { status } = useServerStatus(serverId);
   const [players, setPlayers] = useState<Player[]>([]);
 
@@ -36,10 +42,7 @@ export default function PlayersList() {
     };
 
     getPlayers();
-    const interval = setInterval(getPlayers, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
+  }, [onlinePlayers]);
 
   const setOperatorStatus = (nickname: string, operator: boolean) => {
     setPlayers((old) =>

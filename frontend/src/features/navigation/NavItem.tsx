@@ -63,13 +63,15 @@ export const NavItem = ({ item, opened = true }: SideMenuItemProps) => {
             >
               {item.label}
             </motion.span>
-            <motion.div
-              initial={false}
-              animate={{ rotate: isOpen ? 90 : 0 }}
-              transition={{ duration: 0.1, ease: "easeInOut" }}
-            >
-              <ChevronRight size={20} />
-            </motion.div>
+            {item.children!.length > 0 && (
+              <motion.div
+                initial={false}
+                animate={{ rotate: isOpen ? 90 : 0 }}
+                transition={{ duration: 0.1, ease: "easeInOut" }}
+              >
+                <ChevronRight size={20} />
+              </motion.div>
+            )}
           </div>
         )}
       </div>

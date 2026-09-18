@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/apiClient";
-import type { ServerVersion } from "../types/Server";
+import type { ServerVersion } from "../types/server";
 
 export function useServerVersions() {
   const [serverVersions, setServerVersions] = useState<ServerVersion[]>([]);

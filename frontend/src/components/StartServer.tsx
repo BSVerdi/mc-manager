@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useServerControl } from "../hooks/useServerControl";
-import { Status } from "../types/Status";
 import { Play, Square } from "lucide-react";
+import { useServerControl } from "../hooks/useServerControl";
+import { Status } from "../types/status";
 
 type StartServerProps = {
   serverId: number;

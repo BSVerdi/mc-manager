@@ -6,8 +6,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { User } from "../types/User";
 import { api } from "../lib/apiClient";
+import type { User } from "../types/user";
 
 interface AuthContextData {
   user: User | null;

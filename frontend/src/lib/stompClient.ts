@@ -48,13 +48,13 @@ export function onStompAuthError(listener: AuthErrorListener): () => void {
 }
 
 export const topics = {
-  console: (serverId: number | string) => `/topic/console/${serverId}`,
-  status: (serverId: number | string) => `/topic/status/${serverId}`,
-  metrics: (serverId: number | string) => `/topic/metrics/${serverId}`,
+  console: (serverId: number | string) => `/topic/${serverId}/console`,
+  status: (serverId: number | string) => `/topic/${serverId}/status`,
+  metrics: (serverId: number | string) => `/topic/${serverId}/metrics`,
 };
 
 export const destinations = {
-  command: (serverId: number | string) => `/app/command/${serverId}`,
+  command: (serverId: number | string) => `/app/${serverId}/command`,
 };
 
 stompClient.activate();

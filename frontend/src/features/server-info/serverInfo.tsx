@@ -1,10 +1,16 @@
 import { RotateCcw } from "lucide-react";
+import { useEffect } from "react";
 import { StartServer } from "../../components/StartServer";
 import { useMetricsSocket } from "../../hooks/useMetricsSocket";
 import { useServerControl } from "../../hooks/useServerControl";
 import { useServerData } from "../../hooks/useServerData";
 import { useStatusSocket } from "../../hooks/useStatusSocket";
-import { Status } from "../../types/Status";
+import { Status } from "../../types/status";
+
+interface ServerInfoProps {
+  serverId: number;
+  setOnlinePlayers: (value: number) => void;
+}
 
 function formatUptime(totalSeconds: number): string {
   if (totalSeconds <= 0) return "--";
@@ -18,11 +24,19 @@ function formatUptime(totalSeconds: number): string {
   return `${seconds}s`;
 }
 
-export default function ServerInfo({ serverId }: { serverId: number }) {
+export default function ServerInfo({
+  serverId,
+  setOnlinePlayers,
+}: ServerInfoProps) {
   const status = useStatusSocket(serverId);
   const metrics = useMetricsSocket(serverId);
   const { server } = useServerData(serverId);
   const { restart } = useServerControl(serverId);
+
+  useEffect(
+    () => setOnlinePlayers(metrics.onlinePlayers),
+    [metrics.onlinePlayers],
+  );
 
   return (
     <section className="server-info">
