@@ -1,29 +1,44 @@
+import { forwardRef, useId } from "react";
 import Select from "react-select";
 import type { Option } from "../data/server";
 
-type SelectItemProps = {
+interface SelectItemProps {
   title: string;
-  defaultValue: Option;
+  defaultValue?: Option;
   options: Option[];
-  setFunction: (value: any) => void;
-};
+  onChange: (value: Option) => void;
+  placeholder?: string;
+  isDisabled?: boolean;
+  value?: Option;
+}
 
-export default function SelectItem({
-  title,
-  defaultValue,
-  options,
-  setFunction,
-}: SelectItemProps) {
+const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(function SelectItem(
+  { title, defaultValue, options, onChange, placeholder = "Selecione…", isDisabled = false, value },
+  ref,
+) {
+  const id = useId();
+
   return (
-    <div className="select-item-container">
-      <span className="select-item-title">{title}</span>
+    <div className="select-item-container" ref={ref}>
+      <label className="select-item-title" htmlFor={id}>
+        {title}
+      </label>
       <Select
+        id={id}
+        value={value}
         defaultValue={defaultValue}
         options={options}
-        onChange={(value) => setFunction(value)}
+        placeholder={placeholder}
+        isDisabled={isDisabled}
+        isClearable={false}
+        onChange={(selected) => {
+          if (selected) onChange(selected);
+        }}
         className="select-item"
         classNamePrefix="select"
       />
     </div>
   );
-}
+});
+
+export default SelectItem;

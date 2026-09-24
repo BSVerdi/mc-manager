@@ -107,6 +107,11 @@
   width: 100%;
 }
 
+.nav-item-label {
+  font-size: 16px;
+  overflow-y: hidden;
+}
+
 .nav-icon-container {
   flex-shrink: 0;
   display: grid;
@@ -138,6 +143,11 @@
   flex-direction: column;
   align-items: center;
   position: relative;
+}
+
+.nav-btn.chevron {
+  background-color: transparent;
+  border: none;
 }
 
 .nav-item-submenu {
@@ -267,7 +277,7 @@
   width: 100%;
   height: 100px;
   background-color: var(--bg-card);
-  box-shadow: var(--shadow-subtle);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 10px;
 }
@@ -278,7 +288,7 @@
   display: flex;
   flex-direction: column;
   background-color: var(--bg-card);
-  box-shadow: var(--shadow-subtle);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   overflow-y: auto;
 }
@@ -454,6 +464,7 @@
   background-color: white;
   z-index: 1000;
   border-radius: 10px;
+  border: 1px solid var(--border-color);
   gap: 10px;
 }
 
@@ -516,27 +527,6 @@
   transform: scale(1);
 }
 
-.form-submit-btn {
-  width: 95%;
-  height: 40px;
-  border-radius: 5px;
-  border: 1px solid var(--border-color);
-  background-color: var(--brand-bg);
-  color: var(--brand-color);
-  transition: all 0.2s ease-in-out;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.form-submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-subtle);
-}
-
-.form-submit-btn:active {
-  transform: translateY(0);
-}
-
 /* ================================ */
 /*      SERVER DASHBOARD STYLE      */
 /* ================================ */
@@ -564,7 +554,7 @@
   height: 120px;
   min-width: 600px;
   border-radius: 10px;
-  box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.104);
+  border: 1px solid var(--border-color);
   background-color: var(--bg-card);
 }
 
@@ -626,8 +616,8 @@
   align-items: center;
   justify-content: center;
   background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
-  box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.104);
 }
 
 .top-menu-container {
@@ -1068,6 +1058,13 @@
   gap: 10px;
 }
 
+.server-settings-submit-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
 .server-settings-danger-actions-container {
   display: flex;
   grid-column: 2;
@@ -1114,7 +1111,7 @@
   padding: 10px 0px;
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  box-shadow: var(--shadow-subtle);
+  border: 1px solid var(--border-color);
   background-color: white;
   color: var(--text-main);
 }
@@ -1296,6 +1293,13 @@
   align-items: center;
   padding: 10px;
   gap: 10px;
+}
+
+.settings-submit-btn-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 /* ========================== */
@@ -1482,4 +1486,108 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.submit-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s linear infinite;
+}
+
+.submit-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 95%;
+  background-color: var(--brand-bg);
+  border: none;
+  height: 40px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--brand-bg);
+}
+
+.submit-btn:disabled {
+  cursor: not-allowed;
+}
+
+.submit-spinner-container {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+}
+
+.form-submit-btn {
+  width: 95%;
+  height: 40px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: var(--brand-bg);
+  color: var(--brand-color);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.form-submit-btn:active {
+  transform: translateY(0);
+}
+
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1000;
+  max-width: 320px;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--color-bg, #fff);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid;
+}
+
+.toast-success {
+  border-color: #22c55e;
+}
+.toast-error {
+  border-color: #ef4444;
+}
+.toast-info {
+  border-color: #3b82f6;
+}
+
+.toast-icon {
+  flex-shrink: 0;
+}
+.toast-message {
+  flex: 1;
+  font-size: 0.875rem;
+}
+
+.toast-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+.toast-close:hover {
+  background: rgba(0, 0, 0, 0.1);
 }

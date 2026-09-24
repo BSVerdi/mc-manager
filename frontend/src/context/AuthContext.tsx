@@ -1,20 +1,15 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
-import { api } from "../lib/apiClient";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { authApi } from "../features/auth/api";
+import { activateStomp, deactivateStomp } from "../lib/stompClient";
 import type { User } from "../types/user";
 
 interface AuthContextData {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData | undefined>(undefined);
@@ -29,9 +24,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const verifySession = async () => {
+      setLoading(true);
+
       try {
-        const response = await api.auth.me();
+        const response = await authApi.me();
         setUser(response);
+        activateStomp();
       } catch (error) {
         setUser(null);
       } finally {
@@ -42,51 +40,78 @@ export function AuthProvider({ children }: AuthProviderProps) {
     verifySession();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    try {
-      await api.auth.login(email, password);
+  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+    setLoading(true);
 
-      const response = await api.auth.me();
+    try {
+      await authApi.login(email, password);
+
+      const response = await authApi.me();
       setUser(response);
+      activateStomp();
 
       return true;
     } catch (error) {
       console.error("Erro ao realizar login: ", error);
       return false;
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async (): Promise<boolean> => {
+    setLoading(true);
+
     try {
-      await api.auth.logout();
+      await authApi.logout();
+
+      return true;
     } catch (error) {
       console.error("Erro ao realizar logout: ", error);
+
+      return false;
     } finally {
+      deactivateStomp();
       setUser(null);
+      setLoading(false);
     }
-  };
+  }, []);
 
-  const register = async (
-    name: string,
-    email: string,
-    password: string,
-  ): Promise<boolean> => {
+  const register = useCallback(async (name: string, email: string, password: string): Promise<boolean> => {
+    setLoading(true);
+
     try {
-      await api.auth.register(name, email, password);
+      await authApi.register(name, email, password);
 
-      const response = await api.auth.me();
+      const response = await authApi.me();
       setUser(response);
 
       return true;
     } catch (error) {
       console.error("Erro ao realizar login: ", error);
       return false;
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
+
+  const refreshUser = useCallback(async (): Promise<void> => {
+    setLoading(true);
+
+    try {
+      const response = await authApi.me();
+      setUser(response);
+      activateStomp();
+    } catch (err) {
+      console.error("Erro ao atualizar dados do usuário:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const value = useMemo(
-    () => ({ user, loading, login, logout, register }),
-    [user, loading, login, logout, register],
+    () => ({ user, loading, login, logout, register, refreshUser }),
+    [user, loading, login, logout, register, refreshUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

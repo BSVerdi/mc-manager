@@ -1,9 +1,11 @@
 import { Client } from "@stomp/stompjs";
 
 type ConnectListener = () => void;
+type DisconnectListener = () => void;
 type AuthErrorListener = (message: string) => void;
 
 const connectListeners = new Set<ConnectListener>();
+const disconnectListeners = new Set<DisconnectListener>();
 const authErrorListeners = new Set<AuthErrorListener>();
 
 export const stompClient = new Client({
@@ -11,10 +13,9 @@ export const stompClient = new Client({
   reconnectDelay: 5000,
 
   onConnect: () => {
-    stompClient.subscribe("/user/queue/erors", (message) => {
+    stompClient.subscribe("/user/queue/errors", (message) => {
       try {
         const payload = JSON.parse(message.body) as { message: string };
-
         authErrorListeners.forEach((listener) => listener(payload.message));
       } catch (err) {
         console.error("[stompClient] Erro ao parsear payload de erro: ", err);
@@ -22,6 +23,10 @@ export const stompClient = new Client({
     });
 
     connectListeners.forEach((listener) => listener());
+  },
+
+  onDisconnect: () => {
+    disconnectListeners.forEach((listener) => listener());
   },
 
   onStompError(frame) {
@@ -41,9 +46,13 @@ export function onStompConnect(listener: ConnectListener): () => void {
   return () => connectListeners.delete(listener);
 }
 
+export function onStompDisconnect(listener: DisconnectListener): () => void {
+  disconnectListeners.add(listener);
+  return () => disconnectListeners.delete(listener);
+}
+
 export function onStompAuthError(listener: AuthErrorListener): () => void {
   authErrorListeners.add(listener);
-
   return () => authErrorListeners.delete(listener);
 }
 
@@ -57,4 +66,12 @@ export const destinations = {
   command: (serverId: number | string) => `/app/${serverId}/command`,
 };
 
-stompClient.activate();
+export function activateStomp() {
+  if (!stompClient.connected) {
+    stompClient.activate();
+  }
+}
+
+export function deactivateStomp() {
+  stompClient.deactivate();
+}

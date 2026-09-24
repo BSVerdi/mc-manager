@@ -1,32 +1,45 @@
-type InputItemProps = {
-  type: string;
-  title: string;
-  placeHolder?: string;
-  defaultValue?: string;
-  setFunction: (value: any) => void;
-  isRequired?: boolean;
-  disabled?: boolean;
-};
+import { forwardRef, useId } from "react";
 
-export default function InputItem({
-  type,
-  title,
-  placeHolder,
-  defaultValue,
-  setFunction,
-  disabled,
-}: InputItemProps) {
+type InputType = "text" | "email" | "password" | "number" | "search" | "tel" | "url";
+
+interface InputItemProps {
+  type: InputType;
+  title: string;
+  placeholder?: string;
+  defaultValue?: string;
+  value?: string;
+  onChange: (value: string) => void;
+  required?: boolean;
+  disabled?: boolean;
+  name?: string;
+}
+
+const InputItem = forwardRef<HTMLInputElement, InputItemProps>(function InputItem(
+  { type, title, placeholder, defaultValue, value, onChange, required = false, disabled = false, name },
+  ref,
+) {
+  const id = useId();
+
   return (
     <div className="input-item-container">
-      <span className="input-item-title">{title}</span>
+      <label className="input-item-title" htmlFor={id}>
+        {title}
+      </label>
       <input
+        ref={ref}
+        id={id}
         type={type}
-        placeholder={placeHolder}
-        defaultValue={defaultValue}
-        onChange={(e) => setFunction(e.target.value)}
+        name={name}
+        placeholder={placeholder}
+        value={value}
+        defaultValue={value === undefined ? defaultValue : undefined}
+        onChange={(e) => onChange(e.target.value)}
         className="input-item"
         disabled={disabled}
+        required={required}
       />
     </div>
   );
-}
+});
+
+export default InputItem;

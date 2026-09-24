@@ -5,24 +5,50 @@ export function useServerControl(serverId: number) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const run = useCallback(async (action: () => Promise<unknown>) => {
+  const start = useCallback(async () => {
     setLoading(true);
-    setError(null);
 
     try {
-      await action();
+      await api.server.start(serverId);
     } catch (err) {
-      setError((err as Error).message);
+      console.error("[useServerControl] Erro ao iniciar servidor:", err);
+      setError("Erro ao iniciar servidor.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [serverId]);
+
+  const stop = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      await api.server.stop(serverId);
+    } catch (err) {
+      console.error("[useServerControl] Erro ao parar servidor:", err);
+      setError("Erro ao iniciar servidor");
+    } finally {
+      setLoading(false);
+    }
+  }, [serverId]);
+
+  const restart = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      await api.server.restart(serverId);
+    } catch (err) {
+      console.error("[useServerControl] Erro ao reiniciar servidor:", err);
+      setError("Eroo ao iniciar servidor");
+    } finally {
+      setLoading(false);
+    }
+  }, [serverId]);
 
   return {
     loading,
     error,
-    start: () => run(() => api.server.start(serverId)),
-    stop: () => run(() => api.server.stop(serverId)),
-    restart: () => run(() => api.server.restart(serverId)),
+    start,
+    stop,
+    restart,
   };
 }

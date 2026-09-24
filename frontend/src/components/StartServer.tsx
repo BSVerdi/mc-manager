@@ -1,40 +1,27 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Play, Square } from "lucide-react";
-import { useServerControl } from "../hooks/useServerControl";
 import { Status } from "../types/status";
 
 type StartServerProps = {
-  serverId: number;
+  loading: boolean;
   status: Status;
-  setStatus?: (status: Status) => void;
+  onStart: () => void;
+  onStop: () => void;
 };
 
-export function StartServer({ serverId, status, setStatus }: StartServerProps) {
-  const { start, stop } = useServerControl(serverId);
+export function StartServer({ loading, status, onStart, onStop }: StartServerProps) {
+  const isStart = status === Status.OFFLINE || status === Status.STOPPING;
 
-  const handleToggleServer = () => {
-    if (status === Status.OFFLINE) {
-      start();
+  const handleClick = () => {
+    if (loading) return;
 
-      if (setStatus) setStatus(Status.ONLINE);
-    } else {
-      stop();
-
-      if (setStatus) setStatus(Status.OFFLINE);
-    }
+    isStart ? onStart() : onStop();
   };
 
   return (
-    <button
-      onClick={handleToggleServer}
-      className={
-        status === Status.OFFLINE || status === Status.STOPPING
-          ? "server-btn start"
-          : "server-btn stop"
-      }
-    >
+    <button onClick={handleClick} disabled={loading} className={isStart ? "server-btn start" : "server-btn stop"}>
       <AnimatePresence mode="wait" initial={false}>
-        {status === Status.OFFLINE || status === Status.STOPPING ? (
+        {isStart ? (
           <motion.div
             key="play"
             initial={{ opacity: 0, scale: 0.6 }}

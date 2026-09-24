@@ -2,48 +2,53 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { PrivateRoute } from "./components/PrivateRoute";
 import { PublicOnlyRoute } from "./components/PublicOnlyRoute";
+import { ToastProvider } from "./components/toast";
 import { AuthProvider } from "./context/AuthContext";
 import { LoadingProvider } from "./context/LoadingContext";
+import Login from "./features/auth/Login";
+import Register from "./features/auth/Register";
+import Home from "./features/home";
+import Console from "./features/server_dashboard/console/Console";
+import FileExplorer from "./features/server_dashboard/files";
+import PlayersList from "./features/server_dashboard/players/PlayerList";
+import ServerDashboard from "./features/server_dashboard/ServerDashboard";
+import ServerSettings from "./features/server_dashboard/settings/ServerSettings";
+import Settings from "./features/settings/Settings";
 import AuthLayout from "./layouts/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
-import Console from "./pages/Console";
-import FileViewer from "./pages/FileViewer";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import PlayersList from "./pages/PlayerList";
-import Register from "./pages/Register";
-import ServerDashboard from "./pages/ServerDashboard";
-import ServerSettings from "./pages/ServerSettings";
-import Settings from "./pages/Settings";
+import TestPage from "./pages/TestPage";
 
 export default function Router() {
   return (
-    <AuthProvider>
-      <LoadingProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<PublicOnlyRoute />}>
-              <Route path="/" element={<AuthLayout />}>
-                <Route path="login" element={<Login />} />
-                <Route path="register" element={<Register />} />
-              </Route>
-            </Route>
-            <Route element={<PrivateRoute />}>
-              <Route path="/" element={<MainLayout />}>
-                <Route index element={<Home />} />
-                <Route path="servers/:serverId" element={<ServerDashboard />}>
-                  <Route index element={<Navigate to="console" replace />} />
-                  <Route path="console" element={<Console />} />
-                  <Route path="files" element={<FileViewer />} />
-                  <Route path="players" element={<PlayersList />} />
-                  <Route path="settings" element={<ServerSettings />} />
+    <ToastProvider>
+      <AuthProvider>
+        <LoadingProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route element={<PublicOnlyRoute />}>
+                <Route path="/" element={<AuthLayout />}>
+                  <Route path="login" element={<Login />} />
+                  <Route path="register" element={<Register />} />
                 </Route>
-                <Route path="settings" element={<Settings />} />
               </Route>
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </LoadingProvider>
-    </AuthProvider>
+              <Route element={<PrivateRoute />}>
+                <Route path="/" element={<MainLayout />}>
+                  <Route index element={<Home />} />
+                  <Route path="servers/:serverId" element={<ServerDashboard />}>
+                    <Route index element={<Navigate to="console" replace />} />
+                    <Route path="console" element={<Console />} />
+                    <Route path="files" element={<FileExplorer />} />
+                    <Route path="players" element={<PlayersList />} />
+                    <Route path="settings" element={<ServerSettings />} />
+                  </Route>
+                  <Route path="settings" element={<Settings />} />
+                  <Route path="test" element={<TestPage />} />
+                </Route>
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </LoadingProvider>
+      </AuthProvider>
+    </ToastProvider>
   );
 }

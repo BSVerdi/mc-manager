@@ -1,39 +1,43 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronsLeft, LogOut, Settings } from "lucide-react";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import defaultProfilePic from "../assets/big-steve-face.png";
-import { api } from "../lib/apiClient";
+import { useAuth } from "../context/AuthContext";
 import type { User } from "../types/user";
+import { useToast } from "./toast";
 
 interface HeaderProps {
   opened: boolean;
-  setOpened: Dispatch<SetStateAction<boolean>>;
   user?: User | null;
+  onToggleSideBar: () => void;
 }
 
-export default function Header({ opened, setOpened, user }: HeaderProps) {
+export default function Header({ opened, user, onToggleSideBar }: HeaderProps) {
   const [userSettings, setUserSettings] = useState<boolean>(false);
-  const [loggingOut, setLogginOut] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const toggleSideMenu = () => setOpened((prev) => !prev);
+  const { loading, logout } = useAuth();
+  const { success, error } = useToast();
 
   const toggleUserSettings = () => setUserSettings((prev) => !prev);
 
   const handleLogout = async () => {
-    if (loggingOut) return;
+    if (loading) return;
 
-    setLogginOut(true);
+    const result = await logout();
 
-    api.auth
-      .logout()
-      .catch((error) => {
-        console.error("Erro ao realizar logout: ", error);
-        alert("Erro ao realizar logout");
-      })
-      .then(() => window.location.reload())
-      .finally(() => setLogginOut(false));
+    if (!result) {
+      error("Erro ao realizar logout", {
+        id: "auth-error",
+        duration: 2000,
+      });
+    }
+
+    success("Logout realizado com sucesso", {
+      id: "auth-success",
+      duration: 2000,
+    });
   };
 
   return (
@@ -43,10 +47,7 @@ export default function Header({ opened, setOpened, user }: HeaderProps) {
         transition={{ duration: 0.1 }}
         className="side-menu-state-container"
       >
-        <ChevronsLeft
-          className="side-menu-state-btn"
-          onClick={toggleSideMenu}
-        />
+        <ChevronsLeft className="side-menu-state-btn" onClick={onToggleSideBar} />
       </motion.div>
       <motion.div
         className="user-container"
@@ -54,18 +55,8 @@ export default function Header({ opened, setOpened, user }: HeaderProps) {
         animate={{ width: userSettings ? "150px" : "60px" }}
         transition={{ duration: 0.15 }}
       >
-        <motion.button
-          className="user-pfp-container"
-          onClick={toggleUserSettings}
-        >
-          <img
-            src={
-              user?.profilePictureUrl
-                ? user?.profilePictureUrl
-                : defaultProfilePic
-            }
-            className="user-pfp"
-          ></img>
+        <motion.button className="user-pfp-container" onClick={toggleUserSettings}>
+          <img src={user?.profilePictureUrl ? user?.profilePictureUrl : defaultProfilePic} className="user-pfp"></img>
         </motion.button>
         <AnimatePresence>
           {userSettings && (
@@ -81,11 +72,7 @@ export default function Header({ opened, setOpened, user }: HeaderProps) {
                 style={{ width: 32, right: 32, color: "#6b7280" }}
                 onClick={() => navigate("/settings")}
               />
-              <LogOut
-                className="user-btn"
-                style={{ width: 32, right: 32, color: "red" }}
-                onClick={handleLogout}
-              />
+              <LogOut className="user-btn" style={{ width: 32, right: 32, color: "red" }} onClick={handleLogout} />
             </motion.div>
           )}
         </AnimatePresence>

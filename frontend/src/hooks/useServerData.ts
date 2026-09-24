@@ -10,12 +10,7 @@ export function useServerData(serverId: number) {
     api.servers
       .get(serverId)
       .then(setServer)
-      .catch((err) =>
-        console.error(
-          "[useServerData] Erro ao carregar os dados do servidor.",
-          err,
-        ),
-      )
+      .catch((err) => console.error("[useServerData] Erro ao carregar os dados do servidor.", err))
       .finally(() => setLoading(false));
   }, [serverId]);
 
