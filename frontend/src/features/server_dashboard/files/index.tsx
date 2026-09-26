@@ -1,12 +1,12 @@
 import { useServerId } from "../useServerId";
-import { FileBrowser } from "./fileBrowser";
-import { FileEditor } from "./fileEditor";
-import { useFileBrowser } from "./useFileBrowser";
-import { useFileEditor } from "./useFileEditor";
+import { FileBrowser } from "./components/fileBrowser";
+import { FileEditor } from "./components/fileEditor";
+import { useFileBrowser, type FilesBrowserApi } from "./hooks/useFileBrowser";
+import { useFileEditor, type FileEditorApi } from "./hooks/useFileEditor";
 
 export interface FileExplorerProps {
-  browser: ReturnType<typeof useFileBrowser>;
-  editor: ReturnType<typeof useFileEditor>;
+  browser: FilesBrowserApi;
+  editor: FileEditorApi;
 }
 
 export default function FileExplorer() {

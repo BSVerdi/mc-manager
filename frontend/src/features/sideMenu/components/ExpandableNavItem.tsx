@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import type { MenuItem } from "../../data/navigation";
+import type { MenuItem } from "../../../types/menu";
 
 interface ExpandableNavItemProps {
   item: MenuItem;

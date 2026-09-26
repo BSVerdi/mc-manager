@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import type { MenuItem } from "../../data/navigation";
+import type { MenuItem } from "../../../types/menu";
 
 interface SideMenuItemProps {
   item: MenuItem;

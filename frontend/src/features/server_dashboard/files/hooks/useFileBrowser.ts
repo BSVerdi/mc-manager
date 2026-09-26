@@ -1,27 +1,52 @@
-import { useCallback, useEffect, useState } from "react";
-import { filesApi } from "./api";
-import type { FileEntry } from "./types";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { filesApi } from "../api";
+import type { FileEntry } from "../types";
 
-export function useFileBrowser(serverId: number) {
+export interface FilesBrowserApi {
+  currentPath: string;
+  entries: FileEntry[];
+  loading: boolean;
+  error: string | null;
+  openFolder: (name: string) => void;
+  goUp: () => void;
+  goToBreadcrumb: (index: number) => void;
+  getEntryPath: (name: string) => string;
+  remove: (path: string) => Promise<void>;
+  reload: () => void;
+  upload: (file: File) => Promise<void>;
+  uploadZip: (file: File) => Promise<void>;
+  download: (path: string, directory: boolean, name: string) => Promise<void>;
+}
+
+export function useFileBrowser(serverId: number): FilesBrowserApi {
   const [currentPath, setCurrentPath] = useState("");
   const [entries, setEntries] = useState<FileEntry[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<unknown>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const requestIdRef = useRef(0);
 
   const load = useCallback(
     async (path: string) => {
+      const id = ++requestIdRef.current;
+
       setLoading(true);
       setError(null);
 
       try {
         const response = await filesApi.list(serverId, path);
+
+        if (id !== requestIdRef.current) return;
+
         setEntries(response);
         setCurrentPath(path);
       } catch (err) {
+        if (id !== requestIdRef.current) return;
+
         console.error("[useFileBrowser] Erro ao carregar arquivos:", err);
-        setError(err);
+        setError("Erro ao carregar arquivos");
       } finally {
-        setLoading(false);
+        if (id === requestIdRef.current) setLoading(false);
       }
     },
     [serverId],
@@ -31,16 +56,18 @@ export function useFileBrowser(serverId: number) {
     load("");
   }, [load]);
 
+  const getEntryPath = useCallback((name: string) => (currentPath ? `${currentPath}/${name}` : name), [currentPath]);
+
   const openFolder = useCallback(
     async (name: string) => {
-      const newPath = currentPath ? `${currentPath}/${name}` : name;
-      await load(newPath);
+      await load(getEntryPath(name));
     },
-    [serverId, currentPath, load],
+    [getEntryPath, load],
   );
 
   const goUp = useCallback(async () => {
     if (!currentPath) return;
+
     const parts = currentPath.split("/").filter(Boolean);
     parts.pop();
     await load(parts.join("/"));
@@ -51,7 +78,7 @@ export function useFileBrowser(serverId: number) {
       const parts = currentPath.split("/").filter(Boolean);
       await load(parts.slice(0, index + 1).join("/"));
     },
-    [serverId, currentPath, load],
+    [currentPath, load],
   );
 
   const upload = useCallback(
@@ -60,11 +87,12 @@ export function useFileBrowser(serverId: number) {
 
       try {
         await filesApi.upload(serverId, currentPath, file);
-        await load(currentPath);
       } catch (err) {
         console.error("[useFileBrowser] Erro ao realizar upload do arquivo:", err);
-        setError(err);
+        setError("Erro ao realizar upload de arquivo");
       }
+
+      await load(currentPath);
     },
     [serverId, currentPath, load],
   );
@@ -77,9 +105,10 @@ export function useFileBrowser(serverId: number) {
         await filesApi.uploadZip(serverId, currentPath, file);
       } catch {
         console.error("[useFileBrowser] Erro ao realizar upload de arquivo");
-      } finally {
-        await load(currentPath);
+        setError("Erro ao realizar upload de pasta.");
       }
+
+      await load(currentPath);
     },
     [serverId, currentPath, load],
   );
@@ -90,21 +119,23 @@ export function useFileBrowser(serverId: number) {
 
       try {
         await filesApi.delete(serverId, path);
-        await load(currentPath);
       } catch (err) {
         console.error("[useFileBrowser] Erro ao deletar:", err);
+        setError("Erro ao deletar arquivo ou diretório.");
       }
+
+      await load(currentPath);
     },
     [serverId, currentPath, load],
   );
 
   const reload = useCallback(() => load(currentPath), [serverId, currentPath, load]);
 
-  const getDownloadUrl = useCallback(
-    (path: string, directory: boolean) => {
-      if (directory) return filesApi.downloadZipUrl(serverId, path);
+  const download = useCallback(
+    (path: string, directory: boolean, name: string) => {
+      if (directory) return filesApi.downloadZip(serverId, path, name);
 
-      return filesApi.downloadUrl(serverId, path);
+      return filesApi.download(serverId, path, name);
     },
     [serverId],
   );
@@ -117,10 +148,11 @@ export function useFileBrowser(serverId: number) {
     openFolder,
     goUp,
     goToBreadcrumb,
+    getEntryPath,
     remove,
     reload,
     upload,
     uploadZip,
-    getDownloadUrl,
+    download,
   };
 }

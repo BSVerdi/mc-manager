@@ -8,15 +8,14 @@ import { LoadingProvider } from "./context/LoadingContext";
 import Login from "./features/auth/Login";
 import Register from "./features/auth/Register";
 import Home from "./features/home";
-import Console from "./features/server_dashboard/console/Console";
+import ServerDashboard from "./features/server_dashboard";
+import Console from "./features/server_dashboard/console";
 import FileExplorer from "./features/server_dashboard/files";
-import PlayersList from "./features/server_dashboard/players/PlayerList";
-import ServerDashboard from "./features/server_dashboard/ServerDashboard";
-import ServerSettings from "./features/server_dashboard/settings/ServerSettings";
+import PlayersList from "./features/server_dashboard/players";
+import ServerSettings from "./features/server_dashboard/settings";
 import Settings from "./features/settings/Settings";
 import AuthLayout from "./layouts/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
-import TestPage from "./pages/TestPage";
 
 export default function Router() {
   return (
@@ -42,7 +41,6 @@ export default function Router() {
                     <Route path="settings" element={<ServerSettings />} />
                   </Route>
                   <Route path="settings" element={<Settings />} />
-                  <Route path="test" element={<TestPage />} />
                 </Route>
               </Route>
             </Routes>

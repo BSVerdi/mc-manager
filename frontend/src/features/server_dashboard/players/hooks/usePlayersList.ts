@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Player } from "../../../types/player";
-import { playersApi } from "./api";
+import { playersApi } from "../api";
+import type { Player } from "../types";
 import { useOnlinePlayers } from "./useOnlinePlayers";
 
 export function usePlayersList(serverId: number) {

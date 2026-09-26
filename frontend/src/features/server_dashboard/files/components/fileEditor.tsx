@@ -1,5 +1,5 @@
 import { Save, X } from "lucide-react";
-import type { FileExplorerProps } from "./index";
+import type { FileExplorerProps } from "../index";
 
 export function FileEditor({ editor }: FileExplorerProps) {
   if (!editor.file) return null;

@@ -6,6 +6,7 @@ import InputItem from "../../components/InputItem";
 import { Portal } from "../../components/Portal";
 import SelectItem from "../../components/SelectItem";
 import SubmitButton from "../../components/SubmitButton";
+import { useToast } from "../../components/toast";
 import { ramSizes, type Option } from "../../data/server";
 import { useCreateServer } from "./useCreateServer";
 import { useServerVersions } from "./useServerVersions";
@@ -20,6 +21,7 @@ const parseRam = (ram: string): number => parseInt(ram.replace("G", ""), 10);
 export default function CreateServer({ isOpen, setIsOpen }: CreateServerProps) {
   const { data } = useServerVersions();
   const { submitting, createServer } = useCreateServer();
+  const { success, error } = useToast();
 
   const serverVersions: Option[] = useMemo(
     () => data.map((version) => ({ value: version.id, label: version.id })),
@@ -68,9 +70,20 @@ export default function CreateServer({ isOpen, setIsOpen }: CreateServerProps) {
     });
 
     setIsOpen(false);
-    if (serverId !== null) {
-      navigate(`/servers/${serverId}`);
+    if (!serverId) {
+      error("Erro ao criar servidor", {
+        id: "create-server-error",
+        duration: 2000,
+      });
+
+      return;
     }
+    success("Servidor criado com sucesso", {
+      id: "create-server-success",
+      duration: 2000,
+    });
+
+    navigate(`/servers/${serverId}`);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

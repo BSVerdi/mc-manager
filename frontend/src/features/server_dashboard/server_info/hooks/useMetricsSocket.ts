@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { onStompConnect, stompClient, topics } from "../../../lib/stompClient";
-import { EMPTY_METRICS, type Metrics } from "./types";
+import { onStompConnect, stompClient, topics } from "../../../../lib/stompClient";
+import { EMPTY_METRICS, type Metrics } from "../types";
 
 export function useMetricsSocket(serverId: number) {
   const [metrics, setMetrics] = useState<Metrics>(EMPTY_METRICS);

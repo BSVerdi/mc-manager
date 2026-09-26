@@ -3,8 +3,8 @@ import { memo, useState } from "react";
 import { useServerStatus } from "../../../hooks/useServerStatus";
 import { Status } from "../../../types/status";
 import { useServerId } from "../useServerId";
+import { usePlayersList } from "./hooks/usePlayersList";
 import type { Player } from "./types";
-import { usePlayersList } from "./usePlayersList";
 
 const PlayerAvatar = memo(function PlayerAvatar({ name }: { name: string }) {
   const [imageFailed, setImageFailed] = useState(false);

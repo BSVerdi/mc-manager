@@ -1,7 +1,7 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { File, FolderInput, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { useClickOutside } from "../hooks/useClickOutside";
-import { Upload, File, FolderInput } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 
 type UploadButtonProps = {
   onFileSelected: (file: File) => void;
@@ -9,11 +9,7 @@ type UploadButtonProps = {
   disable?: boolean;
 };
 
-export default function UploadButton({
-  onFileSelected,
-  onFolderSelected,
-  disable,
-}: UploadButtonProps) {
+export default function UploadButton({ onFileSelected, onFolderSelected, disable }: UploadButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const uploadModeRef = useRef<"file" | "folder">("file");
@@ -58,12 +54,7 @@ export default function UploadButton({
 
   return (
     <div className="upload-btn-wrapper" ref={wrapperRef}>
-      <button
-        className="upload-btn"
-        onClick={() => setMenuOpen((o) => !o)}
-        disabled={disable}
-        title="Enviar"
-      >
+      <button className="upload-btn" onClick={() => setMenuOpen((o) => !o)} disabled={disable} title="Enviar">
         <Upload style={{ color: "#9ca3af" }} />
       </button>
 
@@ -97,16 +88,10 @@ export default function UploadButton({
             }}
             className="upload-menu"
           >
-            <button
-              className="upload-menu-item"
-              onClick={() => openFilePicker("file")}
-            >
+            <button className="upload-menu-item" onClick={() => openFilePicker("file")}>
               <File size={16} /> Enviar arquivo
             </button>
-            <button
-              className="upload-menu-item"
-              onClick={() => openFilePicker("folder")}
-            >
+            <button className="upload-menu-item" onClick={() => openFilePicker("folder")}>
               <FolderInput size={16} /> Enviar pasta
             </button>
           </motion.div>

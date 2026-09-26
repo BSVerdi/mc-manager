@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { api } from "../../../lib/apiClient";
-import { onStompConnect, stompClient, topics } from "../../../lib/stompClient";
-import { defaultStatus, type Status } from "../../../types/status";
+import { api } from "../../../../lib/apiClient";
+import { onStompConnect, stompClient, topics } from "../../../../lib/stompClient";
+import { defaultStatus, type Status } from "../../../../types/status";
 
 export function useStatusSocket(serverId: number) {
   const [status, setStatus] = useState<Status>(defaultStatus);

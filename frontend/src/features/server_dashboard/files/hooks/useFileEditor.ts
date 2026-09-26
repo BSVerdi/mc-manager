@@ -1,29 +1,51 @@
-import { useCallback, useState } from "react";
-import { filesApi } from "./api";
-import type { FileContent } from "./types";
+import { useCallback, useRef, useState } from "react";
+import { filesApi } from "../api";
+import type { FileContent } from "../types";
 
-export function useFileEditor(serverId: number) {
+export interface FileEditorApi {
+  file: FileContent | null;
+  draft: string;
+  setDraft: (v: string) => void;
+  open: (path: string) => void;
+  save: () => Promise<void>;
+  close: () => void;
+  isDirty: boolean;
+  loading: boolean;
+  saving: boolean;
+  error: string | null;
+}
+
+export function useFileEditor(serverId: number): FileEditorApi {
   const [file, setFile] = useState<FileContent | null>(null);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<unknown>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const openRequestIdRef = useRef(0);
+  const isDirty = file !== null && draft !== file.content;
 
   const open = useCallback(
     async (path: string) => {
+      const id = ++openRequestIdRef.current;
+
       setLoading(true);
       setError(null);
 
       try {
         const response = await filesApi.getContent(serverId, path);
 
+        if (id !== openRequestIdRef.current) return;
+
         setFile(response);
         setDraft(response.content);
       } catch (err) {
+        if (id !== openRequestIdRef.current) return;
+
         console.error("[useFileEditor] Erro ao abrir arquivo:", err);
-        setError(err);
+        setError("Erro ao abrir arquivo.");
       } finally {
-        setLoading(false);
+        if (id === openRequestIdRef.current) setLoading(false);
       }
     },
     [serverId],
@@ -41,19 +63,19 @@ export function useFileEditor(serverId: number) {
       setFile((f) => (f ? { ...f, content: draft } : f));
     } catch (err) {
       console.error("[useFileEditor] Erro ao salvar conteúdo do arquivo:", err);
-      setError(err);
+      setError("Erro ao salvar conteudo do arquivo.");
     } finally {
       setSaving(false);
     }
   }, [file, draft, serverId]);
 
   const close = useCallback(() => {
+    if (isDirty && !window.confirm("Há alterações não salvas. Descartar?")) return;
+
     setFile(null);
     setDraft("");
     setError(null);
-  }, []);
-
-  const isDirty = file !== null && draft !== file.content;
+  }, [isDirty]);
 
   return {
     file,

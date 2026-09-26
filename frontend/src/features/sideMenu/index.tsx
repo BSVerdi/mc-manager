@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { useServerList } from "../../hooks/useServerList";
-import ExpandableNavItem from "./ExpandableNavItem";
-import { NavItem } from "./NavItem";
-import SideMenuFooter from "./SideMenuFooter";
-import SideMenuHeader from "./SideMenuHeader";
+import ExpandableNavItem from "./components/ExpandableNavItem";
+import { NavItem } from "./components/NavItem";
+import SideMenuFooter from "./components/SideMenuFooter";
+import SideMenuHeader from "./components/SideMenuHeader";
 import { useMenuItems } from "./useMenuItems";
 
 interface SideMenuProps {

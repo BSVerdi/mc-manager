@@ -1,5 +1,20 @@
-import { BASE_URL, http } from "../../../lib/apiClient";
+import { http } from "../../../lib/apiClient";
 import type { FileContent, FileEntry } from "./types";
+
+function triggerDownload(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+
+  requestAnimationFrame(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+}
 
 export const filesApi = {
   list: (serverId: number, path = "") =>
@@ -15,11 +30,21 @@ export const filesApi = {
   saveContent: (serverId: number, path: string, content: string) =>
     http.put<void>(`/servers/${serverId}/files/content`, { content }, { params: { path } }).then((res) => res.data),
 
-  downloadUrl: (serverId: number, path: string) =>
-    `${BASE_URL}/servers/${serverId}/files/download?path=${encodeURIComponent(path)}`,
+  download: (serverId: number, path: string, filename: string) =>
+    http
+      .get<Blob>(`/servers/${serverId}/files/download`, {
+        params: { path },
+        responseType: "blob",
+      })
+      .then((res) => triggerDownload(res.data, filename)),
 
-  downloadZipUrl: (serverId: number, path: string) =>
-    `${BASE_URL}/servers/${serverId}/files/download-zip?path=${encodeURIComponent(path)}`,
+  downloadZip: (serverId: number, path: string, folderName: string) =>
+    http
+      .get<Blob>(`/servers/${serverId}/files/download-zip`, {
+        params: { path },
+        responseType: "blob",
+      })
+      .then((res) => triggerDownload(res.data, `${folderName}.zip`)),
 
   upload: (serverId: number, path: string, file: File) => {
     const formData = new FormData();
@@ -28,7 +53,6 @@ export const filesApi = {
     return http
       .post<void>(`/servers/${serverId}/files/upload`, formData, {
         params: { path },
-        headers: { "Content-Type": "multipart/form-data" },
       })
       .then((res) => res.data);
   },
@@ -40,15 +64,10 @@ export const filesApi = {
     return http
       .post<void>(`/servers/${serverId}/files/upload-zip`, formData, {
         params: { path },
-        headers: { "Content-Type": "multipart/form-data" },
       })
       .then((res) => res.data);
   },
 
   delete: (serverId: number, path: string) =>
-    http
-      .delete<void>(`/servers/${serverId}/files/delete`, {
-        params: { path },
-      })
-      .then((res) => res.data),
+    http.delete<void>(`/servers/${serverId}/files/delete`, { params: { path } }).then((res) => res.data),
 };

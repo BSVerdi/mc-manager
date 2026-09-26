@@ -2,10 +2,10 @@ import { RotateCcw } from "lucide-react";
 import { useEffect } from "react";
 import { StartServer } from "../../../components/StartServer";
 import { useServerControl } from "../../../hooks/useServerControl";
-import { useServerData } from "../../../hooks/useServerData";
 import { Status } from "../../../types/status";
-import { useMetricsSocket } from "./useMetricsSocket";
-import { useStatusSocket } from "./useStatusSocket";
+import { useServerData } from "../useServerData";
+import { useMetricsSocket } from "./hooks/useMetricsSocket";
+import { useStatusSocket } from "./hooks/useStatusSocket";
 
 interface ServerInfoProps {
   serverId: number;
