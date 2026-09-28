@@ -68,4 +68,9 @@ public class AccessTokenFilter extends OncePerRequestFilter {
             .orElse(null);
   }
 
+  @Override
+  protected boolean shouldNotFilterAsyncDispatch() {
+    return false;
+  }
+
 }

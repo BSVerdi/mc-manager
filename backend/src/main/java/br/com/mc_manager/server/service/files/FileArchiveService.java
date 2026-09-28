@@ -5,9 +5,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -25,8 +27,11 @@ public class FileArchiveService {
   public void downloadFolder(String scope, String targetFolderPath, OutputStream outputStream) throws IOException {
     Path folderPath = pathSecurityService.getFolderPath(scope, targetFolderPath);
 
-    try (ZipOutputStream zipOut = new ZipOutputStream(outputStream)) {
+    ZipOutputStream zipOut = new ZipOutputStream(outputStream);
+    try {
       zipFolder(folderPath, zipOut);
+    } catch (IOException ex) {
+      throw new UncheckedIOException(ex);
     }
   }
 
@@ -40,18 +45,20 @@ public class FileArchiveService {
 
   private void zipFolder(Path folderPath, ZipOutputStream zipOut) throws IOException {
     try (Stream<Path> walk = Files.walk(folderPath)) {
-      walk.filter(Files::isRegularFile).forEach(file -> {
-        String entryName = folderPath.relativize(file).toString().replace('\\', '/');
+      walk.filter(Files::isRegularFile)
+              .sorted(Comparator.comparing(Path::toString))
+              .forEach(file -> {
+                String entryName = folderPath.relativize(file).toString().replace('\\', '/');
 
-        try {
-          ZipEntry entry = new ZipEntry(entryName);
-          zipOut.putNextEntry(entry);
-          Files.copy(file, zipOut);
-          zipOut.closeEntry();
-        } catch (IOException e) {
-          throw new RuntimeException("Erro ao compactar " + entryName, e);
-        }
-      });
+                try {
+                  ZipEntry entry = new ZipEntry(entryName);
+                  zipOut.putNextEntry(entry);
+                  Files.copy(file, zipOut);
+                  zipOut.closeEntry();
+                } catch (IOException e) {
+                  throw new RuntimeException("Erro ao compactar " + entryName, e);
+                }
+              });
     }
 
     zipOut.finish();

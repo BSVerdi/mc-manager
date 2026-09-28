@@ -5,7 +5,6 @@ import br.com.mc_manager.server.dto.FileEntryDTO;
 import br.com.mc_manager.server.dto.MediaDto;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
 import br.com.mc_manager.server.service.files.ServerFilesService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -79,8 +78,7 @@ public class ServerFilesController {
 
   @GetMapping("/download-zip")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
-  public ResponseEntity<StreamingResponseBody> downloadZip(@PathVariable Long serverId, @RequestParam String path, HttpServletResponse response
-  ) throws IOException {
+  public ResponseEntity<StreamingResponseBody> downloadZip(@PathVariable Long serverId, @RequestParam String path) {
     StreamingResponseBody responseBody = out -> {
       serverFileService.downloadFolder(serverId, path, out);
     };
