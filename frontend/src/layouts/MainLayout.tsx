@@ -18,11 +18,10 @@ export default function MainLayout() {
 
   useEffect(() => {
     return onStompAuthError((message) => {
-      (error(`Acesso negado: ${message}`),
-        {
-          id: "stopm-auth-error",
-          duration: 5000,
-        });
+      error(`Acesso negado: ${message}`, {
+        id: "stopm-auth-error",
+        duration: 5000,
+      });
     });
   }, []);
 

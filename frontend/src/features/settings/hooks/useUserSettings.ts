@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { userSettingsApi } from "./api";
+import { userSettingsApi } from "../api";
 
 export function useUserSettings(userId: number) {
   const [isUpdatingUser, setIsUpdatingUser] = useState<boolean>(false);

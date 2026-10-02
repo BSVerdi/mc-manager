@@ -3,9 +3,3 @@ export type UpdateServerRequest = {
   minRam?: string;
   maxRam?: string;
 };
-
-export type ServerVersion = {
-  id: string;
-  type: string;
-  url: string;
-};

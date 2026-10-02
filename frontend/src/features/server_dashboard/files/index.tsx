@@ -1,6 +1,6 @@
-import { useServerId } from "../useServerId";
-import { FileBrowser } from "./components/fileBrowser";
-import { FileEditor } from "./components/fileEditor";
+import { useServerId } from "../hooks/useServerId";
+import { FileBrowser } from "./components/FileBrowser";
+import { FileEditor } from "./components/FileEditor";
 import { useFileBrowser, type FilesBrowserApi } from "./hooks/useFileBrowser";
 import { useFileEditor, type FileEditorApi } from "./hooks/useFileEditor";
 

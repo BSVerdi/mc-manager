@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { destinations, onStompConnect, onStompDisconnect, stompClient, topics } from "../../../lib/stompClient";
-import type { Log } from "./types";
+import { destinations, onStompConnect, onStompDisconnect, stompClient, topics } from "../../../../lib/stompClient";
+import type { Log } from "../types";
 
 const MAX_LINES = 2000;
 

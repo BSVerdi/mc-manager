@@ -1,6 +1,5 @@
 import { http } from "../../lib/apiClient";
-import type { Server } from "../../types/server";
-import type { ServerVersion } from "../server_dashboard/types";
+import type { Server, ServerVersion } from "../../types/server";
 import type { CreateServerRequest } from "./types";
 
 export const createServerApi = {

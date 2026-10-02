@@ -4,7 +4,7 @@ import ExpandableNavItem from "./components/ExpandableNavItem";
 import { NavItem } from "./components/NavItem";
 import SideMenuFooter from "./components/SideMenuFooter";
 import SideMenuHeader from "./components/SideMenuHeader";
-import { useMenuItems } from "./useMenuItems";
+import { useMenuItems } from "./hooks/useMenuItems";
 
 interface SideMenuProps {
   opened: boolean;

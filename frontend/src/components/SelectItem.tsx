@@ -1,6 +1,6 @@
 import { forwardRef, useId } from "react";
 import Select from "react-select";
-import type { Option } from "../data/server";
+import type { Option } from "../data/data";
 
 interface SelectItemProps {
   title: string;

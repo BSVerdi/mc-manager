@@ -6,3 +6,9 @@ export type Server = {
   maxRam: string;
   version: string;
 };
+
+export type ServerVersion = {
+  id: string;
+  type: string;
+  url: string;
+};

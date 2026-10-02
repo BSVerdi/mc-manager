@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
-import type { UpdateServerRequest } from "../types";
-import { serverSettingsApi } from "./api";
+import type { UpdateServerRequest } from "../../types";
+import { serverSettingsApi } from "../api";
 
 export function useServerSettings(serverId: number) {
   const [error, setError] = useState<string | null>(null);

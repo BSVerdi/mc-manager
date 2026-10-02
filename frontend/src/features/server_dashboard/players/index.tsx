@@ -2,7 +2,7 @@ import { UserStar } from "lucide-react";
 import { memo, useState } from "react";
 import { useServerStatus } from "../../../hooks/useServerStatus";
 import { Status } from "../../../types/status";
-import { useServerId } from "../useServerId";
+import { useServerId } from "../hooks/useServerId";
 import { usePlayersList } from "./hooks/usePlayersList";
 import type { Player } from "./types";
 

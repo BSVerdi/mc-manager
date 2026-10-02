@@ -13,7 +13,7 @@ import Console from "./features/server_dashboard/console";
 import FileExplorer from "./features/server_dashboard/files";
 import PlayersList from "./features/server_dashboard/players";
 import ServerSettings from "./features/server_dashboard/settings";
-import Settings from "./features/settings/Settings";
+import Settings from "./features/settings";
 import AuthLayout from "./layouts/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
 

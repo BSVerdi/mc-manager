@@ -25,19 +25,19 @@ export default function Header({ opened, user, onToggleSideBar }: HeaderProps) {
   const handleLogout = async () => {
     if (loading) return;
 
-    const result = await logout();
+    const ok = await logout();
 
-    if (!result) {
+    if (ok) {
+      success("Logout realizado com sucesso", {
+        id: "auth-success",
+        duration: 2000,
+      });
+    } else {
       error("Erro ao realizar logout", {
         id: "auth-error",
         duration: 2000,
       });
     }
-
-    success("Logout realizado com sucesso", {
-      id: "auth-success",
-      duration: 2000,
-    });
   };
 
   return (
@@ -56,7 +56,7 @@ export default function Header({ opened, user, onToggleSideBar }: HeaderProps) {
         transition={{ duration: 0.15 }}
       >
         <motion.button className="user-pfp-container" onClick={toggleUserSettings}>
-          <img src={user?.profilePictureUrl ? user?.profilePictureUrl : defaultProfilePic} className="user-pfp"></img>
+          <img src={user?.profilePictureUrl ? user.profilePictureUrl : defaultProfilePic} className="user-pfp"></img>
         </motion.button>
         <AnimatePresence>
           {userSettings && (

@@ -38,7 +38,7 @@ export function useServerControl(serverId: number) {
       await api.server.restart(serverId);
     } catch (err) {
       console.error("[useServerControl] Erro ao reiniciar servidor:", err);
-      setError("Eroo ao iniciar servidor");
+      setError("Erro ao reiniciar servidor");
     } finally {
       setLoading(false);
     }

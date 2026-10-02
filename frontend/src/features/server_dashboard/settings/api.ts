@@ -1,5 +1,6 @@
+import type { Server } from "http";
 import { http } from "../../../lib/apiClient";
-import type { Server, UpdateServerRequest } from "../types";
+import type { UpdateServerRequest } from "../types";
 
 export const serverSettingsApi = {
   update: (serverId: number, data: UpdateServerRequest) =>

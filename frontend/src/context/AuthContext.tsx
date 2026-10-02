@@ -88,7 +88,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       return true;
     } catch (error) {
-      console.error("Erro ao realizar login: ", error);
+      console.error("Erro ao realizar registro: ", error);
       return false;
     } finally {
       setLoading(false);

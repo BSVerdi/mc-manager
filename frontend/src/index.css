@@ -175,7 +175,7 @@
   align-items: center;
   justify-content: center;
   height: 50px;
-  width: 100% - 300px;
+  width: 100%;
   border-top: 1px solid var(--border-color);
   padding: 10px;
 }
@@ -804,7 +804,6 @@
   background-color: transparent;
   transition: all 0.2s ease-in-out;
   cursor: pointer;
-  border-radius: px;
 }
 
 .download-btn:hover,
@@ -1478,7 +1477,7 @@
   height: 50px;
   border: 5px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: #3b82f6; /* Azul moderno */
+  border-top-color: #3b82f6;
   animation: spin 1s ease-in-out infinite;
 }
 
@@ -1590,4 +1589,83 @@
 }
 .toast-close:hover {
   background: rgba(0, 0, 0, 0.1);
+}
+
+.confirm-dialog-container {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.confirm-dialog {
+  z-index: 1000;
+  width: 400px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.confirm-dialog-title {
+  text-align: center;
+  color: var(--text-main);
+}
+
+.confirm-dialog-description {
+  text-align: center;
+  color: var(--text-sub);
+}
+
+.confirm-dialog-btns {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 20px;
+}
+
+.confirm-dialog-btn {
+  height: 40px;
+  width: 150px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+  color: var(--text-main);
+}
+
+.confirm-dialog-btn:hover {
+  transform: translateY(-2px);
+}
+
+.confirm-dialog-btn:active {
+  transform: translateY(0);
+}
+
+.confirm-dialog-btn.confirm {
+  background-color: #ef4444;
+  color: white;
+}
+
+.confirm-dialog-btn.confirm:hover {
+  background-color: #d63e3e;
+}
+
+.confirm-dialog-btn.confirm:active {
+  background-color: #c33838;
 }

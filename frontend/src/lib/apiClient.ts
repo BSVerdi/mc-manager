@@ -1,6 +1,7 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { type Server } from "../types/server";
 import type { Status } from "../types/status";
+import { deactivateStomp } from "./stompClient";
 
 export const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -49,8 +50,9 @@ http.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as RetryableRequestConfig | undefined;
+    const isAuthEndpoint = originalRequest?.url?.includes("/auth/");
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         originalRequest._retry = true;
 
@@ -72,6 +74,8 @@ http.interceptors.response.use(
       } catch (refreshError) {
         pendingRequests.forEach(({ reject }) => reject(refreshError));
         pendingRequests = [];
+
+        deactivateStomp();
 
         if (window.location.pathname !== "/login") {
           window.location.href = "/login";

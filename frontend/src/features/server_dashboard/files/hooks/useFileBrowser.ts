@@ -11,10 +11,10 @@ export interface FilesBrowserApi {
   goUp: () => void;
   goToBreadcrumb: (index: number) => void;
   getEntryPath: (name: string) => string;
-  remove: (path: string) => Promise<void>;
+  remove: (path: string) => Promise<boolean>;
   reload: () => void;
-  upload: (file: File) => Promise<void>;
-  uploadZip: (file: File) => Promise<void>;
+  upload: (file: File) => Promise<boolean>;
+  uploadZip: (file: File) => Promise<boolean>;
   download: (path: string, directory: boolean, name: string) => Promise<void>;
 }
 
@@ -82,17 +82,21 @@ export function useFileBrowser(serverId: number): FilesBrowserApi {
   );
 
   const upload = useCallback(
-    async (file: File) => {
+    async (file: File): Promise<boolean> => {
       setError(null);
 
       try {
         await filesApi.upload(serverId, currentPath, file);
+
+        return true;
       } catch (err) {
         console.error("[useFileBrowser] Erro ao realizar upload do arquivo:", err);
         setError("Erro ao realizar upload de arquivo");
-      }
 
-      await load(currentPath);
+        return false;
+      } finally {
+        await load(currentPath);
+      }
     },
     [serverId, currentPath, load],
   );
@@ -103,12 +107,16 @@ export function useFileBrowser(serverId: number): FilesBrowserApi {
 
       try {
         await filesApi.uploadZip(serverId, currentPath, file);
+
+        return true;
       } catch {
         console.error("[useFileBrowser] Erro ao realizar upload de arquivo");
         setError("Erro ao realizar upload de pasta.");
-      }
 
-      await load(currentPath);
+        return false;
+      } finally {
+        await load(currentPath);
+      }
     },
     [serverId, currentPath, load],
   );
@@ -119,12 +127,16 @@ export function useFileBrowser(serverId: number): FilesBrowserApi {
 
       try {
         await filesApi.delete(serverId, path);
+
+        return true;
       } catch (err) {
         console.error("[useFileBrowser] Erro ao deletar:", err);
         setError("Erro ao deletar arquivo ou diretório.");
-      }
 
-      await load(currentPath);
+        return false;
+      } finally {
+        await load(currentPath);
+      }
     },
     [serverId, currentPath, load],
   );

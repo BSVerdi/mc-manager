@@ -4,9 +4,9 @@ import defaultProfilePic from "../../assets/big-steve-face.png";
 import InputItem from "../../components/InputItem";
 import SubmitButton from "../../components/SubmitButton";
 import { useAuth } from "../../context/AuthContext";
-import { ImageSelection } from "./ImageSelection";
-import { getCroppedImg } from "./ImageUtils";
-import { useUserSettings } from "./useUserSettings";
+import { ImageSelection } from "./components/ImageSelection";
+import { useUserSettings } from "./hooks/useUserSettings";
+import { getCroppedImg } from "./utils/ImageUtils";
 
 export default function Settings() {
   const { user, refreshUser } = useAuth();

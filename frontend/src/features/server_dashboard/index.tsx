@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate, Outlet, useParams } from "react-router-dom";
-import TopMenu from "./NavBar";
+import TopMenu from "./components/NavBar";
 import ServerInfo from "./server_info";
 
 export interface DashboardContext {

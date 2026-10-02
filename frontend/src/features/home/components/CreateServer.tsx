@@ -2,14 +2,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import InputItem from "../../components/InputItem";
-import { Portal } from "../../components/Portal";
-import SelectItem from "../../components/SelectItem";
-import SubmitButton from "../../components/SubmitButton";
-import { useToast } from "../../components/toast";
-import { ramSizes, type Option } from "../../data/server";
-import { useCreateServer } from "./useCreateServer";
-import { useServerVersions } from "./useServerVersions";
+import InputItem from "../../../components/InputItem";
+import { Portal } from "../../../components/Portal";
+import SelectItem from "../../../components/SelectItem";
+import SubmitButton from "../../../components/SubmitButton";
+import { useToast } from "../../../components/toast";
+import { ramSizes, type Option } from "../../../data/data";
+import { useCreateServer } from "../hooks/useCreateServer";
+import { useServerVersions } from "../hooks/useServerVersions";
 
 export type CreateServerProps = {
   isOpen: boolean;
@@ -78,6 +78,7 @@ export default function CreateServer({ isOpen, setIsOpen }: CreateServerProps) {
 
       return;
     }
+
     success("Servidor criado com sucesso", {
       id: "create-server-success",
       duration: 2000,

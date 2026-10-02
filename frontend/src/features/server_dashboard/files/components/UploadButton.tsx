@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { File, FolderInput, Upload } from "lucide-react";
 import { useRef, useState } from "react";
-import { useClickOutside } from "../hooks/useClickOutside";
 
 type UploadButtonProps = {
   onFileSelected: (file: File) => void;
@@ -14,8 +13,6 @@ export default function UploadButton({ onFileSelected, onFolderSelected, disable
   const wrapperRef = useRef<HTMLDivElement>(null);
   const uploadModeRef = useRef<"file" | "folder">("file");
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-
-  useClickOutside(wrapperRef, () => setMenuOpen(false));
 
   const openFilePicker = (mode: "file" | "folder") => {
     const input = inputRef.current;

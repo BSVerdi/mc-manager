@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import InputItem from "../../../components/InputItem";
 import SelectItem from "../../../components/SelectItem";
 import SubmitButton from "../../../components/SubmitButton";
-import { ramSizes, type Option } from "../../../data/server";
-import { useServerId } from "../useServerId";
-import { useServerSettings } from "./useServerSettings";
+import { ramSizes, type Option } from "../../../data/data";
+import { useServerId } from "../hooks/useServerId";
+import { useServerSettings } from "./hooks/useServerSettings";
 
 export default function ServerSettings() {
   const [serverName, setServerName] = useState<string>("");

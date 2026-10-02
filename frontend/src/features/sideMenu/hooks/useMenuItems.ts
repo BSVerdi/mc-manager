@@ -1,7 +1,7 @@
 import { HardDrive, LayoutDashboard, Server as ServerIcon, Settings } from "lucide-react";
 import { useMemo } from "react";
-import type { MenuItem } from "../../types/menu";
-import type { Server } from "../../types/server";
+import type { MenuItem } from "../../../types/menu";
+import type { Server } from "../../../types/server";
 
 const MENU_ITEMS: MenuItem[] = [
   {

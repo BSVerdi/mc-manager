@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { createServerApi } from "./api";
-import type { CreateServerRequest } from "./types";
+import { createServerApi } from "../api";
+import type { CreateServerRequest } from "../types";
 
 export function useCreateServer() {
   const [submitting, setSubmitting] = useState<boolean>(false);

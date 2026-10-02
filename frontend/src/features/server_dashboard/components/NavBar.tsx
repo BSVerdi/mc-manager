@@ -1,6 +1,6 @@
 import { Folder, Settings, Terminal, User } from "lucide-react";
-import type { MenuItem } from "../../types/menu";
-import { NavItem } from "../sideMenu/components/NavItem";
+import type { MenuItem } from "../../../types/menu";
+import { NavItem } from "../../sideMenu/components/NavItem";
 
 const NAV_BAR_ITEMS: MenuItem[] = [
   {

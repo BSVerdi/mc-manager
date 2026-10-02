@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { StartServer } from "../../../components/StartServer";
 import { useServerControl } from "../../../hooks/useServerControl";
 import { Status } from "../../../types/status";
-import { useServerData } from "../useServerData";
+import { useServerData } from "../hooks/useServerData";
 import { useMetricsSocket } from "./hooks/useMetricsSocket";
 import { useStatusSocket } from "./hooks/useStatusSocket";
 

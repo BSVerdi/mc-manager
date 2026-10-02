@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import type { ServerVersion } from "../server_dashboard/types";
-import { createServerApi } from "./api";
+import type { ServerVersion } from "../../../types/server";
+import { createServerApi } from "../api";
 
 interface UseServerVersionsResult {
   data: ServerVersion[];

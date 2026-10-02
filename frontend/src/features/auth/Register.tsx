@@ -19,20 +19,19 @@ export default function Register() {
 
     if (loading) return;
 
-    const result = await register(name, email, password);
+    const ok = await register(name, email, password);
 
-    if (!result) {
+    if (ok) {
+      success("Registro realizado com sucesso", {
+        id: "auth-success",
+        duration: 2000,
+      });
+    } else {
       error("Erro ao registrar nova conta", {
         id: "auth-error",
         duration: 2000,
       });
-      return;
     }
-
-    success("Registro realizado com sucesso", {
-      id: "auth-success",
-      duration: 2000,
-    });
   };
 
   return (
@@ -48,9 +47,9 @@ export default function Register() {
             <span>Registre uma conta para continuar</span>
           </div>
           <form onSubmit={handleSubmit} className="auth-inputs">
-            <InputItem title="Nome de usuário" type="text" onChange={setName} />
-            <InputItem title="Email" type="email" placeholder="exemplo@email.com" onChange={setEmail} />
-            <InputItem title="Senha" type="password" onChange={setPassword} />
+            <InputItem title="Nome de usuário" type="text" required={true} onChange={setName} />
+            <InputItem title="Email" type="email" required={true} placeholder="exemplo@email.com" onChange={setEmail} />
+            <InputItem title="Senha" type="password" required={true} onChange={setPassword} />
             <SubmitButton type="submit" label={"Registrar"} loading={loading} />
           </form>
           <span className="auth-link">
