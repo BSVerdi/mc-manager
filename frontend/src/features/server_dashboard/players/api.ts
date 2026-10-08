@@ -1,5 +1,5 @@
 import { http } from "../../../lib/apiClient";
-import type { Player } from "../../../types/player";
+import type { Player } from "./types";
 
 export const playersApi = {
   getPlayers: (serverId: number) => http.get<Player[]>(`/servers/${serverId}/players`).then((res) => res.data),
