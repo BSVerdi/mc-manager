@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import type { MenuItem } from "../../../types/menu";
 
@@ -8,16 +7,7 @@ interface SideMenuItemProps {
   opened?: boolean;
 }
 
-export const NavItem = ({ item, opened = true }: SideMenuItemProps) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const handleAction = (e: React.MouseEvent) => {
-    if (item.children && !item.path) {
-      e.preventDefault();
-      setIsOpen((prev) => !prev);
-    }
-  };
-
+export function NavItem({ item, opened = true }: SideMenuItemProps) {
   return (
     <motion.div layout className="nav-item-container">
       <NavLink key={item.id} to={item.path!} className={({ isActive }) => (isActive ? "nav-btn active" : "nav-btn")}>
@@ -35,4 +25,4 @@ export const NavItem = ({ item, opened = true }: SideMenuItemProps) => {
       </NavLink>
     </motion.div>
   );
-};
+}

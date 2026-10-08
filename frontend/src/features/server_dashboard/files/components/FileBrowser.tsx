@@ -1,12 +1,12 @@
 import { MoveLeft } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
-import LoadingScreen from "../../../../components/LoadingScreen";
+import { LoadingScreen } from "../../../../components/LoadingScreen";
 import { useToast } from "../../../../components/toast";
 import { useConfirm } from "../../../../hooks/useConfirm";
 import type { FileExplorerProps } from "../index";
 import { zipFolder } from "../utils/zipFolder";
-import FileCard from "./FileCard";
-import UploadButton from "./UploadButton";
+import { FileCard } from "./FileCard";
+import { UploadButton } from "./UploadButton";
 
 export function FileBrowser({ browser, editor }: FileExplorerProps) {
   const [deleting, setDeleting] = useState<boolean>(false);

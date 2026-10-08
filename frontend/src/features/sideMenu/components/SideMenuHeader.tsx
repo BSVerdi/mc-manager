@@ -5,7 +5,7 @@ interface SideMenuHeaderProps {
   isOpen: boolean;
 }
 
-export default function ({ isOpen }: SideMenuHeaderProps) {
+export function SideMenuHeader({ isOpen }: SideMenuHeaderProps) {
   return (
     <motion.div layout className="side-menu-header">
       <motion.div layout className="side-menu-icon-container">

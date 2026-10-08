@@ -4,7 +4,7 @@ interface SideMenuFooterProps {
   isOpen: boolean;
 }
 
-export default function SideMenuFooter({ isOpen }: SideMenuFooterProps) {
+export function SideMenuFooter({ isOpen }: SideMenuFooterProps) {
   return (
     <footer className="side-menu-footer">
       <AnimatePresence>

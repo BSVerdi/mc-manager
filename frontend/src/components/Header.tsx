@@ -13,7 +13,7 @@ interface HeaderProps {
   onToggleSideBar: () => void;
 }
 
-export default function Header({ opened, user, onToggleSideBar }: HeaderProps) {
+export function Header({ opened, user, onToggleSideBar }: HeaderProps) {
   const [userSettings, setUserSettings] = useState<boolean>(false);
   const navigate = useNavigate();
 

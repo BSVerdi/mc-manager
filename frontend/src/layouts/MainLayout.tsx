@@ -1,14 +1,14 @@
 import { useCallback, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import Header from "../components/Header";
+import { Header } from "../components/Header";
 import { useToast } from "../components/toast";
 import { useAuth } from "../context/AuthContext";
 import { useLoading } from "../context/LoadingContext";
-import SideMenu from "../features/sideMenu";
+import { SideMenu } from "../features/sideMenu";
 import { useSidebarState } from "../hooks/useSidebarState";
 import { onStompAuthError } from "../lib/stompClient";
 
-export default function MainLayout() {
+export function MainLayout() {
   const [opened, setOpened] = useSidebarState();
   const { isLoading } = useLoading();
   const { user } = useAuth();

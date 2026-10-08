@@ -5,7 +5,7 @@ interface ConsoleLineProps {
   log: Log;
 }
 
-export default function ConsoleLine({ log }: ConsoleLineProps) {
+export function ConsoleLine({ log }: ConsoleLineProps) {
   const time = parseTime(log.timestamp);
 
   return (

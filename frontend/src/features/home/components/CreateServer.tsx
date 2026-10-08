@@ -2,12 +2,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import InputItem from "../../../components/InputItem";
+import { InputItem } from "../../../components/InputItem";
 import { Portal } from "../../../components/Portal";
-import SelectItem from "../../../components/SelectItem";
-import SubmitButton from "../../../components/SubmitButton";
+import { SelectItem } from "../../../components/SelectItem";
+import { SubmitButton } from "../../../components/SubmitButton";
 import { useToast } from "../../../components/toast";
-import { ramSizes, type Option } from "../../../data/data";
+import { ramSizes, type Option } from "../../../data";
 import { useCreateServer } from "../hooks/useCreateServer";
 import { useServerVersions } from "../hooks/useServerVersions";
 

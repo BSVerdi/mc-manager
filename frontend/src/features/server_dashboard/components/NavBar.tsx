@@ -29,7 +29,7 @@ const NAV_BAR_ITEMS: MenuItem[] = [
   },
 ];
 
-export default function TopMenu() {
+export function NavBar() {
   return (
     <nav className="top-menu-container">
       <div className="top-menu-btns">

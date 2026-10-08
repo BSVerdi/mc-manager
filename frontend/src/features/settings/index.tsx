@@ -1,14 +1,14 @@
 import { Upload, User } from "lucide-react";
 import { useRef, useState } from "react";
 import defaultProfilePic from "../../assets/big-steve-face.png";
-import InputItem from "../../components/InputItem";
-import SubmitButton from "../../components/SubmitButton";
+import { InputItem } from "../../components/InputItem";
+import { SubmitButton } from "../../components/SubmitButton";
 import { useAuth } from "../../context/AuthContext";
 import { ImageSelection } from "./components/ImageSelection";
 import { useUserSettings } from "./hooks/useUserSettings";
 import { getCroppedImg } from "./utils/ImageUtils";
 
-export default function Settings() {
+export function Settings() {
   const { user, refreshUser } = useAuth();
   const { isUpdatingUser, isUpdatingUserPicture, updateUser, updateUserProfilePic } = useUserSettings(user!.id);
 

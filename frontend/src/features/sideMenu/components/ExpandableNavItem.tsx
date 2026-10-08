@@ -9,7 +9,7 @@ interface ExpandableNavItemProps {
   isOpen?: boolean;
 }
 
-export default function ExpandableNavItemProps({ item, isOpen }: ExpandableNavItemProps) {
+export function ExpandableNavItem({ item, isOpen }: ExpandableNavItemProps) {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const hasChildren = (item.children?.length ?? 0) > 0;

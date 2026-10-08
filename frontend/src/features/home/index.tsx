@@ -5,7 +5,7 @@ import { useServerList } from "../../hooks/useServerList";
 import CreateServer from "./components/CreateServer";
 import { ServerCard } from "./components/ServerCard";
 
-export default function Home() {
+export function Home() {
   const { user } = useAuth();
   const { servers } = useServerList();
   const [isOpen, setIsOpen] = useState<boolean>(false);

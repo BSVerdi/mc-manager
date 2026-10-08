@@ -77,5 +77,4 @@ function FileCardBase({ entry, entryPath, deleting, openFolder, openFile, onDele
   );
 }
 
-const FileCard = memo(FileCardBase);
-export default FileCard;
+export const FileCard = memo(FileCardBase);

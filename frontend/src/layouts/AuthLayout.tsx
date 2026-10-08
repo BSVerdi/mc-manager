@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-export default function AuthLayout() {
+export function AuthLayout() {
   return (
     <main className="content-area">
       <Outlet />

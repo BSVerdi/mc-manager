@@ -14,7 +14,7 @@ interface InputItemProps {
   name?: string;
 }
 
-const InputItem = forwardRef<HTMLInputElement, InputItemProps>(function InputItem(
+export const InputItem = forwardRef<HTMLInputElement, InputItemProps>(function InputItem(
   { type, title, placeholder, defaultValue, value, onChange, required = false, disabled = false, name },
   ref,
 ) {
@@ -41,5 +41,3 @@ const InputItem = forwardRef<HTMLInputElement, InputItemProps>(function InputIte
     </div>
   );
 });
-
-export default InputItem;

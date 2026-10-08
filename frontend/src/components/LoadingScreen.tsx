@@ -4,7 +4,7 @@ interface LoadingScreenProps {
   isVisible: boolean;
 }
 
-export default function LoadingScreen({ isVisible }: LoadingScreenProps) {
+export function LoadingScreen({ isVisible }: LoadingScreenProps) {
   return (
     <AnimatePresence>
       {isVisible && (

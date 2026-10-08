@@ -44,7 +44,7 @@ export function ConfirmDialog({ input, onClose }: ConfirmDialogProps) {
             transition={{ delay: 0.125 }}
             className="confirm-dialog-description"
           >
-            {input.description}
+            {input.description} <br />
             Essa ação não pode ser desfeita.
           </motion.span>
           <div className="confirm-dialog-btns">

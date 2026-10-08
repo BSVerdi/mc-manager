@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import { forwardRef, useEffect, useState } from "react";
 import Cropper from "react-easy-crop";
 import { Portal } from "../../../components/Portal";
-import SubmitButton from "../../../components/SubmitButton";
+import { SubmitButton } from "../../../components/SubmitButton";
 import type { Crop } from "../utils/ImageUtils";
 
 interface ImageSelectionProps {

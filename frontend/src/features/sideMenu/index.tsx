@@ -1,16 +1,16 @@
 import { motion } from "framer-motion";
 import { useServerList } from "../../hooks/useServerList";
-import ExpandableNavItem from "./components/ExpandableNavItem";
+import { ExpandableNavItem } from "./components/ExpandableNavItem";
 import { NavItem } from "./components/NavItem";
-import SideMenuFooter from "./components/SideMenuFooter";
-import SideMenuHeader from "./components/SideMenuHeader";
+import { SideMenuFooter } from "./components/SideMenuFooter";
+import { SideMenuHeader } from "./components/SideMenuHeader";
 import { useMenuItems } from "./hooks/useMenuItems";
 
 interface SideMenuProps {
   opened: boolean;
 }
 
-export default function SideMenu({ opened }: SideMenuProps) {
+export function SideMenu({ opened }: SideMenuProps) {
   const { servers } = useServerList();
   const menuItems = useMenuItems(servers);
 

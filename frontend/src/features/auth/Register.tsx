@@ -1,12 +1,12 @@
 import { MonitorCog } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import InputItem from "../../components/InputItem";
-import SubmitButton from "../../components/SubmitButton";
+import { InputItem } from "../../components/InputItem";
+import { SubmitButton } from "../../components/SubmitButton";
 import { useToast } from "../../components/toast";
 import { useAuth } from "../../context/AuthContext";
 
-export default function Register() {
+export function Register() {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate, Outlet, useParams } from "react-router-dom";
-import TopMenu from "./components/NavBar";
-import ServerInfo from "./server_info";
+import { NavBar } from "./components/NavBar";
+import { ServerInfo } from "./server_info";
 
 export interface DashboardContext {
   serverId: number;
@@ -9,7 +9,7 @@ export interface DashboardContext {
   setOnlinePlayers: (value: number) => void;
 }
 
-export default function ServerDashboard() {
+export function ServerDashboard() {
   const { serverId } = useParams<{ serverId: string }>();
   const [onlinePlayers, setOnlinePlayers] = useState<number>(0);
   const numericServerId = Number(serverId);
@@ -22,7 +22,7 @@ export default function ServerDashboard() {
     <div className="server-dashboard">
       <ServerInfo serverId={numericServerId} setOnlinePlayers={setOnlinePlayers} />
       <section className="server-content">
-        <TopMenu />
+        <NavBar />
         <section className="server-content-pages">
           <Outlet
             context={{

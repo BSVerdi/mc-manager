@@ -53,6 +53,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return true;
     } catch (error) {
       console.error("Erro ao realizar login: ", error);
+      
       return false;
     } finally {
       setLoading(false);

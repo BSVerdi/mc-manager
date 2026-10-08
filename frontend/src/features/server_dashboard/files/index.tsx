@@ -9,7 +9,7 @@ export interface FileExplorerProps {
   editor: FileEditorApi;
 }
 
-export default function FileExplorer() {
+export function FileExplorer() {
   const serverId = useServerId();
   const browser = useFileBrowser(serverId);
   const editor = useFileEditor(serverId);

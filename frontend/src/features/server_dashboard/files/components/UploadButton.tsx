@@ -8,7 +8,7 @@ type UploadButtonProps = {
   disable?: boolean;
 };
 
-export default function UploadButton({ onFileSelected, onFolderSelected, disable }: UploadButtonProps) {
+export function UploadButton({ onFileSelected, onFolderSelected, disable }: UploadButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const uploadModeRef = useRef<"file" | "folder">("file");

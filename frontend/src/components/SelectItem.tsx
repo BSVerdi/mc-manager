@@ -1,6 +1,6 @@
 import { forwardRef, useId } from "react";
 import Select from "react-select";
-import type { Option } from "../data/data";
+import type { Option } from "../data";
 
 interface SelectItemProps {
   title: string;
@@ -12,7 +12,7 @@ interface SelectItemProps {
   value?: Option;
 }
 
-const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(function SelectItem(
+export const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(function SelectItem(
   { title, defaultValue, options, onChange, placeholder = "Selecione…", isDisabled = false, value },
   ref,
 ) {
@@ -40,5 +40,3 @@ const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(function SelectIt
     </div>
   );
 });
-
-export default SelectItem;

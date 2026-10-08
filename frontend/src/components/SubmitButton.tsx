@@ -8,7 +8,7 @@ interface SubmitButtonProps {
   disabled?: boolean;
 }
 
-export default function SubmitButton({ type = "button", label, loading, onClick, disabled }: SubmitButtonProps) {
+export function SubmitButton({ type = "button", label, loading, onClick, disabled }: SubmitButtonProps) {
   const isDisabled = loading || disabled;
 
   return (

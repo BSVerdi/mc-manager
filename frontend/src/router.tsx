@@ -5,17 +5,17 @@ import { PublicOnlyRoute } from "./components/PublicOnlyRoute";
 import { ToastProvider } from "./components/toast";
 import { AuthProvider } from "./context/AuthContext";
 import { LoadingProvider } from "./context/LoadingContext";
-import Login from "./features/auth/Login";
-import Register from "./features/auth/Register";
-import Home from "./features/home";
-import ServerDashboard from "./features/server_dashboard";
-import Console from "./features/server_dashboard/console";
-import FileExplorer from "./features/server_dashboard/files";
-import PlayersList from "./features/server_dashboard/players";
-import ServerSettings from "./features/server_dashboard/settings";
-import Settings from "./features/settings";
-import AuthLayout from "./layouts/AuthLayout";
-import MainLayout from "./layouts/MainLayout";
+import { Login } from "./features/auth/Login";
+import { Register } from "./features/auth/Register";
+import { Home } from "./features/home";
+import { ServerDashboard } from "./features/server_dashboard";
+import { Console } from "./features/server_dashboard/console";
+import { FileExplorer } from "./features/server_dashboard/files";
+import { PlayersList } from "./features/server_dashboard/players";
+import { ServerSettings } from "./features/server_dashboard/settings";
+import { Settings } from "./features/settings";
+import { AuthLayout } from "./layouts/AuthLayout";
+import { MainLayout } from "./layouts/MainLayout";
 
 export default function Router() {
   return (

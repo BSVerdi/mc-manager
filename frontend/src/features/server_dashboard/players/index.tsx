@@ -25,7 +25,7 @@ const PlayerAvatar = memo(function PlayerAvatar({ name }: { name: string }) {
   );
 });
 
-export default function PlayersList() {
+export function PlayersList() {
   const serverId = useServerId();
   const { status } = useServerStatus(serverId);
   const { pendingNick, players, opPlayer, deopPlayer, banPlayer, unbanPlayer } = usePlayersList(serverId);

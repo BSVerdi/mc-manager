@@ -24,7 +24,7 @@ function formatUptime(totalSeconds: number): string {
   return `${seconds}s`;
 }
 
-export default function ServerInfo({ serverId, setOnlinePlayers }: ServerInfoProps) {
+export function ServerInfo({ serverId, setOnlinePlayers }: ServerInfoProps) {
   const status = useStatusSocket(serverId);
   const metrics = useMetricsSocket(serverId);
   const { server } = useServerData(serverId);
