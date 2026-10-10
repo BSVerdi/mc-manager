@@ -1,13 +1,13 @@
 import { PlusCircle, Server as ServerIcon } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useServerList } from "../../hooks/useServerList";
+import { useServers } from "../../context/ServersContext";
 import CreateServer from "./components/CreateServer";
 import { ServerCard } from "./components/ServerCard";
 
 export function Home() {
   const { user } = useAuth();
-  const { servers } = useServerList();
+  const { servers, reload } = useServers();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
@@ -26,7 +26,7 @@ export function Home() {
           <button onClick={() => setIsOpen(true)} className="create-server-btn">
             <PlusCircle /> Create New Server
           </button>
-          <CreateServer isOpen={isOpen} setIsOpen={setIsOpen} />
+          <CreateServer isOpen={isOpen} setIsOpen={setIsOpen} onCreate={reload} />
         </section>
         <section className="server-grid-container">
           <section className="server-grid">

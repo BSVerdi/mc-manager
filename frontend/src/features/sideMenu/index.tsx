@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useServerList } from "../../hooks/useServerList";
+import { useServers } from "../../context/ServersContext";
 import { ExpandableNavItem } from "./components/ExpandableNavItem";
 import { NavItem } from "./components/NavItem";
 import { SideMenuFooter } from "./components/SideMenuFooter";
@@ -11,7 +11,7 @@ interface SideMenuProps {
 }
 
 export function SideMenu({ opened }: SideMenuProps) {
-  const { servers } = useServerList();
+  const { servers } = useServers();
   const menuItems = useMenuItems(servers);
 
   return (

@@ -1,7 +1,7 @@
 import { MoveLeft } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { LoadingScreen } from "../../../../components/LoadingScreen";
-import { useToast } from "../../../../components/toast";
+import { useToast } from "../../../../context/ToastContext";
 import { useConfirm } from "../../../../hooks/useConfirm";
 import type { FileExplorerProps } from "../index";
 import { zipFolder } from "../utils/zipFolder";

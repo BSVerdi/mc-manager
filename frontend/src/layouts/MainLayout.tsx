@@ -1,20 +1,20 @@
 import { useCallback, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Header } from "../components/Header";
-import { useToast } from "../components/toast";
 import { useAuth } from "../context/AuthContext";
 import { useLoading } from "../context/LoadingContext";
+import { useToast } from "../context/ToastContext";
 import { SideMenu } from "../features/sideMenu";
 import { useSidebarState } from "../hooks/useSidebarState";
 import { onStompAuthError } from "../lib/stompClient";
 
 export function MainLayout() {
-  const [opened, setOpened] = useSidebarState();
+  const [isOpen, setIsOpened] = useSidebarState();
   const { isLoading } = useLoading();
   const { user } = useAuth();
   const { error } = useToast();
 
-  const toggleSideBar = useCallback(() => setOpened(!opened), [opened, setOpened]);
+  const toggleSideBar = useCallback(() => setIsOpened(!isOpen), [isOpen, setIsOpened]);
 
   useEffect(() => {
     return onStompAuthError((message) => {
@@ -31,11 +31,11 @@ export function MainLayout() {
       style={{ opacity: isLoading ? 0.5 : 1, pointerEvents: isLoading ? "none" : "auto", transition: "opacity 0.3s" }}
     >
       <aside>
-        <SideMenu opened={opened} />
+        <SideMenu opened={isOpen} />
       </aside>
       <div className="content-container">
         <header className="header-area">
-          <Header opened={opened} onToggleSideBar={toggleSideBar} user={user} />
+          <Header opened={isOpen} onToggleSideBar={toggleSideBar} user={user} />
         </header>
         <main className="content-area">
           <Outlet />

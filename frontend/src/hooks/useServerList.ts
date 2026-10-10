@@ -6,7 +6,7 @@ export function useServerList() {
   const [servers, setServers] = useState<Server[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const refetchServers = useCallback(async () => {
+  const getServers = useCallback(async () => {
     setLoading(true);
 
     try {
@@ -19,9 +19,11 @@ export function useServerList() {
     }
   }, []);
 
-  useEffect(() => {
-    refetchServers();
-  }, [refetchServers]);
+  const reload = useCallback(() => getServers(), [getServers]);
 
-  return { servers, loading, refetchServers };
+  useEffect(() => {
+    getServers();
+  }, [getServers]);
+
+  return { servers, loading, getServers, reload };
 }

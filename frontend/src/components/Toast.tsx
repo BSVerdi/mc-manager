@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Portal } from "../Portal";
-import type { ToastItem, ToastVariant } from "./types";
+import type { ToastItem, ToastVariant } from "../types/toast";
+import { Portal } from "./Portal";
 
 interface ToasterProps {
   toasts: ToastItem[];

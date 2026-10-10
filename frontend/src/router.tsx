@@ -1,10 +1,11 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { PrivateRoute } from "./components/PrivateRoute";
+import { PrivateShell } from "./components/PrivateShell";
 import { PublicOnlyRoute } from "./components/PublicOnlyRoute";
-import { ToastProvider } from "./components/toast";
 import { AuthProvider } from "./context/AuthContext";
 import { LoadingProvider } from "./context/LoadingContext";
+import { ToastProvider } from "./context/ToastContext";
 import { Login } from "./features/auth/Login";
 import { Register } from "./features/auth/Register";
 import { Home } from "./features/home";
@@ -15,7 +16,6 @@ import { PlayersList } from "./features/server_dashboard/players";
 import { ServerSettings } from "./features/server_dashboard/settings";
 import { Settings } from "./features/settings";
 import { AuthLayout } from "./layouts/AuthLayout";
-import { MainLayout } from "./layouts/MainLayout";
 
 export default function Router() {
   return (
@@ -31,7 +31,7 @@ export default function Router() {
                 </Route>
               </Route>
               <Route element={<PrivateRoute />}>
-                <Route path="/" element={<MainLayout />}>
+                <Route path="/" element={<PrivateShell />}>
                   <Route index element={<Home />} />
                   <Route path="servers/:serverId" element={<ServerDashboard />}>
                     <Route index element={<Navigate to="console" replace />} />

@@ -6,19 +6,20 @@ import { InputItem } from "../../../components/InputItem";
 import { Portal } from "../../../components/Portal";
 import { SelectItem } from "../../../components/SelectItem";
 import { SubmitButton } from "../../../components/SubmitButton";
-import { useToast } from "../../../components/toast";
+import { useToast } from "../../../context/ToastContext";
 import { ramSizes, type Option } from "../../../data";
 import { useCreateServer } from "../hooks/useCreateServer";
 import { useServerVersions } from "../hooks/useServerVersions";
 
-export type CreateServerProps = {
+interface CreateServerProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
+  onCreate: () => void;
+}
 
 const parseRam = (ram: string): number => parseInt(ram.replace("G", ""), 10);
 
-export default function CreateServer({ isOpen, setIsOpen }: CreateServerProps) {
+export default function CreateServer({ isOpen, setIsOpen, onCreate }: CreateServerProps) {
   const { data } = useServerVersions();
   const { submitting, createServer } = useCreateServer();
   const { success, error } = useToast();
@@ -70,20 +71,20 @@ export default function CreateServer({ isOpen, setIsOpen }: CreateServerProps) {
     });
 
     setIsOpen(false);
-    if (!serverId) {
+
+    if (serverId) {
+      success("Servidor criado com sucesso", {
+        id: "create-server-success",
+        duration: 2000,
+      });
+    } else {
       error("Erro ao criar servidor", {
         id: "create-server-error",
         duration: 2000,
       });
-
-      return;
     }
 
-    success("Servidor criado com sucesso", {
-      id: "create-server-success",
-      duration: 2000,
-    });
-
+    await onCreate();
     navigate(`/servers/${serverId}`);
   };
 
@@ -107,9 +108,7 @@ export default function CreateServer({ isOpen, setIsOpen }: CreateServerProps) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -500, opacity: 0 }}
               transition={{
-                type: "spring",
-                stiffness: 100,
-                damping: 18,
+                duration: 0.3,
               }}
               className="create-server-container"
             >

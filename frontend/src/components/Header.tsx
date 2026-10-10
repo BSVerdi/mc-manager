@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import defaultProfilePic from "../assets/big-steve-face.png";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import type { User } from "../types/user";
-import { useToast } from "./toast";
 
 interface HeaderProps {
   opened: boolean;

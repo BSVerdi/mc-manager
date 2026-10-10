@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { InputItem } from "../../../components/InputItem";
 import { SelectItem } from "../../../components/SelectItem";
 import { SubmitButton } from "../../../components/SubmitButton";
-import { useToast } from "../../../components/toast";
+import { useServers } from "../../../context/ServersContext";
+import { useToast } from "../../../context/ToastContext";
 import { ramSizes, type Option } from "../../../data";
 import { useConfirm } from "../../../hooks/useConfirm";
 import { useServerId } from "../hooks/useServerId";
@@ -20,6 +21,7 @@ export function ServerSettings() {
   const { submitting, updateServer, deleteServer } = useServerSettings(serverId);
   const { error, success } = useToast();
   const { confirm, modal } = useConfirm();
+  const { reload } = useServers();
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
@@ -65,6 +67,7 @@ export function ServerSettings() {
         duration: 2000,
       });
 
+      reload();
       navigate("/");
     } else {
       error("Erro ao deletar servidor.", {

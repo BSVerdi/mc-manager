@@ -51,14 +51,6 @@ export function ServerInfo({ serverId, setOnlinePlayers }: ServerInfoProps) {
             </span>
           </li>
           <li>
-            <strong>CPU Usage: </strong>
-            {status === Status.OFFLINE ? 0 : metrics.cpuUsagePercent}%
-          </li>
-          <li>
-            <strong>RAM Usage: </strong>
-            {status === Status.OFFLINE ? "0MB / 0MB" : `${metrics.ramUsedMb}MB / ${metrics.ramMaxMb}MB`}
-          </li>
-          <li>
             <strong>Server Uptime: </strong>
             {status === Status.OFFLINE ? "--" : formatUptime(metrics.uptimeSeconds)}
           </li>
@@ -67,8 +59,16 @@ export function ServerInfo({ serverId, setOnlinePlayers }: ServerInfoProps) {
             <span>{server?.version}</span>
           </li>
           <li>
-            <strong>Server Port: </strong>
-            <span>{server?.port}</span>
+            <strong>Server Domain: </strong>
+            <span>{server?.domain}</span>
+          </li>
+          <li>
+            <strong>CPU Usage: </strong>
+            {status === Status.OFFLINE ? 0 : metrics.cpuUsagePercent}%
+          </li>
+          <li>
+            <strong>RAM Usage: </strong>
+            {status === Status.OFFLINE ? "0MB / 0MB" : `${metrics.ramUsedMb}MB / ${metrics.ramMaxMb}MB`}
           </li>
           <li>
             <strong>Online players: </strong> {metrics.onlinePlayers}

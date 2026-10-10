@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { InputItem } from "../../components/InputItem";
 import { SubmitButton } from "../../components/SubmitButton";
-import { useToast } from "../../components/toast";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
 
 export function Login() {
   const [email, setEmail] = useState<string>("");

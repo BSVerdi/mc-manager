@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
-import { Toaster } from "./Toaster";
-import type { ToastItem, ToastOptions } from "./types";
+import { Toaster } from "../components/Toast";
+import type { ToastItem, ToastOptions } from "../types/toast";
 
 interface ToastContextValue {
   toast: (message: string, options?: ToastOptions) => string;
