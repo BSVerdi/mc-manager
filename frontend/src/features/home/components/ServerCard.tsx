@@ -7,7 +7,7 @@ import type { Server } from "../../../types/server";
 import { Status } from "../../../types/status";
 
 export function ServerCard({ server }: { server: Server }) {
-  const { status } = useServerStatus(server.id);
+  const { status, reload } = useServerStatus(server.id);
   const { loading, start, stop } = useServerControl(server.id);
 
   return (
@@ -25,7 +25,18 @@ export function ServerCard({ server }: { server: Server }) {
         </div>
       </NavLink>
       <div className="server-card-btns">
-        <StartServer loading={loading} onStart={start} onStop={stop} status={status} />
+        <StartServer
+          loading={loading}
+          onStart={async () => {
+            await start();
+            reload();
+          }}
+          onStop={async () => {
+            await stop();
+            reload();
+          }}
+          status={status}
+        />
       </div>
     </div>
   );

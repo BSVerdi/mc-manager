@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { TriangleAlert } from "lucide-react";
+import { elevateIn } from "../lib/animations/elevateIn";
 import type { ConfirmInput } from "../types/confirm";
 import { Portal } from "./Portal";
 
@@ -28,22 +29,10 @@ export function ConfirmDialog({ input, onClose }: ConfirmDialogProps) {
           <motion.div>
             <TriangleAlert className="confirm-dialog-warning" size={48} color="#ef4444" />
           </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 12 }}
-            transition={{ delay: 0.125 }}
-            className="confirm-dialog-title"
-          >
+          <motion.h2 variants={elevateIn} initial="hidden" animate="visible" className="confirm-dialog-title">
             {input.title}
           </motion.h2>
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 12 }}
-            transition={{ delay: 0.125 }}
-            className="confirm-dialog-description"
-          >
+          <motion.span variants={elevateIn} initial="hidden" animate="visible" className="confirm-dialog-description">
             {input.description} <br />
             Essa ação não pode ser desfeita.
           </motion.span>

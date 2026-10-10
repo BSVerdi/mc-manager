@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { MonitorCog } from "lucide-react";
+import { elevateIn } from "../../../lib/animations/elevateIn";
 
 interface SideMenuHeaderProps {
   isOpen: boolean;
@@ -12,7 +13,7 @@ export function SideMenuHeader({ isOpen }: SideMenuHeaderProps) {
         <MonitorCog style={{ width: 48, height: 48 }} />
       </motion.div>
       {isOpen && (
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.125 }}>
+        <motion.div variants={elevateIn} initial="hidden" animate="visible">
           <h1>MC-Manager</h1>
         </motion.div>
       )}

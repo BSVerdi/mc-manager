@@ -12,10 +12,10 @@ type StartServerProps = {
 export function StartServer({ loading, status, onStart, onStop }: StartServerProps) {
   const isStart = status === Status.OFFLINE || status === Status.STOPPING;
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (loading) return;
 
-    isStart ? onStart() : onStop();
+    isStart ? await onStart() : await onStop();
   };
 
   return (

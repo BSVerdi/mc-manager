@@ -21,8 +21,8 @@ export function Settings() {
 
     if (isUpdatingUser || username === "") return;
 
-    const success = await updateUser(username);
-    if (success) await refreshUser();
+    const ok = await updateUser(username);
+    if (ok) await refreshUser();
   };
 
   const handleCropAndUpload = async (img: string, crop: { x: number; y: number; width: number; height: number }) => {
@@ -30,8 +30,8 @@ export function Settings() {
 
     const croppedImage = await getCroppedImg(img, crop);
 
-    const success = await updateUserProfilePic(croppedImage);
-    if (success) await refreshUser();
+    const ok = await updateUserProfilePic(croppedImage);
+    if (ok) await refreshUser();
 
     setShowImageSelection(false);
   };

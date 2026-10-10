@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { NavLink } from "react-router-dom";
+import { elevateIn } from "../../../lib/animations/elevateIn";
 import type { MenuItem } from "../../../types/menu";
 
 interface SideMenuItemProps {
@@ -13,12 +14,7 @@ export function NavItem({ item, opened = true }: SideMenuItemProps) {
       <NavLink key={item.id} to={item.path!} className={({ isActive }) => (isActive ? "nav-btn active" : "nav-btn")}>
         <motion.div className="nav-icon-container">{item.icon ? <item.icon /> : null}</motion.div>
         {opened && (
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.125 }}
-            className="nav-item-label"
-          >
+          <motion.span variants={elevateIn} initial="hidden" animate="visible" className="nav-item-label">
             {item.label}
           </motion.span>
         )}
