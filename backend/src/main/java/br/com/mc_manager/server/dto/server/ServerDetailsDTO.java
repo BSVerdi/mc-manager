@@ -2,10 +2,10 @@ package br.com.mc_manager.server.dto.server;
 
 import br.com.mc_manager.server.model.Server;
 
-public record ServerDetailsDto(
+public record ServerDetailsDTO(
         Long id, String name, Integer port, String minRam, String maxRam, String version, String domain
 ) {
-  public ServerDetailsDto(Server server) {
+  public ServerDetailsDTO(Server server) {
     this(
             server.getId(),
             server.getName(),

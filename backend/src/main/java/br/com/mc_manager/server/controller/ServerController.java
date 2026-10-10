@@ -1,9 +1,9 @@
 package br.com.mc_manager.server.controller;
 
-import br.com.mc_manager.server.dto.MinecraftManifest.MinecraftVersionDto;
-import br.com.mc_manager.server.dto.StatusResponseDto;
+import br.com.mc_manager.server.dto.StatusResponseDTO;
+import br.com.mc_manager.server.dto.minecraftManifest.MinecraftVersionDTO;
 import br.com.mc_manager.server.dto.server.CreateServerDTO;
-import br.com.mc_manager.server.dto.server.ServerDetailsDto;
+import br.com.mc_manager.server.dto.server.ServerDetailsDTO;
 import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 import br.com.mc_manager.server.service.MinecraftMetaDataService;
 import br.com.mc_manager.server.service.ServerManagementService;
@@ -32,7 +32,7 @@ public class ServerController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ServerDetailsDto>> listServers(Principal principal) {
+  public ResponseEntity<List<ServerDetailsDTO>> listServers(Principal principal) {
     var servers = managementService.listServers(principal.getName());
 
     return ResponseEntity.ok().body(servers);
@@ -40,14 +40,14 @@ public class ServerController {
 
   @GetMapping("/{serverId}")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
-  public ResponseEntity<ServerDetailsDto> getServer(@PathVariable Long serverId) {
+  public ResponseEntity<ServerDetailsDTO> getServer(@PathVariable Long serverId) {
     var server = managementService.getServer(serverId);
 
     return ResponseEntity.ok().body(server);
   }
 
   @PostMapping
-  public ResponseEntity<ServerDetailsDto> createServer(
+  public ResponseEntity<ServerDetailsDTO> createServer(
           @Valid @RequestBody CreateServerDTO dto,
           Principal principal,
           UriComponentsBuilder uriBuilder
@@ -61,7 +61,7 @@ public class ServerController {
 
   @PutMapping("/{serverId}")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
-  public ResponseEntity<ServerDetailsDto> update(
+  public ResponseEntity<ServerDetailsDTO> update(
           @PathVariable Long serverId,
           @Valid @RequestBody UpdateServerDTO dto
   ) {
@@ -105,22 +105,22 @@ public class ServerController {
 
   @GetMapping("/{serverId}/status")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
-  public ResponseEntity<StatusResponseDto> getStatus(@PathVariable Long serverId) {
+  public ResponseEntity<StatusResponseDTO> getStatus(@PathVariable Long serverId) {
     var status = runtimeService.getStatus(serverId);
-    var statusResponse = new StatusResponseDto(status);
+    var statusResponse = new StatusResponseDTO(status);
 
     return ResponseEntity.ok().body(statusResponse);
   }
 
   @GetMapping("/versions/released")
-  public ResponseEntity<List<MinecraftVersionDto>> getReleasedMinecraftServerVersions() {
+  public ResponseEntity<List<MinecraftVersionDTO>> getReleasedMinecraftServerVersions() {
     var releasedVersions = metaDataService.getReleasedMinecraftServerVersions();
 
     return ResponseEntity.ok(releasedVersions);
   }
 
   @GetMapping("/versions")
-  public ResponseEntity<List<MinecraftVersionDto>> getAllMinecraftServerVersions() {
+  public ResponseEntity<List<MinecraftVersionDTO>> getAllMinecraftServerVersions() {
     var allVersions = metaDataService.getMinecraftServerVersions();
 
     return ResponseEntity.ok(allVersions);

@@ -1,8 +1,8 @@
 package br.com.mc_manager.server.controller;
 
-import br.com.mc_manager.server.dto.MinecraftManifest.MinecraftVersionDto;
+import br.com.mc_manager.server.dto.minecraftManifest.MinecraftVersionDTO;
 import br.com.mc_manager.server.dto.server.CreateServerDTO;
-import br.com.mc_manager.server.dto.server.ServerDetailsDto;
+import br.com.mc_manager.server.dto.server.ServerDetailsDTO;
 import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.security.expression.ServerSecurityExpressions;
@@ -81,8 +81,8 @@ class ServerControllerTest {
     @DisplayName("Deve listar servidores com sucesso para usuário autenticado")
     void deveListarServidores() throws Exception {
       // Arrange
-      ServerDetailsDto server1 = createServerResponseDtoWithAttributes(1L, "Server 1");
-      ServerDetailsDto server2 = createServerResponseDtoWithAttributes(2L, "Server 2");
+      ServerDetailsDTO server1 = createServerResponseDtoWithAttributes(1L, "Server 1");
+      ServerDetailsDTO server2 = createServerResponseDtoWithAttributes(2L, "Server 2");
 
       given(managementService.listServers(anyString())).willReturn(Arrays.asList(server1, server2));
 
@@ -129,7 +129,7 @@ class ServerControllerTest {
     void deveRetornarServidorExistente() throws Exception {
       // Arrange
       Long serverId = 1L;
-      ServerDetailsDto expectedServer = createServerResponseDtoWithAllAttributes();
+      ServerDetailsDTO expectedServer = createServerResponseDtoWithAllAttributes();
 
       given(managementService.getServer(serverId)).willReturn(expectedServer);
 
@@ -178,7 +178,7 @@ class ServerControllerTest {
     void deveCriarServidorComSucesso() throws Exception {
       // Arrange
       CreateServerDTO createServerDto = createCreateServerDTOWithAllAttributes();
-      ServerDetailsDto createdServerDto = createServerResponseDtoWithAllAttributes();
+      ServerDetailsDTO createdServerDto = createServerResponseDtoWithAllAttributes();
 
       given(managementService.create(any(CreateServerDTO.class), any())).willReturn(createdServerDto);
 
@@ -240,7 +240,7 @@ class ServerControllerTest {
     void deveAtualizarESReiniciarServidor() throws Exception {
       // Arrange
       UpdateServerDTO updateServerDto = createUpdateServerDTOWithAllAttributes();
-      ServerDetailsDto updatedServer = createServerResponseDtoWithAttributes(1L, "Updated Server");
+      ServerDetailsDTO updatedServer = createServerResponseDtoWithAttributes(1L, "Updated Server");
 
       given(managementService.update(any(Long.class), any(UpdateServerDTO.class))).willReturn(updatedServer);
 
@@ -528,10 +528,10 @@ class ServerControllerTest {
     @DisplayName("Deve retornar todas as versões do Minecraft disponíveis")
     void deveRetornarTodasVersoes() throws Exception {
       // Arrange
-      List<MinecraftVersionDto> allVersions = Arrays.asList(
-              new MinecraftVersionDto("1.20.4", "release", "download/1.20.4"),
-              new MinecraftVersionDto("1.20.1", "release", "download/1.20.1"),
-              new MinecraftVersionDto("1.19.4", "snapshot", "download/1.19.4")
+      List<MinecraftVersionDTO> allVersions = Arrays.asList(
+              new MinecraftVersionDTO("1.20.4", "release", "download/1.20.4"),
+              new MinecraftVersionDTO("1.20.1", "release", "download/1.20.1"),
+              new MinecraftVersionDTO("1.19.4", "snapshot", "download/1.19.4")
       );
 
       given(metaDataService.getMinecraftServerVersions()).willReturn(allVersions);
@@ -579,9 +579,9 @@ class ServerControllerTest {
   @DisplayName("Obter Versões Lançadas do Minecraft")
   class GetReleasedVersionsTest {
 
-    private final List<MinecraftVersionDto> releasedVersions = Arrays.asList(
-            new MinecraftVersionDto("1.20.4", "release", "download/1.20.4"),
-            new MinecraftVersionDto("1.20.1", "release", "download/1.20.1")
+    private final List<MinecraftVersionDTO> releasedVersions = Arrays.asList(
+            new MinecraftVersionDTO("1.20.4", "release", "download/1.20.4"),
+            new MinecraftVersionDTO("1.20.1", "release", "download/1.20.1")
     );
 
     @Test

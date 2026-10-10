@@ -1,7 +1,7 @@
 package br.com.mc_manager.server.service;
 
 import br.com.mc_manager.server.dto.server.CreateServerDTO;
-import br.com.mc_manager.server.dto.server.ServerDetailsDto;
+import br.com.mc_manager.server.dto.server.ServerDetailsDTO;
 import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.User;
@@ -70,7 +70,7 @@ class ServerManagementServiceTest {
     when(serverRepository.findByOwnerEmail(username)).thenReturn(mockServers);
 
     // Act
-    List<ServerDetailsDto> servers = serverManagementService.listServers(username);
+    List<ServerDetailsDTO> servers = serverManagementService.listServers(username);
 
     // Assert
     assertNotNull(servers);
@@ -87,7 +87,7 @@ class ServerManagementServiceTest {
       when(serverRepository.findByOwnerEmail(anyString())).thenReturn(mockServers);
 
       // Act
-      List<ServerDetailsDto> servers = serverManagementService.listServers("admin");
+      List<ServerDetailsDTO> servers = serverManagementService.listServers("admin");
 
       // Assert
       assertNotNull(servers);
@@ -104,7 +104,7 @@ class ServerManagementServiceTest {
       when(serverRepository.findByOwnerEmail(anyString())).thenReturn(new ArrayList<>());
 
       // Act & Assert
-      List<ServerDetailsDto> servers = serverManagementService.listServers("admin");
+      List<ServerDetailsDTO> servers = serverManagementService.listServers("admin");
       assertThat(servers).isEmpty();
     }
   }
@@ -122,7 +122,7 @@ class ServerManagementServiceTest {
       when(serverRepository.findById(anyLong())).thenReturn(Optional.of(server));
 
       // Act
-      ServerDetailsDto response = serverManagementService.getServer(1L);
+      ServerDetailsDTO response = serverManagementService.getServer(1L);
 
       // Assert
       assertNotNull(response);
@@ -153,7 +153,7 @@ class ServerManagementServiceTest {
       when(serverRepository.findById(anyLong())).thenReturn(Optional.of(server));
 
       // Act
-      ServerDetailsDto response = serverManagementService.getServer(1L);
+      ServerDetailsDTO response = serverManagementService.getServer(1L);
 
       // Assert
       assertNotNull(response.id());
@@ -189,7 +189,7 @@ class ServerManagementServiceTest {
       doReturn("21").when(provisioningService).downloadVanillaJar(anyLong(), anyString());
 
       // Act
-      ServerDetailsDto response = serverManagementService.create(createServerDTO, principal);
+      ServerDetailsDTO response = serverManagementService.create(createServerDTO, principal);
 
       // Assert
       assertNotNull(response);
@@ -229,7 +229,7 @@ class ServerManagementServiceTest {
       doReturn("17").when(provisioningService).downloadVanillaJar(anyLong(), anyString());
 
       // Act
-      ServerDetailsDto response = serverManagementService.create(createServerDTO, principal);
+      ServerDetailsDTO response = serverManagementService.create(createServerDTO, principal);
 
       // Assert
       assertNotNull(response);
@@ -259,7 +259,7 @@ class ServerManagementServiceTest {
       UpdateServerDTO updateDTO = new UpdateServerDTO("Example Name", null, null);
 
       // Act
-      ServerDetailsDto response = serverManagementService.update(1L, updateDTO);
+      ServerDetailsDTO response = serverManagementService.update(1L, updateDTO);
 
       // Assert
       assertNotNull(response);
@@ -288,11 +288,11 @@ class ServerManagementServiceTest {
       when(serverRepository.findById(anyLong())).thenReturn(Optional.of(mockServerExistente));
 
       // Act
-      ServerDetailsDto response = serverManagementService.update(1L, new UpdateServerDTO("Example Name", null, null));
+      ServerDetailsDTO response = serverManagementService.update(1L, new UpdateServerDTO("Example Name", null, null));
 
       // Assert
       assertNotNull(response);
-      assertThat(response).isInstanceOf(ServerDetailsDto.class);
+      assertThat(response).isInstanceOf(ServerDetailsDTO.class);
       verify(serverRepository).save(any(Server.class));
     }
   }
@@ -409,7 +409,7 @@ class ServerManagementServiceTest {
       try (MockedStatic<ServerRepository> mockRepo = mockStatic(ServerRepository.class)) {
         when(serverRepository.findByOwnerEmail("admin")).thenReturn(mockServers);
 
-        List<ServerDetailsDto> servers = serverManagementService.listServers("admin");
+        List<ServerDetailsDTO> servers = serverManagementService.listServers("admin");
 
         assertThat(servers.size()).isEqualTo(mockServers.size());
       }
@@ -429,7 +429,7 @@ class ServerManagementServiceTest {
 
         // Executar criação de servidor
         CreateServerDTO dto = new CreateServerDTO("Example Server", null, null, "26.2");
-        ServerDetailsDto response = serverManagementService.create(dto, principal);
+        ServerDetailsDTO response = serverManagementService.create(dto, principal);
 
         verify(provisioningServiceMock).createBaseServerFiles(anyLong(), anyInt());
       }

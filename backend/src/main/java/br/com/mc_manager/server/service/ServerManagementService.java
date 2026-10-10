@@ -1,7 +1,7 @@
 package br.com.mc_manager.server.service;
 
 import br.com.mc_manager.server.dto.server.CreateServerDTO;
-import br.com.mc_manager.server.dto.server.ServerDetailsDto;
+import br.com.mc_manager.server.dto.server.ServerDetailsDTO;
 import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.User;
@@ -30,22 +30,22 @@ public class ServerManagementService {
     this.domainGenerator = domainGenerator;
   }
 
-  public List<ServerDetailsDto> listServers(String username) {
+  public List<ServerDetailsDTO> listServers(String username) {
     return serverRepository
             .findByOwnerEmail(username)
             .stream()
-            .map(ServerDetailsDto::new)
+            .map(ServerDetailsDTO::new)
             .toList();
   }
 
-  public ServerDetailsDto getServer(Long id) {
+  public ServerDetailsDTO getServer(Long id) {
     var server = serverRepository.findById(id).orElseThrow();
 
-    return new ServerDetailsDto(server);
+    return new ServerDetailsDTO(server);
   }
 
   @Transactional
-  public ServerDetailsDto create(CreateServerDTO dto, Principal principal) {
+  public ServerDetailsDTO create(CreateServerDTO dto, Principal principal) {
     User owner = userService.currentUser(principal);
     Server server = new Server(dto, owner);
 
@@ -66,16 +66,16 @@ public class ServerManagementService {
       throw new RuntimeException("Erro ao criar arquivos do servidor", e);
     }
 
-    return new ServerDetailsDto(server);
+    return new ServerDetailsDTO(server);
   }
 
-  public ServerDetailsDto update(Long id, UpdateServerDTO dto) {
+  public ServerDetailsDTO update(Long id, UpdateServerDTO dto) {
     Server server = serverRepository.findById(id).orElseThrow();
 
     server.update(dto);
     serverRepository.save(server);
 
-    return new ServerDetailsDto(server);
+    return new ServerDetailsDTO(server);
   }
 
   public void delete(Long id) {

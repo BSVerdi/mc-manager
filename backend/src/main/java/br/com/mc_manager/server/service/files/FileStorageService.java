@@ -1,7 +1,7 @@
 package br.com.mc_manager.server.service.files;
 
 import br.com.mc_manager.server.dto.FileEntryDTO;
-import br.com.mc_manager.server.dto.MediaDto;
+import br.com.mc_manager.server.dto.MediaDTO;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -117,7 +117,7 @@ public class FileStorageService {
     }
   }
 
-  public MediaDto downloadFile(String scope, String targetFilePath) throws IOException {
+  public MediaDTO downloadFile(String scope, String targetFilePath) throws IOException {
     Path filePath = pathSecurityService.getFilePath(scope, targetFilePath);
 
     Resource resource;
@@ -132,7 +132,7 @@ public class FileStorageService {
             MediaType.parseMediaType(contentType) :
             MediaType.APPLICATION_OCTET_STREAM;
 
-    return new MediaDto(mediaType, resource, filePath.getFileName());
+    return new MediaDTO(mediaType, resource, filePath.getFileName());
   }
 
   public void uploadFile(String scope, String targetFilePath, MultipartFile file) throws IOException {

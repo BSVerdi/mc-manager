@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.service;
 
-import br.com.mc_manager.server.dto.UpdateUserDto;
+import br.com.mc_manager.server.dto.UpdateUserDTO;
 import br.com.mc_manager.server.dto.UserDetailsDTO;
 import br.com.mc_manager.server.factory.UserFactory;
 import br.com.mc_manager.server.model.User;
@@ -134,7 +134,7 @@ class UserServiceTest {
     @DisplayName("Deve atualizar usuário e retornar UserDetailsDTO com novo nome")
     void testUpdateUserSuccess() {
       // Arrange - Criar DTO de atualização
-      UpdateUserDto updateDto = new UpdateUserDto("João Updated");
+      UpdateUserDTO updateDto = new UpdateUserDTO("João Updated");
       when(userRepository.findById(anyLong())).thenReturn(optionalValidUser);
 
       // Act
@@ -152,7 +152,7 @@ class UserServiceTest {
       // Arrange - Usuário não existe (findById retorna Optional.empty)
       when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-      UpdateUserDto updateDto = new UpdateUserDto("New Name");
+      UpdateUserDTO updateDto = new UpdateUserDTO("New Name");
 
       // Act & Assert
       assertThatThrownBy(() -> userService.updateUser(999L, updateDto))

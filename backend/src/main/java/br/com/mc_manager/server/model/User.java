@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.model;
 
-import br.com.mc_manager.server.dto.UpdateUserDto;
+import br.com.mc_manager.server.dto.UpdateUserDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -68,7 +68,7 @@ public class User implements UserDetails {
     return this.email;
   }
 
-  public void updateUser(UpdateUserDto dto) {
+  public void updateUser(UpdateUserDTO dto) {
     this.name = dto.username();
 
     this.updatedAt = Instant.now();

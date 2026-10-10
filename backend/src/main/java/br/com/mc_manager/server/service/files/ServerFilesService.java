@@ -2,7 +2,7 @@ package br.com.mc_manager.server.service.files;
 
 import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
-import br.com.mc_manager.server.dto.MediaDto;
+import br.com.mc_manager.server.dto.MediaDTO;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
 import br.com.mc_manager.server.service.MinecraftMetaDataService;
 import org.springframework.stereotype.Service;
@@ -106,10 +106,10 @@ public class ServerFilesService {
     fileContentService.saveFileContent(serverScope, path, request.content());
   }
 
-  public MediaDto downloadFile(Long serverId, String path) throws IOException {
+  public MediaDTO downloadFile(Long serverId, String path) throws IOException {
     String serverScope = "servers/" + serverId + "/";
 
-    MediaDto downloadFile = fileStorageService.downloadFile(serverScope, path);
+    MediaDTO downloadFile = fileStorageService.downloadFile(serverScope, path);
 
     return downloadFile;
   }

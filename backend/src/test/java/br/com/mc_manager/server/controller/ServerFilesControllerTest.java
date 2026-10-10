@@ -2,7 +2,7 @@ package br.com.mc_manager.server.controller;
 
 import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
-import br.com.mc_manager.server.dto.MediaDto;
+import br.com.mc_manager.server.dto.MediaDTO;
 import br.com.mc_manager.server.security.expression.ServerSecurityExpressions;
 import br.com.mc_manager.server.service.files.ServerFilesService;
 import org.junit.jupiter.api.BeforeEach;
@@ -283,7 +283,7 @@ class ServerFilesControllerTest {
       byte[] fileContent = "Conteúdo do arquivo".getBytes(StandardCharsets.UTF_8);
 
       given(serverFilesService.downloadFile(anyLong(), anyString()))
-              .willReturn(new MediaDto(MediaType.TEXT_PLAIN, new ByteArrayResource(fileContent), Path.of(fileName)));
+              .willReturn(new MediaDTO(MediaType.TEXT_PLAIN, new ByteArrayResource(fileContent), Path.of(fileName)));
 
       mockMvc.perform(get("/api/servers/{serverId}/files/download?path={path}", TEST_SERVER_ID, fileName)
                       .accept(MediaType.TEXT_PLAIN))
@@ -302,7 +302,7 @@ class ServerFilesControllerTest {
 
       given(serverFilesService.downloadFile(anyLong(), anyString()))
               .willReturn(
-                      new MediaDto(
+                      new MediaDTO(
                               MediaType.APPLICATION_OCTET_STREAM,
                               new ByteArrayResource(binaryContent),
                               Path.of("/binario.bin")

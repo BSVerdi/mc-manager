@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.service;
 
-import br.com.mc_manager.server.dto.UpdateUserDto;
+import br.com.mc_manager.server.dto.UpdateUserDTO;
 import br.com.mc_manager.server.dto.UserDetailsDTO;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.UserRepository;
@@ -41,7 +41,7 @@ public class UserService implements UserDetailsService {
   }
 
   @Transactional
-  public UserDetailsDTO updateUser(Long id, UpdateUserDto dto) {
+  public UserDetailsDTO updateUser(Long id, UpdateUserDTO dto) {
     User user = getUserById(id);
 
     user.updateUser(dto);

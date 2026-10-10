@@ -2,12 +2,12 @@ package br.com.mc_manager.server.service.files;
 
 import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
-import br.com.mc_manager.server.dto.MediaDto;
-import br.com.mc_manager.server.dto.MinecraftManifest.DownloadMinecraftVersionDto;
-import br.com.mc_manager.server.dto.MinecraftManifest.JavaVersionDto;
-import br.com.mc_manager.server.dto.MinecraftManifest.MinecraftServerDownloadDto;
-import br.com.mc_manager.server.dto.MinecraftManifest.MinecraftVersionDetailsDto;
+import br.com.mc_manager.server.dto.MediaDTO;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
+import br.com.mc_manager.server.dto.minecraftManifest.DownloadMinecraftVersionDTO;
+import br.com.mc_manager.server.dto.minecraftManifest.JavaVersionDTO;
+import br.com.mc_manager.server.dto.minecraftManifest.MinecraftServerDownloadDTO;
+import br.com.mc_manager.server.dto.minecraftManifest.MinecraftVersionDetailsDTO;
 import br.com.mc_manager.server.service.MinecraftMetaDataService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -161,12 +161,12 @@ class ServerFilesServiceTest {
 
       when(minecraftMetaDataService.getMinecraftServerVersionDetails(anyString()))
               .thenReturn(
-                      new MinecraftVersionDetailsDto(
+                      new MinecraftVersionDetailsDTO(
                               "exampleId",
-                              new DownloadMinecraftVersionDto(
-                                      new MinecraftServerDownloadDto("Example Url")
+                              new DownloadMinecraftVersionDTO(
+                                      new MinecraftServerDownloadDTO("Example Url")
                               ),
-                              new JavaVersionDto("17")
+                              new JavaVersionDTO("17")
                       )
               );
 
@@ -194,12 +194,12 @@ class ServerFilesServiceTest {
 
       when(minecraftMetaDataService.getMinecraftServerVersionDetails(anyString()))
               .thenReturn(
-                      new MinecraftVersionDetailsDto(
+                      new MinecraftVersionDetailsDTO(
                               "exampleId",
-                              new DownloadMinecraftVersionDto(
-                                      new MinecraftServerDownloadDto("Example Url")
+                              new DownloadMinecraftVersionDTO(
+                                      new MinecraftServerDownloadDTO("Example Url")
                               ),
-                              new JavaVersionDto("26.2")
+                              new JavaVersionDTO("26.2")
                       )
               );
 
@@ -222,11 +222,11 @@ class ServerFilesServiceTest {
       String path = "config/settings.yml";
 
       when(fileStorageService.downloadFile(anyString(), anyString())).thenReturn(
-              new MediaDto(null, null, null)
+              new MediaDTO(null, null, null)
       );
 
       // Act
-      MediaDto response = serverFilesService.downloadFile(serverId, path);
+      MediaDTO response = serverFilesService.downloadFile(serverId, path);
 
       // Assert
       assertNotNull(response);

@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.factory;
 
-import br.com.mc_manager.server.dto.UpdateUserDto;
+import br.com.mc_manager.server.dto.UpdateUserDTO;
 import br.com.mc_manager.server.dto.UserDetailsDTO;
 
 import java.time.Instant;
@@ -33,12 +33,12 @@ public class UserDtoFactory {
     );
   }
 
-  public static UpdateUserDto createUpdateUserDtoWithAllAttributes() {
-    return new UpdateUserDto("New Username");
+  public static UpdateUserDTO createUpdateUserDtoWithAllAttributes() {
+    return new UpdateUserDTO("New Username");
   }
 
-  public static UpdateUserDto createUpdateUserDtoWithNullAttributes() {
-    return new UpdateUserDto(null);
+  public static UpdateUserDTO createUpdateUserDtoWithNullAttributes() {
+    return new UpdateUserDTO(null);
   }
 
 }

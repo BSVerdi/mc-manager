@@ -5,7 +5,7 @@ import org.springframework.http.MediaType;
 
 import java.nio.file.Path;
 
-public record MediaDto(
+public record MediaDTO(
         MediaType mediaType,
         Resource resource,
         Path path

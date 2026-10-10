@@ -2,7 +2,7 @@ package br.com.mc_manager.server.controller;
 
 import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
-import br.com.mc_manager.server.dto.MediaDto;
+import br.com.mc_manager.server.dto.MediaDTO;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
 import br.com.mc_manager.server.service.files.ServerFilesService;
 import org.springframework.core.io.Resource;
@@ -64,7 +64,7 @@ public class ServerFilesController {
   @GetMapping("/download")
   @PreAuthorize("@serverSecurity.isOwner(#serverId, authentication)")
   public ResponseEntity<Resource> download(@PathVariable Long serverId, @RequestParam String path) throws IOException {
-    MediaDto media = serverFileService.downloadFile(serverId, path);
+    MediaDTO media = serverFileService.downloadFile(serverId, path);
 
     String fileName = media.path().toString();
     String encoded = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replace("+", "%20");

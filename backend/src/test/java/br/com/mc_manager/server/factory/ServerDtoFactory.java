@@ -1,14 +1,14 @@
 package br.com.mc_manager.server.factory;
 
 import br.com.mc_manager.server.dto.server.CreateServerDTO;
-import br.com.mc_manager.server.dto.server.ServerDetailsDto;
+import br.com.mc_manager.server.dto.server.ServerDetailsDTO;
 import br.com.mc_manager.server.dto.server.ServerMetricsDTO;
 import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 
 public class ServerDtoFactory {
 
-  public static ServerDetailsDto createServerResponseDtoWithAllAttributes() {
-    return new ServerDetailsDto(
+  public static ServerDetailsDTO createServerResponseDtoWithAllAttributes() {
+    return new ServerDetailsDTO(
             1L,
             "Example Server",
             25565,
@@ -19,8 +19,8 @@ public class ServerDtoFactory {
     );
   }
 
-  public static ServerDetailsDto createServerResponseDtoWithAttributes(Long id, String name) {
-    return new ServerDetailsDto(
+  public static ServerDetailsDTO createServerResponseDtoWithAttributes(Long id, String name) {
+    return new ServerDetailsDTO(
             id,
             name,
             25565,

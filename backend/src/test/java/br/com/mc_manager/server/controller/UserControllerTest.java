@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.controller;
 
-import br.com.mc_manager.server.dto.UpdateUserDto;
+import br.com.mc_manager.server.dto.UpdateUserDTO;
 import br.com.mc_manager.server.dto.UserDetailsDTO;
 import br.com.mc_manager.server.security.expression.UserSecurityExpression;
 import br.com.mc_manager.server.service.UserService;
@@ -72,12 +72,12 @@ class UserControllerTest {
     void deveAtualizarUsuarioComSucesso() throws Exception {
       // Arrange
       Long userId = 1L;
-      UpdateUserDto dto = createUpdateUserDtoWithAllAttributes();
+      UpdateUserDTO dto = createUpdateUserDtoWithAllAttributes();
       UserDetailsDTO expectedUserDetails = createUserDetailsWithAttributes("New Username", "example@email.com");
 
       String dtoJson = objectMapper.writeValueAsString(dto);
 
-      given(userService.updateUser(eq(userId), any(UpdateUserDto.class))).willReturn(expectedUserDetails);
+      given(userService.updateUser(eq(userId), any(UpdateUserDTO.class))).willReturn(expectedUserDetails);
 
       // Act & Assert
       mockMvc.perform(patch("/api/users/1/update-user")
@@ -87,7 +87,7 @@ class UserControllerTest {
               .andExpect(jsonPath("$.username").value("New Username"))
               .andExpect(jsonPath("$.email").value("example@email.com"));
 
-      verify(userService).updateUser(eq(userId), any(UpdateUserDto.class));
+      verify(userService).updateUser(eq(userId), any(UpdateUserDTO.class));
       verifyNoMoreInteractions(userService);
     }
 
@@ -97,10 +97,10 @@ class UserControllerTest {
     void deveRetornar404ParaUsuarioInexistente() throws Exception {
       // Arrange
       Long userId = 1L;
-      UpdateUserDto dto = createUpdateUserDtoWithAllAttributes();
+      UpdateUserDTO dto = createUpdateUserDtoWithAllAttributes();
       String dtoJson = objectMapper.writeValueAsString(dto);
 
-      doThrow(NoSuchElementException.class).when(userService).updateUser(eq(userId), any(UpdateUserDto.class));
+      doThrow(NoSuchElementException.class).when(userService).updateUser(eq(userId), any(UpdateUserDTO.class));
 
       // Act & Assert
       mockMvc.perform(patch("/api/users/1/update-user")
@@ -114,7 +114,7 @@ class UserControllerTest {
     @DisplayName("Deve retornar 400 Bad Request para payload inválido (falta campo obrigatório)")
     void deveRetornarBadRequestParaPayloadInvalido() throws Exception {
       // Arrange — DTO parcialmente preenchido
-      UpdateUserDto dto = createUpdateUserDtoWithNullAttributes();
+      UpdateUserDTO dto = createUpdateUserDtoWithNullAttributes();
       String invalidJson = objectMapper.writeValueAsString(dto);
 
       // Act & Assert
@@ -129,7 +129,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Sem autenticação retorna 401")
     void semAutenticacao_retorna401() throws Exception {
-      UpdateUserDto dto = createUpdateUserDtoWithAllAttributes();
+      UpdateUserDTO dto = createUpdateUserDtoWithAllAttributes();
       String dtoJson = objectMapper.writeValueAsString(dto);
 
       mockMvc.perform(patch("/api/users/1/update-user")
@@ -146,7 +146,7 @@ class UserControllerTest {
     void naoEhOProprioUsuario_retorna403() throws Exception {
       given(userSecurityExpression.isUser(anyLong(), any(Authentication.class))).willReturn(false);
 
-      UpdateUserDto dto = createUpdateUserDtoWithAllAttributes();
+      UpdateUserDTO dto = createUpdateUserDtoWithAllAttributes();
       String dtoJson = objectMapper.writeValueAsString(dto);
 
       mockMvc.perform(patch("/api/users/1/update-user")

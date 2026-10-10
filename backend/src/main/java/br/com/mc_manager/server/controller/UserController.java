@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.controller;
 
-import br.com.mc_manager.server.dto.UpdateUserDto;
+import br.com.mc_manager.server.dto.UpdateUserDTO;
 import br.com.mc_manager.server.dto.UserDetailsDTO;
 import br.com.mc_manager.server.service.UserService;
 import jakarta.validation.Valid;
@@ -23,7 +23,7 @@ public class UserController {
 
   @PatchMapping("/{id}/update-user")
   @PreAuthorize("@userSecurity.isUser(#id, authentication)")
-  public ResponseEntity<UserDetailsDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserDto dto) {
+  public ResponseEntity<UserDetailsDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserDTO dto) {
     var user = userService.updateUser(id, dto);
 
     return ResponseEntity.ok().body(user);

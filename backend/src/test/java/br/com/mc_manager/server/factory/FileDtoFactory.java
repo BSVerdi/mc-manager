@@ -2,7 +2,7 @@ package br.com.mc_manager.server.factory;
 
 import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
-import br.com.mc_manager.server.dto.MediaDto;
+import br.com.mc_manager.server.dto.MediaDTO;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 
@@ -38,16 +38,16 @@ public class FileDtoFactory {
     return new FileContentDTO(path, null, false, "txt");
   }
 
-  public static MediaDto createMediaDTO(String fileName, byte[] content) {
-    return new MediaDto(
+  public static MediaDTO createMediaDTO(String fileName, byte[] content) {
+    return new MediaDTO(
             MediaType.TEXT_PLAIN,
             new ByteArrayResource(content),
             Path.of(fileName)
     );
   }
 
-  public static MediaDto createMediaDTO(MediaType mediaType, String fileName, byte[] content) {
-    return new MediaDto(
+  public static MediaDTO createMediaDTO(MediaType mediaType, String fileName, byte[] content) {
+    return new MediaDTO(
             mediaType,
             new ByteArrayResource(content),
             Path.of(fileName)

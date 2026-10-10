@@ -1,8 +1,8 @@
 package br.com.mc_manager.server.service;
 
-import br.com.mc_manager.server.dto.MinecraftManifest.ManifestEntryDto;
-import br.com.mc_manager.server.dto.MinecraftManifest.MinecraftVersionDetailsDto;
-import br.com.mc_manager.server.dto.MinecraftManifest.MinecraftVersionDto;
+import br.com.mc_manager.server.dto.minecraftManifest.ManifestEntryDTO;
+import br.com.mc_manager.server.dto.minecraftManifest.MinecraftVersionDTO;
+import br.com.mc_manager.server.dto.minecraftManifest.MinecraftVersionDetailsDTO;
 import org.hibernate.ObjectNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -45,17 +45,17 @@ class MinecraftMetaDataServiceTest {
     @DisplayName("Deve retornar as versões do manifesto com sucesso")
     void deveRetornarVersoesComSucesso() {
       // Arrange
-      List<MinecraftVersionDto> versoesEsperadas = List.of(
-              new MinecraftVersionDto("v1_20", "release", "https://piston-data.mojang.com/v1_20.json"),
-              new MinecraftVersionDto("v1_19", "snapshot", "https://piston-data.mojang.com/v1_19.json")
+      List<MinecraftVersionDTO> versoesEsperadas = List.of(
+              new MinecraftVersionDTO("v1_20", "release", "https://piston-data.mojang.com/v1_20.json"),
+              new MinecraftVersionDTO("v1_19", "snapshot", "https://piston-data.mojang.com/v1_19.json")
       );
-      ManifestEntryDto manifest = new ManifestEntryDto(versoesEsperadas);
+      ManifestEntryDTO manifest = new ManifestEntryDTO(versoesEsperadas);
 
-      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
+      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDTO.class))
               .willReturn(manifest);
 
       // Act
-      List<MinecraftVersionDto> resultado = service.getMinecraftServerVersions();
+      List<MinecraftVersionDTO> resultado = service.getMinecraftServerVersions();
 
       // Assert
       assertThat(resultado).isEqualTo(versoesEsperadas);
@@ -65,11 +65,11 @@ class MinecraftMetaDataServiceTest {
     @DisplayName("Deve retornar lista vazia quando o manifesto não tem versões")
     void deveRetornarListaVaziaQuandoManifestoVazio() {
       // Arrange
-      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
-              .willReturn(new ManifestEntryDto(Collections.emptyList()));
+      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDTO.class))
+              .willReturn(new ManifestEntryDTO(Collections.emptyList()));
 
       // Act
-      List<MinecraftVersionDto> resultado = service.getMinecraftServerVersions();
+      List<MinecraftVersionDTO> resultado = service.getMinecraftServerVersions();
 
       // Assert
       assertThat(resultado).isEmpty();
@@ -79,7 +79,7 @@ class MinecraftMetaDataServiceTest {
     @DisplayName("Deve propagar NullPointerException quando a resposta do manifesto é nula")
     void devePropagarNullPointerExceptionQuandoRespostaNula() {
       // Arrange
-      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
+      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDTO.class))
               .willReturn(null);
 
       // Act & Assert
@@ -91,8 +91,8 @@ class MinecraftMetaDataServiceTest {
     @DisplayName("Deve sempre consultar a URL fixa do manifesto de versões")
     void deveConsultarUrlFixaDoManifesto() {
       // Arrange
-      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
-              .willReturn(new ManifestEntryDto(Collections.emptyList()));
+      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDTO.class))
+              .willReturn(new ManifestEntryDTO(Collections.emptyList()));
 
       clearInvocations(restClient, restClient.get());
 
@@ -113,18 +113,18 @@ class MinecraftMetaDataServiceTest {
     void deveRetornarDetalhesDeVersaoExistente() {
       // Arrange
       String versionUrl = "https://piston-data.mojang.com/v1/packages/v1_20.json";
-      MinecraftVersionDto versaoNoManifesto = new MinecraftVersionDto("v1_20", "release", versionUrl);
-      ManifestEntryDto manifest = new ManifestEntryDto(List.of(versaoNoManifesto));
+      MinecraftVersionDTO versaoNoManifesto = new MinecraftVersionDTO("v1_20", "release", versionUrl);
+      ManifestEntryDTO manifest = new ManifestEntryDTO(List.of(versaoNoManifesto));
 
-      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
+      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDTO.class))
               .willReturn(manifest);
 
-      MinecraftVersionDetailsDto detalhesEsperados = createMinecraftVersionDetailsDtoWithAllAttributes();
-      given(restClient.get().uri(versionUrl).retrieve().body(MinecraftVersionDetailsDto.class))
+      MinecraftVersionDetailsDTO detalhesEsperados = createMinecraftVersionDetailsDtoWithAllAttributes();
+      given(restClient.get().uri(versionUrl).retrieve().body(MinecraftVersionDetailsDTO.class))
               .willReturn(detalhesEsperados);
 
       // Act
-      MinecraftVersionDetailsDto resultado = service.getMinecraftServerVersionDetails("v1_20");
+      MinecraftVersionDetailsDTO resultado = service.getMinecraftServerVersionDetails("v1_20");
 
       // Assert
       assertThat(resultado).isEqualTo(detalhesEsperados);
@@ -135,16 +135,16 @@ class MinecraftMetaDataServiceTest {
     void deveConsultarManifestoEDepoisUrlDaVersao() {
       // Arrange
       String versionUrl = "https://piston-data.mojang.com/v1/packages/26.2.json";
-      ManifestEntryDto manifest = new ManifestEntryDto(
-              List.of(new MinecraftVersionDto("26.2", "release", versionUrl))
+      ManifestEntryDTO manifest = new ManifestEntryDTO(
+              List.of(new MinecraftVersionDTO("26.2", "release", versionUrl))
       );
 
-      MinecraftVersionDetailsDto returnedData = createMinecraftVersionDetailsDtoWithAllAttributes();
+      MinecraftVersionDetailsDTO returnedData = createMinecraftVersionDetailsDtoWithAllAttributes();
 
-      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
+      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDTO.class))
               .willReturn(manifest);
 
-      given(restClient.get().uri(versionUrl).retrieve().body(MinecraftVersionDetailsDto.class))
+      given(restClient.get().uri(versionUrl).retrieve().body(MinecraftVersionDetailsDTO.class))
               .willReturn(returnedData);
 
       clearInvocations(restClient, restClient.get());
@@ -162,8 +162,8 @@ class MinecraftMetaDataServiceTest {
     @DisplayName("Deve lançar ObjectNotFoundException quando a versão não existe no manifesto")
     void deveLancarObjectNotFoundExceptionParaVersaoInexistente() {
       // Arrange
-      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
-              .willReturn(new ManifestEntryDto(Collections.emptyList()));
+      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDTO.class))
+              .willReturn(new ManifestEntryDTO(Collections.emptyList()));
 
       // Act & Assert
       assertThatThrownBy(() -> service.getMinecraftServerVersionDetails("v_inexistente"))
@@ -176,19 +176,19 @@ class MinecraftMetaDataServiceTest {
     void deveRetornarDetalhesParaVersaoSnapshot() {
       // Arrange
       String versionUrl = "https://piston-data.mojang.com/v1/packages/v24w01a.json";
-      ManifestEntryDto manifest = new ManifestEntryDto(
-              List.of(new MinecraftVersionDto("v24w01a", "snapshot", versionUrl))
+      ManifestEntryDTO manifest = new ManifestEntryDTO(
+              List.of(new MinecraftVersionDTO("v24w01a", "snapshot", versionUrl))
       );
 
-      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
+      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDTO.class))
               .willReturn(manifest);
 
-      MinecraftVersionDetailsDto detalhesEsperados = createMinecraftVersionDetailsDtoWithId("v24w01a");
-      given(restClient.get().uri(versionUrl).retrieve().body(MinecraftVersionDetailsDto.class))
+      MinecraftVersionDetailsDTO detalhesEsperados = createMinecraftVersionDetailsDtoWithId("v24w01a");
+      given(restClient.get().uri(versionUrl).retrieve().body(MinecraftVersionDetailsDTO.class))
               .willReturn(detalhesEsperados);
 
       // Act
-      MinecraftVersionDetailsDto resultado = service.getMinecraftServerVersionDetails("v24w01a");
+      MinecraftVersionDetailsDTO resultado = service.getMinecraftServerVersionDetails("v24w01a");
 
       // Assert
       assertThat(resultado).isEqualTo(detalhesEsperados);
@@ -203,22 +203,22 @@ class MinecraftMetaDataServiceTest {
     @DisplayName("Deve retornar apenas versões do tipo release, excluindo snapshots")
     void deveRetornarApenasReleasesExcluindoSnapshots() {
       // Arrange
-      List<MinecraftVersionDto> todasVersoes = List.of(
+      List<MinecraftVersionDTO> todasVersoes = List.of(
               createMinecraftVersionDtoWithIdAndType("v1_20", "release"),
               createMinecraftVersionDtoWithIdAndType("v24w01a", "snapshot"),
               createMinecraftVersionDtoWithIdAndType("v1_19", "release")
       );
 
-      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
-              .willReturn(new ManifestEntryDto(todasVersoes));
+      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDTO.class))
+              .willReturn(new ManifestEntryDTO(todasVersoes));
 
       // Act
-      List<MinecraftVersionDto> releases = service.getReleasedMinecraftServerVersions();
+      List<MinecraftVersionDTO> releases = service.getReleasedMinecraftServerVersions();
 
       // Assert
       assertThat(releases)
               .hasSize(2)
-              .extracting(MinecraftVersionDto::id)
+              .extracting(MinecraftVersionDTO::id)
               .containsExactly("v1_20", "v1_19");
       assertThat(releases).allMatch(v -> "release".equals(v.type()));
     }
@@ -227,16 +227,16 @@ class MinecraftMetaDataServiceTest {
     @DisplayName("Deve retornar lista vazia quando só existem snapshots")
     void deveRetornarListaVaziaQuandoApenasSnapshots() {
       // Arrange
-      MinecraftVersionDto v1 = createMinecraftVersionDtoWithIdAndType("v24w01a", "snapshot");
-      MinecraftVersionDto v2 = createMinecraftVersionDtoWithIdAndType("v23w56a", "snapshot");
+      MinecraftVersionDTO v1 = createMinecraftVersionDtoWithIdAndType("v24w01a", "snapshot");
+      MinecraftVersionDTO v2 = createMinecraftVersionDtoWithIdAndType("v23w56a", "snapshot");
 
-      List<MinecraftVersionDto> apenasSnapshots = List.of(v1, v2);
+      List<MinecraftVersionDTO> apenasSnapshots = List.of(v1, v2);
 
-      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
-              .willReturn(new ManifestEntryDto(apenasSnapshots));
+      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDTO.class))
+              .willReturn(new ManifestEntryDTO(apenasSnapshots));
 
       // Act
-      List<MinecraftVersionDto> releases = service.getReleasedMinecraftServerVersions();
+      List<MinecraftVersionDTO> releases = service.getReleasedMinecraftServerVersions();
 
       // Assert
       assertThat(releases).isEmpty();
@@ -246,11 +246,11 @@ class MinecraftMetaDataServiceTest {
     @DisplayName("Deve retornar lista vazia quando o manifesto não tem versões")
     void deveRetornarListaVaziaQuandoManifestoVazio() {
       // Arrange
-      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDto.class))
-              .willReturn(new ManifestEntryDto(Collections.emptyList()));
+      given(restClient.get().uri(VERSION_MANIFEST_URL).retrieve().body(ManifestEntryDTO.class))
+              .willReturn(new ManifestEntryDTO(Collections.emptyList()));
 
       // Act
-      List<MinecraftVersionDto> releases = service.getReleasedMinecraftServerVersions();
+      List<MinecraftVersionDTO> releases = service.getReleasedMinecraftServerVersions();
 
       // Assert
       assertThat(releases).isEmpty();

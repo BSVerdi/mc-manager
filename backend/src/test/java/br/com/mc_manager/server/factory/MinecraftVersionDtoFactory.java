@@ -1,44 +1,44 @@
 package br.com.mc_manager.server.factory;
 
-import br.com.mc_manager.server.dto.MinecraftManifest.*;
+import br.com.mc_manager.server.dto.minecraftManifest.*;
 
 public class MinecraftVersionDtoFactory {
 
-  public static MinecraftVersionDto createMinecraftVersionDtoWithId(String versionId) {
-    return new MinecraftVersionDto(versionId, "release", "url");
+  public static MinecraftVersionDTO createMinecraftVersionDtoWithId(String versionId) {
+    return new MinecraftVersionDTO(versionId, "release", "url");
   }
 
-  public static MinecraftVersionDto createMinecraftVersionDtoWithIdAndType(String versionId, String type) {
-    return new MinecraftVersionDto(versionId, type, "url");
+  public static MinecraftVersionDTO createMinecraftVersionDtoWithIdAndType(String versionId, String type) {
+    return new MinecraftVersionDTO(versionId, type, "url");
   }
 
-  public static MinecraftVersionDetailsDto createMinecraftVersionDetailsDtoWithAllAttributes() {
-    return new MinecraftVersionDetailsDto(
+  public static MinecraftVersionDetailsDTO createMinecraftVersionDetailsDtoWithAllAttributes() {
+    return new MinecraftVersionDetailsDTO(
             "26.2",
             createDownloadMinecraftVersionDtoWithAllAttributes(),
             createJavaVersionDtoWithAllAttributes()
     );
   }
 
-  public static MinecraftVersionDetailsDto createMinecraftVersionDetailsDtoWithId(String versionId) {
-    return new MinecraftVersionDetailsDto(
+  public static MinecraftVersionDetailsDTO createMinecraftVersionDetailsDtoWithId(String versionId) {
+    return new MinecraftVersionDetailsDTO(
             versionId,
             createDownloadMinecraftVersionDtoWithAllAttributes(),
             createJavaVersionDtoWithAllAttributes()
     );
   }
 
-  public static DownloadMinecraftVersionDto createDownloadMinecraftVersionDtoWithAllAttributes() {
-    return new DownloadMinecraftVersionDto(
+  public static DownloadMinecraftVersionDTO createDownloadMinecraftVersionDtoWithAllAttributes() {
+    return new DownloadMinecraftVersionDTO(
             createMinecraftServerDownloadDtoWithAllAttributes()
     );
   }
 
-  public static MinecraftServerDownloadDto createMinecraftServerDownloadDtoWithAllAttributes() {
-    return new MinecraftServerDownloadDto("26.2/download");
+  public static MinecraftServerDownloadDTO createMinecraftServerDownloadDtoWithAllAttributes() {
+    return new MinecraftServerDownloadDTO("26.2/download");
   }
 
-  public static JavaVersionDto createJavaVersionDtoWithAllAttributes() {
-    return new JavaVersionDto("21");
+  public static JavaVersionDTO createJavaVersionDtoWithAllAttributes() {
+    return new JavaVersionDTO("21");
   }
 }
