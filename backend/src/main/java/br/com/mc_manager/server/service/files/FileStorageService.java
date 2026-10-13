@@ -13,13 +13,14 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static br.com.mc_manager.server.service.files.util.FileNameUtils.extractExtension;
-import static java.nio.file.Files.*;
+import static java.nio.file.Files.createDirectories;
 
 @Service
 public class FileStorageService {
@@ -53,17 +54,17 @@ public class FileStorageService {
   public void saveFile(String scope, String targetPath, MultipartFile file) throws IOException {
     Path filePath = pathSecurityService.resolveSafePath(scope, targetPath);
 
-    copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
   }
 
   public void saveFile(Path filePath, MultipartFile file) throws IOException {
-    copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
   }
 
   public void saveFile(String scope, String targetPath, InputStream in) throws IOException {
     Path filePath = pathSecurityService.resolveSafePath(scope, targetPath);
 
-    copy(in, filePath, StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(in, filePath, StandardCopyOption.REPLACE_EXISTING);
   }
 
   public void delete(String scope, String targetPath) throws IOException {
@@ -82,11 +83,11 @@ public class FileStorageService {
   public void deleteFile(String scope, String targetFilePath) throws IOException {
     Path filePath = pathSecurityService.resolveSafePath(scope, targetFilePath);
 
-    deleteIfExists(filePath);
+    Files.deleteIfExists(filePath);
   }
 
   public void deleteFile(Path filePath) throws IOException {
-    deleteIfExists(filePath);
+    Files.deleteIfExists(filePath);
   }
 
   public void deleteFolder(String scope, String targetPath) throws IOException {
@@ -136,12 +137,15 @@ public class FileStorageService {
   }
 
   public void uploadFile(String scope, String targetFilePath, MultipartFile file) throws IOException {
-    Path filePath = pathSecurityService.resolveSafePath(scope, targetFilePath);
-
     String originalFilename = file.getOriginalFilename();
     if (originalFilename == null || originalFilename.isBlank()) {
       throw new IllegalArgumentException("Nome de arquivo inválido.");
     }
+
+    String safeName = Paths.get(originalFilename).getFileName().toString();
+
+    Path folder = pathSecurityService.getFolderPath(scope, targetFilePath);
+    Path filePath = folder.resolve(safeName);
 
     saveFile(filePath, file);
   }

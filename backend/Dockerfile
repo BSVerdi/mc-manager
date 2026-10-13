@@ -11,7 +11,6 @@ FROM alpine:3.20
 WORKDIR /app
 
 COPY --from=jdk21 /opt/java/openjdk /opt/java/jdk21
-
 COPY --from=build /app/target/*.jar app.jar
 
 ENV JAVA_HOME=/opt/java/jdk21
