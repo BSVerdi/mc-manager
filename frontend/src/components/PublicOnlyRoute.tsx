@@ -6,7 +6,7 @@ export function PublicOnlyRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <LoadingScreen isVisible={loading} />;
+    return <LoadingScreen />;
   }
 
   if (user) {

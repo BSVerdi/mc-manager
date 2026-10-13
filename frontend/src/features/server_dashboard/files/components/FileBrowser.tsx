@@ -1,128 +1,89 @@
-import { MoveLeft } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { MoveLeft, Upload } from "lucide-react";
 import { LoadingScreen } from "../../../../components/LoadingScreen";
+import { Portal } from "../../../../components/Portal";
+import { useConfirmDialog } from "../../../../context/ConfirmDialogContext";
 import { useToast } from "../../../../context/ToastContext";
-import { useConfirm } from "../../../../hooks/useConfirm";
-import type { FileExplorerProps } from "../index";
-import { zipFolder } from "../utils/zipFolder";
+import { elevateIn } from "../../../../lib/animations/elevateIn";
+import { useDelete } from "../hooks/useDelete";
+import { useDropZone } from "../hooks/useDropZone";
+import type { FilesBrowserApi } from "../hooks/useFileBrowser";
+import { useUpload } from "../hooks/useUpload";
+import { Breadcrumbs } from "./Breadcrumbs";
 import { FileCard } from "./FileCard";
 import { UploadButton } from "./UploadButton";
 
-export function FileBrowser({ browser, editor }: FileExplorerProps) {
-  const [deleting, setDeleting] = useState<boolean>(false);
-  const [uploading, setUploading] = useState<boolean>(false);
+interface FileBrowserProps {
+  browser: FilesBrowserApi;
+  openFile: (path: string) => void;
+}
 
-  const deletingRef = useRef(false);
+export function FileBrowser({ browser, openFile }: FileBrowserProps) {
   const { success, error } = useToast();
-  const { confirm, modal } = useConfirm();
-
-  const onDelete = useCallback(
-    async (path: string, name: string) => {
-      if (deletingRef.current) return;
-
-      const confirmed = await confirm({
-        title: `Deletar ${name}`,
-        description: `Tem certeza que deseja Deletar ${name}?`,
-        confirmLabel: "Deletar",
-        cancelLabel: "Cancelar",
-      });
-
-      if (!confirmed) return;
-
-      deletingRef.current = true;
-      setDeleting(true);
-
-      const ok = await browser.remove(path);
-
-      deletingRef.current = false;
-      setDeleting(false);
-
-      if (!ok) {
-        error(`Erro ao remover ${name}.`, {
-          id: "borwser-remove-error",
-          duration: 1000,
-        });
-        return;
-      }
-
-      success(`${name} removido com sucesso.`, {
-        id: "browser-remove-success",
-        duration: 1000,
-      });
-    },
-    [browser.remove],
+  const { confirm } = useConfirmDialog();
+  const { uploading, process, onFileSelected, onFolderSelected } = useUpload(
+    browser.upload,
+    browser.uploadZip,
+    success,
+    error,
   );
-
-  const onFileSelected = useCallback(
-    async (file: File) => {
-      if (uploading) return;
-
-      const result = await browser.upload(file);
-
-      if (!result) {
-        error("Erro ao realizar upload do arquivo", {
-          id: "browser-upload-error",
-          duration: 1000,
-        });
-        return;
-      }
-
-      success("Upload do arquivo realizado com sucesso.", {
-        id: "browser-upload-success",
-        duration: 1000,
-      });
-    },
-    [browser.upload, uploading],
-  );
-
-  const onFolderSelected = useCallback(
-    async (fileList: FileList) => {
-      if (uploading) return;
-
-      setUploading(true);
-
-      const zipFile = await zipFolder(fileList);
-      const result = await browser.uploadZip(zipFile);
-
-      setUploading(false);
-
-      if (!result) {
-        error("Erro ao realizar upload do arquivo", {
-          id: "browser-uploadZip-error",
-          duration: 1000,
-        });
-        return;
-      }
-
-      success("Upload do arquivo realizado com sucesso.", {
-        id: "browser-uploadZip-success",
-        duration: 1000,
-      });
-    },
-    [browser.uploadZip, uploading],
-  );
+  const { deleting, onDelete } = useDelete(success, error, browser.remove, confirm);
+  const { dragging, onDragOver, onDragEnter, onDragLeaves, onDrop } = useDropZone(process);
 
   const breadcrumbs = browser.currentPath.split("/").filter(Boolean);
 
   return (
     <>
       <section className="file-grid-container">
-        <LoadingScreen isVisible={uploading} />
+        {uploading && <LoadingScreen />}
         <section className="file-grid-header">
-          <div>
-            <a onClick={() => browser.goToBreadcrumb(-1)}>root</a>
-            {breadcrumbs.map((part, i) => (
-              <span key={i}>
-                <span className="breadcrumb-sep">/</span>
-                <a className="breadcrumb-item" onClick={() => browser.goToBreadcrumb(i)}>
-                  {part}
-                </a>
-              </span>
-            ))}
-          </div>
+          <Breadcrumbs goToBreadcrumb={browser.goToBreadcrumb} breadcrumbs={breadcrumbs} />
           <UploadButton disable={uploading} onFileSelected={onFileSelected} onFolderSelected={onFolderSelected} />
         </section>
-        <section className="file-grid">
+        <section
+          className={dragging ? "file-grid dragging" : "file-grid"}
+          onDragOver={onDragOver}
+          onDragEnter={onDragEnter}
+          onDragLeave={onDragLeaves}
+          onDrop={onDrop}
+        >
+          <AnimatePresence>
+            {dragging && (
+              <>
+                <motion.div
+                  className="dragging-overlay"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.div
+                    className="dragging-upload-icon"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Upload size={64} color="#6b7280" />
+                  </motion.div>
+                </motion.div>
+                <Portal>
+                  <div className="dragging-notification-container">
+                    <motion.div
+                      className="dragging-notification"
+                      variants={elevateIn}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                    >
+                      <Upload size={32} color="#6b7280" />
+                      <span>Solte os arquivos para fazer upload</span>
+                    </motion.div>
+                  </div>
+                </Portal>
+              </>
+            )}
+          </AnimatePresence>
           {browser.currentPath && (
             <div className="file-card walk-back" onClick={browser.goUp}>
               <MoveLeft />
@@ -136,14 +97,16 @@ export function FileBrowser({ browser, editor }: FileExplorerProps) {
               entryPath={browser.getEntryPath(entry.name)}
               deleting={deleting}
               openFolder={browser.openFolder}
-              openFile={editor.open}
+              openFile={openFile}
               onDelete={onDelete}
               download={browser.download}
+              onDownloadError={(fileName) =>
+                error(`Erro ao baixar ${fileName}`, { id: "Download-error", duration: 1000 })
+              }
             />
           ))}
         </section>
       </section>
-      {modal}
     </>
   );
 }

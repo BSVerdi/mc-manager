@@ -1,7 +1,11 @@
 import { Save, X } from "lucide-react";
-import type { FileExplorerProps } from "../index";
+import type { FileEditorApi } from "../hooks/useFileEditor";
 
-export function FileEditor({ editor }: FileExplorerProps) {
+interface FileEditorProps {
+  editor: FileEditorApi;
+}
+
+export function FileEditor({ editor }: FileEditorProps) {
   if (!editor.file) return null;
 
   return (

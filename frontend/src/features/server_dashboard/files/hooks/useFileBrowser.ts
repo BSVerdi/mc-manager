@@ -15,7 +15,7 @@ export interface FilesBrowserApi {
   reload: () => void;
   upload: (file: File) => Promise<boolean>;
   uploadZip: (file: File) => Promise<boolean>;
-  download: (path: string, directory: boolean, name: string) => Promise<void>;
+  download: (path: string, directory: boolean, name: string) => Promise<boolean>;
 }
 
 export function useFileBrowser(serverId: number): FilesBrowserApi {
@@ -27,7 +27,7 @@ export function useFileBrowser(serverId: number): FilesBrowserApi {
   const requestIdRef = useRef(0);
 
   const load = useCallback(
-    async (path: string) => {
+    async (path: string): Promise<void> => {
       const id = ++requestIdRef.current;
 
       setLoading(true);
@@ -56,16 +56,19 @@ export function useFileBrowser(serverId: number): FilesBrowserApi {
     load("");
   }, [load]);
 
-  const getEntryPath = useCallback((name: string) => (currentPath ? `${currentPath}/${name}` : name), [currentPath]);
+  const getEntryPath = useCallback(
+    (name: string): string => (currentPath ? `${currentPath}/${name}` : name),
+    [currentPath],
+  );
 
   const openFolder = useCallback(
-    async (name: string) => {
+    async (name: string): Promise<void> => {
       await load(getEntryPath(name));
     },
     [getEntryPath, load],
   );
 
-  const goUp = useCallback(async () => {
+  const goUp = useCallback(async (): Promise<void> => {
     if (!currentPath) return;
 
     const parts = currentPath.split("/").filter(Boolean);
@@ -74,7 +77,7 @@ export function useFileBrowser(serverId: number): FilesBrowserApi {
   }, [currentPath, load]);
 
   const goToBreadcrumb = useCallback(
-    async (index: number) => {
+    async (index: number): Promise<void> => {
       const parts = currentPath.split("/").filter(Boolean);
       await load(parts.slice(0, index + 1).join("/"));
     },
@@ -102,7 +105,7 @@ export function useFileBrowser(serverId: number): FilesBrowserApi {
   );
 
   const uploadZip = useCallback(
-    async (file: File) => {
+    async (file: File): Promise<boolean> => {
       setError(null);
 
       try {
@@ -122,7 +125,7 @@ export function useFileBrowser(serverId: number): FilesBrowserApi {
   );
 
   const remove = useCallback(
-    async (path: string) => {
+    async (path: string): Promise<boolean> => {
       setError(null);
 
       try {
@@ -141,13 +144,19 @@ export function useFileBrowser(serverId: number): FilesBrowserApi {
     [serverId, currentPath, load],
   );
 
-  const reload = useCallback(() => load(currentPath), [serverId, currentPath, load]);
+  const reload = useCallback((): Promise<void> => load(currentPath), [serverId, currentPath, load]);
 
   const download = useCallback(
-    (path: string, directory: boolean, name: string) => {
-      if (directory) return filesApi.downloadZip(serverId, path, name);
+    async (path: string, directory: boolean, name: string): Promise<boolean> => {
+      try {
+        if (directory) filesApi.downloadZip(serverId, path, name);
+        else filesApi.download(serverId, path, name);
 
-      return filesApi.download(serverId, path, name);
+        return true;
+      } catch (err) {
+        console.error("[useFileBrowser] Erro ao baixar:", err);
+        return false;
+      }
     },
     [serverId],
   );

@@ -1,5 +1,5 @@
 import { Download, File, FileCog, FileTerminal, FileText, Folder, ImageIcon, Trash2 } from "lucide-react";
-import { memo, type ReactNode } from "react";
+import { memo, useCallback, type ReactNode } from "react";
 import type { FileEntry } from "../types";
 import { formatSize } from "../utils/formatSize";
 
@@ -30,18 +30,29 @@ interface FileCardProps {
   openFolder: (name: string) => void;
   openFile: (path: string) => void;
   onDelete: (path: string, name: string) => void;
-  download: (path: string, directory: boolean, name: string) => Promise<void>;
+  download: (path: string, directory: boolean, name: string) => Promise<boolean>;
+  onDownloadError: (fileName: string) => void;
 }
 
-function FileCardBase({ entry, entryPath, deleting, openFolder, openFile, onDelete, download }: FileCardProps) {
-  const handleMainClick = () => {
+function FileCardBase({
+  entry,
+  entryPath,
+  deleting,
+  openFolder,
+  openFile,
+  onDelete,
+  download,
+  onDownloadError,
+}: FileCardProps) {
+  const handleMainClick = useCallback(() => {
     if (entry.directory) openFolder(entry.name);
     else openFile(entryPath);
-  };
+  }, [openFolder, openFile]);
 
-  const handleDownload = async () => {
-    await download(entryPath, entry.directory, entry.name);
-  };
+  const handleDownload = useCallback(async (): Promise<void> => {
+    const ok = await download(entryPath, entry.directory, entry.name);
+    if (!ok) onDownloadError(entry.name);
+  }, [download, onDownloadError]);
 
   return (
     <div className="file-card">

@@ -1,3 +1,4 @@
+import { useConfirmDialog } from "../../../context/ConfirmDialogContext";
 import { useServerId } from "../hooks/useServerId";
 import { FileBrowser } from "./components/FileBrowser";
 import { FileEditor } from "./components/FileEditor";
@@ -11,15 +12,16 @@ export interface FileExplorerProps {
 
 export function FileExplorer() {
   const serverId = useServerId();
+  const { confirm } = useConfirmDialog();
   const browser = useFileBrowser(serverId);
-  const editor = useFileEditor(serverId);
+  const editor = useFileEditor(serverId, confirm);
 
   return (
     <>
       <section className="file-container">
-        <FileBrowser browser={browser} editor={editor} />
+        <FileBrowser browser={browser} openFile={editor.open} />
 
-        {editor.file && <FileEditor browser={browser} editor={editor} />}
+        {editor.file && <FileEditor editor={editor} />}
       </section>
     </>
   );

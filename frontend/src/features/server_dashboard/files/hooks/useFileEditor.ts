@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import type { ConfirmInput } from "../../../../types/confirm";
 import { filesApi } from "../api";
 import type { FileContent } from "../types";
 
@@ -8,14 +9,14 @@ export interface FileEditorApi {
   setDraft: (v: string) => void;
   open: (path: string) => void;
   save: () => Promise<void>;
-  close: () => void;
+  close: () => Promise<void>;
   isDirty: boolean;
   loading: boolean;
   saving: boolean;
   error: string | null;
 }
 
-export function useFileEditor(serverId: number): FileEditorApi {
+export function useFileEditor(serverId: number, confirm: (next: ConfirmInput) => Promise<boolean>): FileEditorApi {
   const [file, setFile] = useState<FileContent | null>(null);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(false);
@@ -69,13 +70,22 @@ export function useFileEditor(serverId: number): FileEditorApi {
     }
   }, [file, draft, serverId]);
 
-  const close = useCallback(() => {
-    if (isDirty && !window.confirm("Há alterações não salvas. Descartar?")) return;
+  const close = useCallback(async () => {
+    if (isDirty) {
+      const confirmed = await confirm({
+        title: "Descartar Alterações",
+        description: "Deseja descartar as alterações feitas?",
+        confirmLabel: "Descartar",
+        cancelLabel: "Cancelar",
+      });
+
+      if (!confirmed) return;
+    }
 
     setFile(null);
     setDraft("");
     setError(null);
-  }, [isDirty]);
+  }, [isDirty, confirm]);
 
   return {
     file,

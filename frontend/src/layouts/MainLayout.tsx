@@ -2,7 +2,6 @@ import { useCallback, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Header } from "../components/Header";
 import { useAuth } from "../context/AuthContext";
-import { useLoading } from "../context/LoadingContext";
 import { useToast } from "../context/ToastContext";
 import { SideMenu } from "../features/sideMenu";
 import { useSidebarState } from "../hooks/useSidebarState";
@@ -10,7 +9,6 @@ import { onStompAuthError } from "../lib/stompClient";
 
 export function MainLayout() {
   const [isOpen, setIsOpened] = useSidebarState();
-  const { isLoading } = useLoading();
   const { user } = useAuth();
   const { error } = useToast();
 
@@ -26,10 +24,7 @@ export function MainLayout() {
   }, []);
 
   return (
-    <div
-      className="app-container"
-      style={{ opacity: isLoading ? 0.5 : 1, pointerEvents: isLoading ? "none" : "auto", transition: "opacity 0.3s" }}
-    >
+    <div className="app-container">
       <aside>
         <SideMenu opened={isOpen} />
       </aside>

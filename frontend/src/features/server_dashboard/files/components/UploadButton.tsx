@@ -2,13 +2,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { File, FolderInput, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 
-type UploadButtonProps = {
+interface UploadButtonProps {
+  disable?: boolean;
   onFileSelected: (file: File) => void;
   onFolderSelected: (FileList: FileList) => void;
-  disable?: boolean;
-};
+}
 
-export function UploadButton({ onFileSelected, onFolderSelected, disable }: UploadButtonProps) {
+export function UploadButton({ disable, onFileSelected, onFolderSelected }: UploadButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const uploadModeRef = useRef<"file" | "folder">("file");

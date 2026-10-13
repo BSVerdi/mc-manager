@@ -2,12 +2,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Play, Square } from "lucide-react";
 import { Status } from "../types/status";
 
-type StartServerProps = {
+interface StartServerProps {
   loading: boolean;
   status: Status;
   onStart: () => void;
   onStop: () => void;
-};
+}
 
 export function StartServer({ loading, status, onStart, onStop }: StartServerProps) {
   const isStart = status === Status.OFFLINE || status === Status.STOPPING;

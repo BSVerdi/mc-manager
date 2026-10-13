@@ -20,7 +20,7 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const verifySession = async () => {
@@ -65,6 +65,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       await authApi.logout();
+      setUser(null);
+      deactivateStomp();
 
       return true;
     } catch (error) {
@@ -72,8 +74,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       return false;
     } finally {
-      deactivateStomp();
-      setUser(null);
       setLoading(false);
     }
   }, []);
@@ -90,6 +90,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return true;
     } catch (error) {
       console.error("Erro ao realizar registro: ", error);
+
       return false;
     } finally {
       setLoading(false);
