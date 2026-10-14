@@ -1,5 +1,5 @@
 import { Save, X } from "lucide-react";
-import type { FileEditorApi } from "../hooks/useFileEditor";
+import { type FileEditorApi } from "../hooks/useFileEditor";
 
 interface FileEditorProps {
   editor: FileEditorApi;

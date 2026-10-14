@@ -12,7 +12,7 @@ export interface FilesBrowserApi {
   goToBreadcrumb: (index: number) => void;
   getEntryPath: (name: string) => string;
   remove: (path: string) => Promise<boolean>;
-  reload: () => void;
+  reload: () => Promise<void>;
   upload: (file: File) => Promise<boolean>;
   uploadZip: (file: File) => Promise<boolean>;
   download: (path: string, directory: boolean, name: string) => Promise<boolean>;

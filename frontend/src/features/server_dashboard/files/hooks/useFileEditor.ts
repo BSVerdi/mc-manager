@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import type { ConfirmInput } from "../../../../types/confirm";
+import { useConfirmDialog } from "../../../../context/ConfirmDialogContext";
 import { filesApi } from "../api";
 import type { FileContent } from "../types";
 
@@ -16,12 +16,14 @@ export interface FileEditorApi {
   error: string | null;
 }
 
-export function useFileEditor(serverId: number, confirm: (next: ConfirmInput) => Promise<boolean>): FileEditorApi {
+export function useFileEditor(serverId: number): FileEditorApi {
   const [file, setFile] = useState<FileContent | null>(null);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { confirm } = useConfirmDialog();
 
   const openRequestIdRef = useRef(0);
   const isDirty = file !== null && draft !== file.content;

@@ -1,15 +1,13 @@
 import { useCallback, useRef, useState } from "react";
-import type { ConfirmInput } from "../../../../types/confirm";
-import type { ToastOptions } from "../../../../types/toast";
+import { useConfirmDialog } from "../../../../context/ConfirmDialogContext";
+import { useToast } from "../../../../context/ToastContext";
 
-export function useDelete(
-  success: (message: string, options: ToastOptions) => void,
-  error: (message: string, options: ToastOptions) => void,
-  remove: (path: string) => Promise<boolean>,
-  confirm: (next: ConfirmInput) => Promise<boolean>,
-) {
+export function useDelete(remove: (path: string) => Promise<boolean>) {
   const [deleting, setDeleting] = useState<boolean>(false);
   const deletingRef = useRef(false);
+
+  const { success, error } = useToast();
+  const { confirm } = useConfirmDialog();
 
   const onDelete = useCallback(
     async (path: string, name: string) => {

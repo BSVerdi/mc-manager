@@ -2,33 +2,29 @@ import { AnimatePresence, motion } from "framer-motion";
 import { MoveLeft, Upload } from "lucide-react";
 import { LoadingScreen } from "../../../../components/LoadingScreen";
 import { Portal } from "../../../../components/Portal";
-import { useConfirmDialog } from "../../../../context/ConfirmDialogContext";
-import { useToast } from "../../../../context/ToastContext";
 import { elevateIn } from "../../../../lib/animations/elevateIn";
 import { useDelete } from "../hooks/useDelete";
 import { useDropZone } from "../hooks/useDropZone";
-import type { FilesBrowserApi } from "../hooks/useFileBrowser";
+import { useFileBrowser } from "../hooks/useFileBrowser";
 import { useUpload } from "../hooks/useUpload";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { FileCard } from "./FileCard";
 import { UploadButton } from "./UploadButton";
 
 interface FileBrowserProps {
-  browser: FilesBrowserApi;
+  serverId: number;
   openFile: (path: string) => void;
 }
 
-export function FileBrowser({ browser, openFile }: FileBrowserProps) {
-  const { success, error } = useToast();
-  const { confirm } = useConfirmDialog();
+export function FileBrowser({ serverId, openFile }: FileBrowserProps) {
+  const browser = useFileBrowser(serverId);
   const { uploading, process, onFileSelected, onFolderSelected } = useUpload(
-    browser.upload,
-    browser.uploadZip,
-    success,
-    error,
+    serverId,
+    browser.currentPath,
+    browser.reload,
   );
-  const { deleting, onDelete } = useDelete(success, error, browser.remove, confirm);
   const { dragging, onDragOver, onDragEnter, onDragLeaves, onDrop } = useDropZone(process);
+  const { deleting, onDelete } = useDelete(browser.remove);
 
   const breadcrumbs = browser.currentPath.split("/").filter(Boolean);
 
@@ -48,7 +44,7 @@ export function FileBrowser({ browser, openFile }: FileBrowserProps) {
           onDrop={onDrop}
         >
           <AnimatePresence>
-            {dragging && (
+            {!uploading && dragging && (
               <>
                 <motion.div
                   className="dragging-overlay"
@@ -100,9 +96,6 @@ export function FileBrowser({ browser, openFile }: FileBrowserProps) {
               openFile={openFile}
               onDelete={onDelete}
               download={browser.download}
-              onDownloadError={(fileName) =>
-                error(`Erro ao baixar ${fileName}`, { id: "Download-error", duration: 1000 })
-              }
             />
           ))}
         </section>

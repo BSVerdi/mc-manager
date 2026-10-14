@@ -1,5 +1,6 @@
 import { Download, File, FileCog, FileTerminal, FileText, Folder, ImageIcon, Trash2 } from "lucide-react";
 import { memo, useCallback, type ReactNode } from "react";
+import { useToast } from "../../../../context/ToastContext";
 import type { FileEntry } from "../types";
 import { formatSize } from "../utils/formatSize";
 
@@ -31,19 +32,11 @@ interface FileCardProps {
   openFile: (path: string) => void;
   onDelete: (path: string, name: string) => void;
   download: (path: string, directory: boolean, name: string) => Promise<boolean>;
-  onDownloadError: (fileName: string) => void;
 }
 
-function FileCardBase({
-  entry,
-  entryPath,
-  deleting,
-  openFolder,
-  openFile,
-  onDelete,
-  download,
-  onDownloadError,
-}: FileCardProps) {
+function FileCardBase({ entry, entryPath, deleting, openFolder, openFile, onDelete, download }: FileCardProps) {
+  const { error } = useToast();
+
   const handleMainClick = useCallback(() => {
     if (entry.directory) openFolder(entry.name);
     else openFile(entryPath);
@@ -51,8 +44,8 @@ function FileCardBase({
 
   const handleDownload = useCallback(async (): Promise<void> => {
     const ok = await download(entryPath, entry.directory, entry.name);
-    if (!ok) onDownloadError(entry.name);
-  }, [download, onDownloadError]);
+    if (!ok) error(`Erro ao baixar ${entry.name}`, { id: "Download-error", duration: 1000 });
+  }, [download]);
 
   return (
     <div className="file-card">
