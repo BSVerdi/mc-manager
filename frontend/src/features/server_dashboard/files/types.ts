@@ -18,3 +18,5 @@ export type FileContent = {
 export type Payload =
   | { kind: "single"; entry: UploadEntry }
   | { kind: "bundle"; entries: UploadEntry[]; zipName: string };
+
+export type UploadState = "zipping" | "uploading" | null;

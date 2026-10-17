@@ -15,7 +15,7 @@ export function useDelete(remove: (path: string) => Promise<boolean>) {
 
       const confirmed = await confirm({
         title: `Deletar ${name}`,
-        description: `Tem certeza que deseja Deletar ${name}?`,
+        description: `Tem certeza que deseja deletar ${name}?`,
         confirmLabel: "Deletar",
         cancelLabel: "Cancelar",
       });

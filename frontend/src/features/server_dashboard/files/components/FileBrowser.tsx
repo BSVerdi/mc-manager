@@ -1,14 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { MoveLeft, Upload } from "lucide-react";
-import { LoadingScreen } from "../../../../components/LoadingScreen";
-import { Portal } from "../../../../components/Portal";
-import { elevateIn } from "../../../../lib/animations/elevateIn";
 import { useDelete } from "../hooks/useDelete";
 import { useDropZone } from "../hooks/useDropZone";
 import { useFileBrowser } from "../hooks/useFileBrowser";
 import { useUpload } from "../hooks/useUpload";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { FileCard } from "./FileCard";
+import { Notification } from "./Notification";
 import { UploadButton } from "./UploadButton";
 
 interface FileBrowserProps {
@@ -18,7 +16,7 @@ interface FileBrowserProps {
 
 export function FileBrowser({ serverId, openFile }: FileBrowserProps) {
   const browser = useFileBrowser(serverId);
-  const { uploading, process, onFileSelected, onFolderSelected } = useUpload(
+  const { uploadState, progress, process, onFileSelected, onFolderSelected } = useUpload(
     serverId,
     browser.currentPath,
     browser.reload,
@@ -27,11 +25,12 @@ export function FileBrowser({ serverId, openFile }: FileBrowserProps) {
   const { deleting, onDelete } = useDelete(browser.remove);
 
   const breadcrumbs = browser.currentPath.split("/").filter(Boolean);
+  const notification = uploadState || dragging;
+  const uploading = uploadState === "uploading";
 
   return (
     <>
       <section className="file-grid-container">
-        {uploading && <LoadingScreen />}
         <section className="file-grid-header">
           <Breadcrumbs goToBreadcrumb={browser.goToBreadcrumb} breadcrumbs={breadcrumbs} />
           <UploadButton disable={uploading} onFileSelected={onFileSelected} onFolderSelected={onFolderSelected} />
@@ -43,42 +42,27 @@ export function FileBrowser({ serverId, openFile }: FileBrowserProps) {
           onDragLeave={onDragLeaves}
           onDrop={onDrop}
         >
-          <AnimatePresence>
+          <AnimatePresence mode="wait">
             {!uploading && dragging && (
-              <>
+              <motion.div
+                className="dragging-overlay"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
                 <motion.div
-                  className="dragging-overlay"
+                  className="dragging-upload-icon"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <motion.div
-                    className="dragging-upload-icon"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Upload size={64} color="#6b7280" />
-                  </motion.div>
+                  <Upload size={64} color="#6b7280" />
                 </motion.div>
-                <Portal>
-                  <div className="dragging-notification-container">
-                    <motion.div
-                      className="dragging-notification"
-                      variants={elevateIn}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                    >
-                      <Upload size={32} color="#6b7280" />
-                      <span>Solte os arquivos para fazer upload</span>
-                    </motion.div>
-                  </div>
-                </Portal>
-              </>
+              </motion.div>
             )}
+            {notification && <Notification uploadState={uploadState} progress={progress} />}
           </AnimatePresence>
           {browser.currentPath && (
             <div className="file-card walk-back" onClick={browser.goUp}>

@@ -1,5 +1,8 @@
+import type { AxiosProgressEvent } from "axios";
 import { http } from "../../../lib/apiClient";
 import type { FileContent, FileEntry } from "./types";
+
+type ProgressCallback = (percent: number) => void;
 
 function triggerDownload(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -14,6 +17,14 @@ function triggerDownload(blob: Blob, filename: string) {
     a.remove();
     URL.revokeObjectURL(url);
   });
+}
+
+function withProgress(onProgress?: ProgressCallback) {
+  return onProgress
+    ? (e: AxiosProgressEvent) => {
+        if (e.total) onProgress(Math.min(100, Math.round((e.loaded / e.total) * 100)));
+      }
+    : undefined;
 }
 
 export const filesApi = {
@@ -46,24 +57,26 @@ export const filesApi = {
       })
       .then((res) => triggerDownload(res.data, `${folderName}.zip`)),
 
-  upload: (serverId: number, path: string, file: File) => {
+  upload: (serverId: number, path: string, file: File, onProgress?: ProgressCallback) => {
     const formData = new FormData();
     formData.append("file", file);
 
     return http
       .post<void>(`/servers/${serverId}/files/upload`, formData, {
         params: { path },
+        onUploadProgress: withProgress(onProgress),
       })
       .then((res) => res.data);
   },
 
-  uploadZip: (serverId: number, path: string, zipFile: File) => {
+  uploadZip: (serverId: number, path: string, zipFile: File, onProgress?: ProgressCallback) => {
     const formData = new FormData();
     formData.append("file", zipFile);
 
     return http
       .post<void>(`/servers/${serverId}/files/upload-zip`, formData, {
         params: { path },
+        onUploadProgress: withProgress(onProgress),
       })
       .then((res) => res.data);
   },

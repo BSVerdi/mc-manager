@@ -24,10 +24,11 @@ export function useDropZone(process: (payload: Payload) => Promise<void>) {
   const onDrop = useCallback(
     async (e: DragEvent) => {
       e.preventDefault();
-      setDragging(false);
 
       const payload = await collectFromDrop(e.dataTransfer);
       if (payload) void process(payload);
+
+      setDragging(false);
     },
     [collectFromDrop, process],
   );

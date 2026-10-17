@@ -792,19 +792,76 @@
 
 .dragging-notification {
   width: 330px;
-  height: 90px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 5px;
-  background-color: var(--bg-app);
+  padding: 10px;
+  background-color: var(--bg-card);
   border-radius: 10px;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-subtle);
   color: var(--text-main);
-  font-size: 18px;
+  font-size: 16px;
   gap: 10px;
+}
+
+.upload-progress-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.upload-progress-track {
+  width: 90%;
+  height: 5px;
+}
+
+.upload-progress-fill {
+  height: 100%;
+  background-color: var(--brand-color);
+  border-radius: 2px;
+}
+
+.upload-zipping {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.track {
+  position: relative;
+  width: 90%;
+  height: 5px;
+  background-color: var(--bg-card);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 25%;
+  height: 100%;
+  background-color: var(--brand-color);
+  border-radius: 2px;
+  animation: shuttle 1.4s ease-in-out infinite;
+}
+
+@keyframes shuttle {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(400%);
+  }
 }
 
 .file-card {
