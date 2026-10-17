@@ -1,4 +1,3 @@
-import { useConfirmDialog } from "../../../context/ConfirmDialogContext";
 import { useServerId } from "../hooks/useServerId";
 import { FileBrowser } from "./components/FileBrowser";
 import { FileEditor } from "./components/FileEditor";
