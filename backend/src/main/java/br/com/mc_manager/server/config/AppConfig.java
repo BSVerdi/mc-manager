@@ -1,5 +1,6 @@
 package br.com.mc_manager.server.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
@@ -23,8 +24,18 @@ public class AppConfig {
   }
 
   @Bean
-  public RestClient restClient() {
-    return RestClient.create();
+  public RestClient.Builder resclientBuilder(@Value("HTTP.USER-AGENT") String userAgent) {
+    return RestClient.builder().defaultHeader("User-Agent", userAgent);
+  }
+
+  @Bean
+  public RestClient mojangClient(RestClient.Builder builder) {
+    return builder.clone().baseUrl("https://piston-meta.mojang.com").build();
+  }
+
+  @Bean
+  public RestClient paperClient(RestClient.Builder builder) {
+    return builder.clone().baseUrl("https://fill.papermc.io/v3").build();
   }
 
   @Bean

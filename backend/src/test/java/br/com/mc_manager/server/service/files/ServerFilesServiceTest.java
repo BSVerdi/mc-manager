@@ -4,11 +4,6 @@ import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
 import br.com.mc_manager.server.dto.MediaDTO;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
-import br.com.mc_manager.server.dto.minecraftManifest.DownloadMinecraftVersionDTO;
-import br.com.mc_manager.server.dto.minecraftManifest.JavaVersionDTO;
-import br.com.mc_manager.server.dto.minecraftManifest.MinecraftServerDownloadDTO;
-import br.com.mc_manager.server.dto.minecraftManifest.MinecraftVersionDetailsDTO;
-import br.com.mc_manager.server.service.MinecraftMetaDataService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,9 +29,6 @@ class ServerFilesServiceTest {
 
   @InjectMocks
   private ServerFilesService serverFilesService;
-
-  @Mock
-  private MinecraftMetaDataService minecraftMetaDataService;
 
   @Mock
   private FileStorageService fileStorageService;
@@ -157,30 +149,13 @@ class ServerFilesServiceTest {
     void downloadVanillaJar_baixaArquivoJarComSucesso() throws IOException {
       // Arrange
       Long serverId = 1L;
-      String serverVersion = "latest";
-
-      when(minecraftMetaDataService.getMinecraftServerVersionDetails(anyString()))
-              .thenReturn(
-                      new MinecraftVersionDetailsDTO(
-                              "exampleId",
-                              new DownloadMinecraftVersionDTO(
-                                      new MinecraftServerDownloadDTO("Example Url")
-                              ),
-                              new JavaVersionDTO("17")
-                      )
-              );
-
-      // Mock do InputStream para o arquivo jar
+      
       try (InputStream inputStream = new ByteArrayInputStream(new byte[0])) {
-        when(minecraftMetaDataService.getServerInputStream(anyString())).thenReturn(inputStream);
-
         // Act
-        String javaVersion = serverFilesService.downloadVanillaJar(serverId, serverVersion);
+        serverFilesService.downloadServerJar(serverId, inputStream);
 
         // Assert
-        verify(minecraftMetaDataService).getMinecraftServerVersionDetails(serverVersion);
         verify(fileStorageService).saveFile(eq("servers/" + serverId + "/"), eq("server.jar"), any(InputStream.class));
-        assertEquals("17", javaVersion);
       }
 
     }
@@ -192,25 +167,12 @@ class ServerFilesServiceTest {
       Long serverId = 1L;
       InputStream in = new ByteArrayInputStream(new byte[0]);
 
-      when(minecraftMetaDataService.getMinecraftServerVersionDetails(anyString()))
-              .thenReturn(
-                      new MinecraftVersionDetailsDTO(
-                              "exampleId",
-                              new DownloadMinecraftVersionDTO(
-                                      new MinecraftServerDownloadDTO("Example Url")
-                              ),
-                              new JavaVersionDTO("26.2")
-                      )
-              );
-
-      when(minecraftMetaDataService.getServerInputStream(anyString())).thenReturn(in);
-
       doThrow(IOException.class).when(fileStorageService)
               .saveFile(eq("servers/" + serverId + "/"), eq("server.jar"), any(InputStream.class));
 
       // Act & Assert
       assertThrows(IOException.class, () -> {
-        serverFilesService.downloadVanillaJar(serverId, "26.2");
+        serverFilesService.downloadServerJar(serverId, in);
       });
     }
 

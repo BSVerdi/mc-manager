@@ -511,13 +511,15 @@ class FileStorageServiceTest {
     @DisplayName("Deve salvar arquivo com originalFilename válido")
     void deveSalvarArquivoComOriginalFilenameValido() throws IOException {
       // Arrange
-      String targetPath = "uploadado.txt";
-      Path destino = tempDir.resolve(targetPath);
+      String targetFilePath = "";
+      String safeName = "original.txt";
+      Path folder = tempDir.resolve(targetFilePath);
+      Path destino = folder.resolve(safeName);
 
-      doReturn(destino).when(pathSecurityService).resolveSafePath(anyString(), anyString());
+      doReturn(folder).when(pathSecurityService).getFolderPath(anyString(), anyString());
 
       // Act
-      fileStorageService.uploadFile(scope, targetPath, mockFile);
+      fileStorageService.uploadFile(scope, targetFilePath, mockFile);
 
       // Assert
       assertThat(Files.readAllBytes(destino)).isEqualTo(fileContent);
@@ -546,7 +548,7 @@ class FileStorageServiceTest {
     void devePropagarSecurityExceptionQuandoPathEhInvalido() {
       // Arrange
       String targetPath = "upload-falha.txt";
-      when(pathSecurityService.resolveSafePath(anyString(), anyString()))
+      when(pathSecurityService.getFolderPath(anyString(), anyString()))
               .thenThrow(new SecurityException("Caminho fora do escopo permitido"));
 
       // Act & Assert

@@ -4,7 +4,6 @@ import br.com.mc_manager.server.dto.FileContentDTO;
 import br.com.mc_manager.server.dto.FileEntryDTO;
 import br.com.mc_manager.server.dto.MediaDTO;
 import br.com.mc_manager.server.dto.SaveFileRequestDTO;
-import br.com.mc_manager.server.service.MinecraftMetaDataService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,14 +16,17 @@ import java.util.List;
 @Service
 public class ServerFilesService {
 
-  private final MinecraftMetaDataService minecraftMetaDataService;
   private final FileStorageService fileStorageService;
   private final FileArchiveService fileArchiveService;
   private final FileContentService fileContentService;
   private final PathSecurityService pathSecurityService;
 
-  public ServerFilesService(MinecraftMetaDataService minecraftMetaDataService, FileStorageService fileStorageService, FileArchiveService fileArchiveService, FileContentService fileContentService, PathSecurityService pathSecurityService) {
-    this.minecraftMetaDataService = minecraftMetaDataService;
+  public ServerFilesService(
+          FileStorageService fileStorageService,
+          FileArchiveService fileArchiveService,
+          FileContentService fileContentService,
+          PathSecurityService pathSecurityService
+  ) {
     this.fileStorageService = fileStorageService;
     this.fileArchiveService = fileArchiveService;
     this.fileContentService = fileContentService;
@@ -67,19 +69,10 @@ public class ServerFilesService {
     );
   }
 
-  public String downloadVanillaJar(Long serverId, String serverVersion) throws IOException {
-    var versionDetails = minecraftMetaDataService.getMinecraftServerVersionDetails(serverVersion);
-    var javaVersion = versionDetails.javaVersion().majorVersion();
-    var jarUrl = versionDetails.downloads().server().url();
+  public void downloadServerJar(Long serverId, InputStream inputStream) throws IOException {
+    String serverScope = "servers/" + serverId + "/";
 
-
-    try (InputStream in = minecraftMetaDataService.getServerInputStream(jarUrl);) {
-      String serverScope = "servers/" + serverId + "/";
-
-      fileStorageService.saveFile(serverScope, "server.jar", in);
-    }
-
-    return javaVersion;
+    fileStorageService.saveFile(serverScope, "server.jar", inputStream);
   }
 
   public List<FileEntryDTO> listServerFiles(Long serverId, String path) throws IOException {

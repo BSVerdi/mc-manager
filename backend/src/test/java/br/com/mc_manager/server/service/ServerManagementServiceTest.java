@@ -7,6 +7,8 @@ import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.ServerRepository;
 import br.com.mc_manager.server.service.files.ServerFilesService;
+import br.com.mc_manager.server.service.provider.MinecraftProvider;
+import br.com.mc_manager.server.service.provider.ServerProviderRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,10 +18,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -27,6 +30,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static br.com.mc_manager.server.factory.ServerDtoFactory.createCreateServerDTOWithAllAttributes;
 import static br.com.mc_manager.server.factory.ServerFactory.createServerWithAllAttributes;
 import static br.com.mc_manager.server.factory.ServerFactory.createServerWithOwner;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,15 +51,21 @@ class ServerManagementServiceTest {
   private UserService userService;
 
   @Mock
-  private ServerFilesService provisioningService;
+  private ServerFilesService serverFilesService;
 
   @Mock
   private ServerDomainGenerator serverDomainGenerator;
 
   @Mock
+  private ServerProviderRegistry registry;
+
+  @Mock
+  private MinecraftProvider provider;
+
+  @Mock
   private User owner;
 
-  private Principal principal;
+  Principal principal;
 
   private List<Server> mockServers = new ArrayList<>();
 
@@ -173,20 +183,27 @@ class ServerManagementServiceTest {
     @BeforeEach
     void setUpCriacao() {
       // Preparar DTO e servidor para criação
-      createServerDTO = new CreateServerDTO("Example Server", null, null, "26.2");
+      createServerDTO = createCreateServerDTOWithAllAttributes();
       mockServerCriado = createServerWithOwner(owner);
       mockServers.add(mockServerCriado);
+
+      InputStream inputStream = new ByteArrayInputStream(new byte[0]);
+
+      when(registry.get(any())).thenReturn(provider);
+      when(provider.getJavaVersion(anyString())).thenReturn("21");
+      when(provider.getDownloadStream(anyString())).thenReturn(inputStream);
     }
 
     @Test
     @DisplayName("create - Cria servidor novo com sucesso")
     void create_criaServidorNovoComSucesso() throws Exception {
       // Arrange
+
+
       when(serverDomainGenerator.generate(any())).thenReturn("ExampleServer-1");
       when(serverRepository.save(any())).thenReturn(mockServerCriado);
       when(userService.currentUser(any())).thenReturn(owner);
-      doNothing().when(provisioningService).createBaseServerFiles(anyLong(), anyInt());
-      doReturn("21").when(provisioningService).downloadVanillaJar(anyLong(), anyString());
+      doNothing().when(serverFilesService).createBaseServerFiles(anyLong(), anyInt());
 
       // Act
       ServerDetailsDTO response = serverManagementService.create(createServerDTO, principal);
@@ -197,7 +214,7 @@ class ServerManagementServiceTest {
 
       // Verificar chamadas aos mocks
       verify(serverRepository).save(any(Server.class));
-      verify(provisioningService).createBaseServerFiles(anyLong(), anyInt());
+      verify(serverFilesService).createBaseServerFiles(anyLong(), anyInt());
     }
 
     @Test
@@ -209,11 +226,10 @@ class ServerManagementServiceTest {
       when(serverRepository.save(any())).thenReturn(mockServerCriado);
 
       // Simular exceção ao criar arquivos base do servidor
-      doThrow(new IOException()).when(provisioningService)
+      doThrow(new IOException()).when(serverFilesService)
               .createBaseServerFiles(anyLong(), anyInt());
 
       assertThrows(RuntimeException.class, () -> serverManagementService.create(createServerDTO, principal));
-
       verify(serverRepository).delete(mockServerCriado);
     }
 
@@ -225,17 +241,16 @@ class ServerManagementServiceTest {
       when(userService.currentUser(any())).thenReturn(owner);
       when(serverRepository.save(any())).thenReturn(mockServerCriado);
 
-      doNothing().when(provisioningService).createBaseServerFiles(anyLong(), anyInt());
-      doReturn("17").when(provisioningService).downloadVanillaJar(anyLong(), anyString());
+      doNothing().when(serverFilesService).createBaseServerFiles(anyLong(), anyInt());
 
       // Act
       ServerDetailsDTO response = serverManagementService.create(createServerDTO, principal);
 
       // Assert
       assertNotNull(response);
-      assertThat(mockServerCriado.getJavaVersion()).isEqualTo("JAVA_17");
+      assertThat(mockServerCriado.getJavaVersion()).isEqualTo("JAVA_21");
       verify(serverRepository, times(1)).save(any(Server.class));
-      verify(provisioningService).createBaseServerFiles(anyLong(), anyInt());
+      verify(serverFilesService).createBaseServerFiles(anyLong(), anyInt());
     }
   }
 
@@ -310,11 +325,11 @@ class ServerManagementServiceTest {
       when(serverRepository.findById(anyLong())).thenReturn(Optional.of(serverParaDeletar));
 
       // Act
-      doNothing().when(provisioningService).deleteServerFiles(anyLong());
+      doNothing().when(serverFilesService).deleteServerFiles(anyLong());
       serverManagementService.delete(4L);
 
       // Assert
-      verify(provisioningService).deleteServerFiles(4L);
+      verify(serverFilesService).deleteServerFiles(4L);
       verify(serverRepository).delete(serverParaDeletar);
     }
 
@@ -338,7 +353,7 @@ class ServerManagementServiceTest {
 
       when(serverRepository.findById(anyLong())).thenReturn(Optional.of(serverParaDeletar));
 
-      doThrow(new IOException("Erro ao deletar arquivos")).when(provisioningService)
+      doThrow(new IOException("Erro ao deletar arquivos")).when(serverFilesService)
               .deleteServerFiles(anyLong());
 
       // Act & Assert
@@ -396,43 +411,6 @@ class ServerManagementServiceTest {
       assertThrows(NoSuchElementException.class, () -> {
         serverManagementService.assertOwnership(99L, "admin");
       });
-    }
-  }
-
-  @Nested
-  @DisplayName("Testes de Integração com MockedStatic")
-  class IntegrationTests {
-
-    @Test
-    @DisplayName("Listagem com Static Mock do Repositório")
-    void listagemServidoresMockEstático() throws Exception {
-      try (MockedStatic<ServerRepository> mockRepo = mockStatic(ServerRepository.class)) {
-        when(serverRepository.findByOwnerEmail("admin")).thenReturn(mockServers);
-
-        List<ServerDetailsDTO> servers = serverManagementService.listServers("admin");
-
-        assertThat(servers.size()).isEqualTo(mockServers.size());
-      }
-    }
-
-    @Test
-    @DisplayName("Criação com Static Mock de ProvisioningService")
-    void criacaoServidoresMockEstático() throws Exception {
-      try (MockedStatic<ServerFilesService> mockProvisioning = mockStatic(ServerFilesService.class)) {
-        ServerFilesService provisioningServiceMock = mock(ServerFilesService.class);
-        Server server = createServerWithAllAttributes();
-
-        when(provisioningServiceMock.downloadVanillaJar(anyLong(), anyString())).thenReturn("17");
-        when(serverRepository.save(any())).thenReturn(server);
-
-        serverManagementService = new ServerManagementService(serverRepository, userService, provisioningServiceMock, serverDomainGenerator);
-
-        // Executar criação de servidor
-        CreateServerDTO dto = new CreateServerDTO("Example Server", null, null, "26.2");
-        ServerDetailsDTO response = serverManagementService.create(dto, principal);
-
-        verify(provisioningServiceMock).createBaseServerFiles(anyLong(), anyInt());
-      }
     }
   }
 }

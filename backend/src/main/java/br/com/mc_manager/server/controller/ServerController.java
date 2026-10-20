@@ -1,12 +1,12 @@
 package br.com.mc_manager.server.controller;
 
 import br.com.mc_manager.server.dto.StatusResponseDTO;
-import br.com.mc_manager.server.dto.minecraftManifest.MinecraftVersionDTO;
 import br.com.mc_manager.server.dto.server.CreateServerDTO;
 import br.com.mc_manager.server.dto.server.ServerDetailsDTO;
 import br.com.mc_manager.server.dto.server.UpdateServerDTO;
-import br.com.mc_manager.server.service.MinecraftMetaDataService;
+import br.com.mc_manager.server.model.ServerType;
 import br.com.mc_manager.server.service.ServerManagementService;
+import br.com.mc_manager.server.service.provider.ServerProviderRegistry;
 import br.com.mc_manager.server.service.runtime.ServerRuntimeService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +23,16 @@ public class ServerController {
 
   private final ServerRuntimeService runtimeService;
   private final ServerManagementService managementService;
-  private final MinecraftMetaDataService metaDataService;
+  private final ServerProviderRegistry registry;
 
-  public ServerController(ServerRuntimeService runtimeService, ServerManagementService managementService, MinecraftMetaDataService metaDataService) {
+  public ServerController(
+          ServerRuntimeService runtimeService,
+          ServerManagementService managementService,
+          ServerProviderRegistry registry
+  ) {
     this.runtimeService = runtimeService;
     this.managementService = managementService;
-    this.metaDataService = metaDataService;
+    this.registry = registry;
   }
 
   @GetMapping
@@ -113,15 +117,15 @@ public class ServerController {
   }
 
   @GetMapping("/versions/released")
-  public ResponseEntity<List<MinecraftVersionDTO>> getReleasedMinecraftServerVersions() {
-    var releasedVersions = metaDataService.getReleasedMinecraftServerVersions();
+  public ResponseEntity<List<String>> getReleasedVersions(@RequestParam ServerType type) {
+    var releasedVersions = registry.get(type).getReleasedVersions();
 
     return ResponseEntity.ok(releasedVersions);
   }
 
   @GetMapping("/versions")
-  public ResponseEntity<List<MinecraftVersionDTO>> getAllMinecraftServerVersions() {
-    var allVersions = metaDataService.getMinecraftServerVersions();
+  public ResponseEntity<List<String>> getAllVersions(@RequestParam ServerType type) {
+    var allVersions = registry.get(type).getAllVersions();
 
     return ResponseEntity.ok(allVersions);
   }

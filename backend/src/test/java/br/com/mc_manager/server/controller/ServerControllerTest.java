@@ -1,13 +1,14 @@
 package br.com.mc_manager.server.controller;
 
-import br.com.mc_manager.server.dto.minecraftManifest.MinecraftVersionDTO;
 import br.com.mc_manager.server.dto.server.CreateServerDTO;
 import br.com.mc_manager.server.dto.server.ServerDetailsDTO;
 import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 import br.com.mc_manager.server.model.ServerStatus;
+import br.com.mc_manager.server.model.ServerType;
 import br.com.mc_manager.server.security.expression.ServerSecurityExpressions;
-import br.com.mc_manager.server.service.MinecraftMetaDataService;
 import br.com.mc_manager.server.service.ServerManagementService;
+import br.com.mc_manager.server.service.provider.MinecraftProvider;
+import br.com.mc_manager.server.service.provider.ServerProviderRegistry;
 import br.com.mc_manager.server.service.runtime.ServerRuntimeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +57,9 @@ class ServerControllerTest {
   private ServerManagementService managementService;
 
   @MockitoBean
-  private MinecraftMetaDataService metaDataService;
+  private ServerProviderRegistry registry;
+
+  private final MinecraftProvider provider = mock(MinecraftProvider.class);
 
   @MockitoBean
   private ServerSecurityExpressions serverSecurityExpressions;
@@ -95,7 +98,7 @@ class ServerControllerTest {
               .andExpect(jsonPath("$.[1].name").value("Server 2"));
 
       verify(managementService).listServers("user");
-      verifyNoMoreInteractions(runtimeService, metaDataService);
+      verifyNoMoreInteractions(runtimeService, registry);
     }
 
     @Test
@@ -140,7 +143,7 @@ class ServerControllerTest {
               .andExpect(jsonPath("$.name").value("Example Server"));
 
       verify(managementService).getServer(serverId);
-      verifyNoMoreInteractions(runtimeService, metaDataService);
+      verifyNoMoreInteractions(runtimeService, registry);
     }
 
     @Test
@@ -193,7 +196,7 @@ class ServerControllerTest {
               .andExpect(jsonPath("$.version").value("26.2"));
 
       verify(managementService).create(any(CreateServerDTO.class), any());
-      verifyNoMoreInteractions(runtimeService, metaDataService);
+      verifyNoMoreInteractions(runtimeService, registry);
     }
 
     @Test
@@ -255,7 +258,7 @@ class ServerControllerTest {
 
       verify(managementService).update(1L, updateServerDto);
       verify(runtimeService).restartWithUpdatedConfig(1L);
-      verifyNoMoreInteractions(metaDataService);
+      verifyNoMoreInteractions(registry);
     }
 
     @Test
@@ -310,7 +313,7 @@ class ServerControllerTest {
               .andExpect(status().isNoContent());
 
       verify(managementService).delete(serverId);
-      verifyNoMoreInteractions(runtimeService, metaDataService);
+      verifyNoMoreInteractions(runtimeService, registry);
     }
 
     @Test
@@ -354,7 +357,7 @@ class ServerControllerTest {
               .andExpect(status().isNoContent());
 
       verify(runtimeService).start(serverId);
-      verifyNoMoreInteractions(managementService, metaDataService);
+      verifyNoMoreInteractions(managementService, registry);
     }
 
     @Test
@@ -398,7 +401,7 @@ class ServerControllerTest {
               .andExpect(status().isNoContent());
 
       verify(runtimeService).stop(serverId);
-      verifyNoMoreInteractions(managementService, metaDataService);
+      verifyNoMoreInteractions(managementService, registry);
     }
 
     @Test
@@ -442,7 +445,7 @@ class ServerControllerTest {
               .andExpect(status().isNoContent());
 
       verify(runtimeService).restart(serverId);
-      verifyNoMoreInteractions(managementService, metaDataService);
+      verifyNoMoreInteractions(managementService, registry);
     }
 
     @Test
@@ -491,7 +494,7 @@ class ServerControllerTest {
               .andExpect(jsonPath("$.status").value("ONLINE"));
 
       verify(runtimeService).getStatus(serverId);
-      verifyNoMoreInteractions(managementService, metaDataService);
+      verifyNoMoreInteractions(managementService, registry);
     }
 
     @Test
@@ -523,27 +526,28 @@ class ServerControllerTest {
   @DisplayName("Obter Todas as Versões do Minecraft")
   class GetAllVersionsTest {
 
+    @BeforeEach
+    void setUp() {
+      given(registry.get(ServerType.VANILLA)).willReturn(provider);
+    }
+
     @Test
     @WithMockUser
     @DisplayName("Deve retornar todas as versões do Minecraft disponíveis")
     void deveRetornarTodasVersoes() throws Exception {
       // Arrange
-      List<MinecraftVersionDTO> allVersions = Arrays.asList(
-              new MinecraftVersionDTO("1.20.4", "release", "download/1.20.4"),
-              new MinecraftVersionDTO("1.20.1", "release", "download/1.20.1"),
-              new MinecraftVersionDTO("1.19.4", "snapshot", "download/1.19.4")
-      );
-
-      given(metaDataService.getMinecraftServerVersions()).willReturn(allVersions);
+      List<String> allVersions = List.of("1.20.4", "1.20.1", "1.19.4");
+      given(provider.getAllVersions()).willReturn(allVersions);
 
       // Act & Assert
-      mockMvc.perform(get("/api/servers/versions"))
+      mockMvc.perform(get("/api/servers/versions").param("type", "VANILLA"))
               .andExpect(status().isOk())
               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
               .andExpect(jsonPath("$.size()").value(3));
 
-      verify(metaDataService).getMinecraftServerVersions();
-      verifyNoMoreInteractions(managementService, runtimeService);
+      verify(registry).get(ServerType.VANILLA);
+      verify(provider).getAllVersions();
+      verifyNoMoreInteractions(managementService);
     }
 
     @Test
@@ -551,10 +555,10 @@ class ServerControllerTest {
     @DisplayName("Deve retornar lista vazia quando não há versões disponíveis")
     void deveRetornarListaVaziaQuandoSemVersoes() throws Exception {
       // Arrange
-      given(metaDataService.getMinecraftServerVersions()).willReturn(Collections.emptyList());
+      given(provider.getAllVersions()).willReturn(Collections.emptyList());
 
       // Act & Assert
-      mockMvc.perform(get("/api/servers/versions"))
+      mockMvc.perform(get("/api/servers/versions").param("type", "VANILLA"))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.size()").value(0));
     }
@@ -564,13 +568,14 @@ class ServerControllerTest {
     @DisplayName("Rota /versions não é interpretada como {serverId} (guarda de colisão de rota)")
     void rotaVersionsNaoColideComServerId() throws Exception {
       // Arrange
-      given(metaDataService.getMinecraftServerVersions()).willReturn(Collections.emptyList());
+      given(provider.getAllVersions()).willReturn(Collections.emptyList());
 
       // Act & Assert
-      mockMvc.perform(get("/api/servers/versions"))
+      mockMvc.perform(get("/api/servers/versions").param("type", "VANILLA"))
               .andExpect(status().isOk());
 
-      verify(metaDataService).getMinecraftServerVersions();
+      verify(registry).get(ServerType.VANILLA);
+      verify(provider).getAllVersions();
       verifyNoInteractions(managementService);
     }
   }
@@ -579,25 +584,30 @@ class ServerControllerTest {
   @DisplayName("Obter Versões Lançadas do Minecraft")
   class GetReleasedVersionsTest {
 
-    private final List<MinecraftVersionDTO> releasedVersions = Arrays.asList(
-            new MinecraftVersionDTO("1.20.4", "release", "download/1.20.4"),
-            new MinecraftVersionDTO("1.20.1", "release", "download/1.20.1")
-    );
+    @BeforeEach
+    void setUp() {
+      given(registry.get(ServerType.VANILLA)).willReturn(provider);
+    }
 
     @Test
     @WithMockUser
     @DisplayName("Deve retornar apenas versões lançadas (release)")
     void deveRetornarApenasVersoesLancadas() throws Exception {
       // Arrange
-      given(metaDataService.getReleasedMinecraftServerVersions()).willReturn(releasedVersions);
+      List<String> releasedVersions = Arrays.asList(
+              "1.20.4",
+              "1.20.1"
+      );
+
+      given(provider.getReleasedVersions()).willReturn(releasedVersions);
 
       // Act & Assert
-      mockMvc.perform(get("/api/servers/versions/released"))
+      mockMvc.perform(get("/api/servers/versions/released").param("type", "VANILLA"))
               .andExpect(status().isOk())
-              .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-              .andExpect(jsonPath("$[0].type").value("release"));
+              .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-      verify(metaDataService).getReleasedMinecraftServerVersions();
+      verify(registry).get(ServerType.VANILLA);
+      verify(provider).getReleasedVersions();
       verifyNoMoreInteractions(managementService);
     }
 
@@ -606,10 +616,10 @@ class ServerControllerTest {
     @DisplayName("Deve retornar lista vazia quando não há versões lançadas")
     void deveRetornarListaVaziaQuandoSemVersoesLancadas() throws Exception {
       // Arrange
-      given(metaDataService.getReleasedMinecraftServerVersions()).willReturn(Collections.emptyList());
+      given(provider.getReleasedVersions()).willReturn(Collections.emptyList());
 
       // Act & Assert
-      mockMvc.perform(get("/api/servers/versions/released"))
+      mockMvc.perform(get("/api/servers/versions/released").param("type", "VANILLA"))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.size()").value(0));
     }
@@ -619,13 +629,14 @@ class ServerControllerTest {
     @DisplayName("Rota /versions/released não é interpretada como {serverId} (guarda de colisão de rota)")
     void rotaVersionsReleasedNaoColideComServerId() throws Exception {
       // Arrange
-      given(metaDataService.getReleasedMinecraftServerVersions()).willReturn(Collections.emptyList());
+      given(provider.getReleasedVersions()).willReturn(Collections.emptyList());
 
       // Act & Assert
-      mockMvc.perform(get("/api/servers/versions/released"))
+      mockMvc.perform(get("/api/servers/versions/released").param("type", "VANILLA"))
               .andExpect(status().isOk());
 
-      verify(metaDataService).getReleasedMinecraftServerVersions();
+      verify(registry).get(ServerType.VANILLA);
+      verify(provider).getReleasedVersions();
       verifyNoInteractions(managementService);
     }
   }

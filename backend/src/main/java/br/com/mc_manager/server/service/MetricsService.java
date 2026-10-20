@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class MetricsService {
 
-
   private final SimpMessagingTemplate template;
   private final ServerRuntimeService serverRuntimeService;
 

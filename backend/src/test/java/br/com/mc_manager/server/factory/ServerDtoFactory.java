@@ -4,6 +4,7 @@ import br.com.mc_manager.server.dto.server.CreateServerDTO;
 import br.com.mc_manager.server.dto.server.ServerDetailsDTO;
 import br.com.mc_manager.server.dto.server.ServerMetricsDTO;
 import br.com.mc_manager.server.dto.server.UpdateServerDTO;
+import br.com.mc_manager.server.model.ServerType;
 
 public class ServerDtoFactory {
 
@@ -32,11 +33,11 @@ public class ServerDtoFactory {
   }
 
   public static CreateServerDTO createCreateServerDTOWithAllAttributes() {
-    return new CreateServerDTO("Example Server", "1G", "2G", "26.2");
+    return new CreateServerDTO("Example Server", "1G", "2G", "26.2", ServerType.VANILLA);
   }
 
   public static CreateServerDTO createCreateServerDTOWithNullAttributes() {
-    return new CreateServerDTO(null, null, null, null);
+    return new CreateServerDTO(null, null, null, null, null);
   }
 
   public static UpdateServerDTO createUpdateServerDTOWithAllAttributes() {

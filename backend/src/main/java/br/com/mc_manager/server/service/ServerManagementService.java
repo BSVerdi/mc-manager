@@ -4,13 +4,16 @@ import br.com.mc_manager.server.dto.server.CreateServerDTO;
 import br.com.mc_manager.server.dto.server.ServerDetailsDTO;
 import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 import br.com.mc_manager.server.model.Server;
+import br.com.mc_manager.server.model.ServerType;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.ServerRepository;
 import br.com.mc_manager.server.service.files.ServerFilesService;
+import br.com.mc_manager.server.service.provider.ServerProviderRegistry;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.security.Principal;
 import java.util.List;
@@ -20,14 +23,22 @@ public class ServerManagementService {
 
   private final ServerRepository serverRepository;
   private final UserService userService;
-  private final ServerFilesService provisioningService;
+  private final ServerFilesService serverFilesService;
   private final ServerDomainGenerator domainGenerator;
+  private final ServerProviderRegistry registry;
 
-  public ServerManagementService(ServerRepository serverRepository, UserService userService, ServerFilesService provisioningService, ServerDomainGenerator domainGenerator) {
+  public ServerManagementService(
+          ServerRepository serverRepository,
+          UserService userService,
+          ServerFilesService serverFilesService,
+          ServerDomainGenerator domainGenerator,
+          ServerProviderRegistry registry
+  ) {
     this.serverRepository = serverRepository;
     this.userService = userService;
-    this.provisioningService = provisioningService;
+    this.serverFilesService = serverFilesService;
     this.domainGenerator = domainGenerator;
+    this.registry = registry;
   }
 
   public List<ServerDetailsDTO> listServers(String username) {
@@ -49,17 +60,18 @@ public class ServerManagementService {
     User owner = userService.currentUser(principal);
     Server server = new Server(dto, owner);
 
-    server = serverRepository.save(server);
-
     String domain = domainGenerator.generate(server);
     server.updateDomain(domain);
 
-    try {
-      provisioningService.createBaseServerFiles(server.getId(), server.getPort());
+    ServerType serverType = server.getType();
+    String javaVersion = registry.get(serverType).getJavaVersion(server.getVersion());
+    server.updateJavaVersion("JAVA_" + javaVersion);
 
-      String javaVersion = provisioningService.downloadVanillaJar(server.getId(), server.getVersion());
+    server = serverRepository.save(server);
 
-      server.updateJavaVersion("JAVA_" + javaVersion);
+    try (InputStream downloadStream = registry.get(serverType).getDownloadStream(server.getVersion())) {
+      serverFilesService.createBaseServerFiles(server.getId(), server.getPort());
+      serverFilesService.downloadServerJar(server.getId(), downloadStream);
     } catch (IOException e) {
       serverRepository.delete(server);
 
@@ -73,6 +85,10 @@ public class ServerManagementService {
     Server server = serverRepository.findById(id).orElseThrow();
 
     server.update(dto);
+
+    String newDomain = domainGenerator.generate(server);
+    server.updateDomain(newDomain);
+
     serverRepository.save(server);
 
     return new ServerDetailsDTO(server);
@@ -82,7 +98,7 @@ public class ServerManagementService {
     Server server = serverRepository.findById(id).orElseThrow();
 
     try {
-      provisioningService.deleteServerFiles(id);
+      serverFilesService.deleteServerFiles(id);
     } catch (IOException e) {
       throw new UncheckedIOException("Erro ao deletar arquivos do servidor", e);
     }

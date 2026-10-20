@@ -32,6 +32,9 @@ public class Server {
   private int port;
   private String domain;
 
+  @Enumerated(EnumType.STRING)
+  private ServerType type;
+
   @ManyToOne(fetch = FetchType.LAZY)
   private User owner;
 
@@ -84,9 +87,5 @@ public class Server {
 
   public void updateDomain(String domain) {
     this.domain = domain;
-  }
-
-  public void updatePort(int port) {
-    this.port = port;
   }
 }
