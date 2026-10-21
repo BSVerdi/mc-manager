@@ -2,7 +2,6 @@ package br.com.mc_manager.server.service.runtime;
 
 import br.com.mc_manager.server.dto.server.ServerMetricsDTO;
 import br.com.mc_manager.server.model.Server;
-import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.service.PlayerService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
@@ -101,7 +100,7 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
   @Override
   public synchronized void start() {
     if (status.get() == ServerStatus.ONLINE || status.get() == ServerStatus.STARTING) {
-      broadcaster.consoleLine("[CONSOLE] Servidor já está rodando ou iniciando");
+      broadcaster.consoleLine(LogLevel.CONSOLE, "Servidor já está rodando ou iniciando");
       return;
     }
 
@@ -117,19 +116,19 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
       status.set(ServerStatus.ONLINE);
       broadcaster.status(status.get());
 
-      broadcaster.consoleLine("[CONSOLE] Iniciando servidor");
+      broadcaster.consoleLine(LogLevel.CONSOLE, "Iniciando servidor");
     } catch (Exception e) {
       status.set(ServerStatus.OFFLINE);
       broadcaster.status(status.get());
 
-      broadcaster.consoleLine("[CONSOLE] Erro ao iniciar servidor: " + e.getMessage());
+      broadcaster.consoleLine(LogLevel.CONSOLE, "Erro ao iniciar servidor: " + e.getMessage());
     }
   }
 
   @Override
   public synchronized void stop() {
     if (!lifecycle.isRunning()) {
-      broadcaster.consoleLine("[CONSOLE] Servidor não está rodando");
+      broadcaster.consoleLine(LogLevel.CONSOLE, "Servidor não está rodando");
       return;
     }
 
@@ -140,11 +139,11 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
   @Override
   public synchronized void restart() {
     if (!lifecycle.isRunning()) {
-      broadcaster.consoleLine("[CONSOLE] Não é possível reiniciar servidor offline");
+      broadcaster.consoleLine(LogLevel.CONSOLE, "Não é possível reiniciar servidor offline");
       return;
     }
 
-    broadcaster.consoleLine("[CONSOLE] Servidor reiniciando");
+    broadcaster.consoleLine(LogLevel.CONSOLE, "Servidor reiniciando");
     stopThen(this::start);
   }
 
@@ -180,14 +179,14 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
   @Override
   public synchronized void sendCommand(String command) {
     if (!lifecycle.isRunning()) {
-      broadcaster.consoleLine("[CONSOLE] Não é possível enviar comando: servidor parado");
+      broadcaster.consoleLine(LogLevel.CONSOLE, "Não é possível enviar comando: servidor parado");
       return;
     }
 
     try {
       consoleGateway.write(command);
     } catch (Exception e) {
-      broadcaster.consoleLine("[CONSOLE] Erro ao enviar comando: " + e.getMessage());
+      broadcaster.consoleLine(LogLevel.CONSOLE, "Erro ao enviar comando: " + e.getMessage());
     }
   }
 
@@ -225,7 +224,7 @@ public abstract class AbstractManagedServerProcess implements ManagedServerProce
             || status.compareAndSet(ServerStatus.STARTING, ServerStatus.OFFLINE)
     ) {
       startedAt = null;
-      broadcaster.consoleLine("[CONSOLE] Processo encerrado inesperadamente");
+      broadcaster.consoleLine(LogLevel.CONSOLE, "Processo encerrado inesperadamente");
       broadcaster.status(status.get());
 
       lifecycle.cleanup();

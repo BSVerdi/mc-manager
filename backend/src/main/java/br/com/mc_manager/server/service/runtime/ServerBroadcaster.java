@@ -1,13 +1,14 @@
 package br.com.mc_manager.server.service.runtime;
 
-import br.com.mc_manager.server.dto.LogLineDTO;
-import br.com.mc_manager.server.model.ServerStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.time.Clock;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ServerBroadcaster {
+  record LogLineDTO(Long id, LogLevel level, String message, String timestamp) {
+  }
+
   private final Long serverId;
   private final SimpMessagingTemplate template;
   private final Clock clock;
@@ -23,9 +24,9 @@ public class ServerBroadcaster {
     template.convertAndSend("/topic/" + serverId + "/status", status);
   }
 
-  public void consoleLine(String message) {
+  public void consoleLine(LogLevel level, String message) {
     template.convertAndSend("/topic/" + serverId + "/console",
-            new LogLineDTO(idCounter.incrementAndGet(), message, clock.instant().toString())
+            new LogLineDTO(idCounter.incrementAndGet(), level, message, clock.instant().toString())
     );
   }
 }

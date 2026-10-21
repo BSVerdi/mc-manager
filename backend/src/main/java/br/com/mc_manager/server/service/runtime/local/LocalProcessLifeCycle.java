@@ -35,6 +35,8 @@ public class LocalProcessLifeCycle implements ProcessLifecycle {
 
   @Override
   public synchronized void start() {
+    if (isRunning()) throw new IllegalStateException("Servidor já está em execução.");
+
     try {
       String minRam = server.getMinRam();
       String maxRam = server.getMaxRam();
@@ -79,7 +81,7 @@ public class LocalProcessLifeCycle implements ProcessLifecycle {
     this.onExitCallback = callback;
   }
 
-  Process getProcess() {
+  public Process getProcess() {
     return process;
   }
 

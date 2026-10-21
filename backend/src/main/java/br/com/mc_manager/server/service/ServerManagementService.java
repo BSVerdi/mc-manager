@@ -59,6 +59,7 @@ public class ServerManagementService {
   public ServerDetailsDTO create(CreateServerDTO dto, Principal principal) {
     User owner = userService.currentUser(principal);
     Server server = new Server(dto, owner);
+    server = serverRepository.save(server);
 
     String domain = domainGenerator.generate(server);
     server.updateDomain(domain);
@@ -66,8 +67,6 @@ public class ServerManagementService {
     ServerType serverType = server.getType();
     String javaVersion = registry.get(serverType).getJavaVersion(server.getVersion());
     server.updateJavaVersion("JAVA_" + javaVersion);
-
-    server = serverRepository.save(server);
 
     try (InputStream downloadStream = registry.get(serverType).getDownloadStream(server.getVersion())) {
       serverFilesService.createBaseServerFiles(server.getId(), server.getPort());

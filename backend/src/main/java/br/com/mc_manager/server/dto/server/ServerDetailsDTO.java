@@ -1,9 +1,10 @@
 package br.com.mc_manager.server.dto.server;
 
 import br.com.mc_manager.server.model.Server;
+import br.com.mc_manager.server.model.ServerType;
 
 public record ServerDetailsDTO(
-        Long id, String name, Integer port, String minRam, String maxRam, String version, String domain
+        Long id, String name, Integer port, String minRam, String maxRam, String version, String domain, ServerType type
 ) {
   public ServerDetailsDTO(Server server) {
     this(
@@ -13,7 +14,8 @@ public record ServerDetailsDTO(
             server.getMinRam(),
             server.getMaxRam(),
             server.getVersion(),
-            server.getDomain()
+            server.getDomain(),
+            server.getType()
     );
   }
 }

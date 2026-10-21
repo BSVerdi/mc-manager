@@ -2,7 +2,6 @@ package br.com.mc_manager.server.service.runtime;
 
 import br.com.mc_manager.server.dto.server.ServerMetricsDTO;
 import br.com.mc_manager.server.model.Server;
-import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.repository.ServerRepository;
 import br.com.mc_manager.server.service.files.ServerFilesService;
 import com.github.dockerjava.api.exception.NotFoundException;

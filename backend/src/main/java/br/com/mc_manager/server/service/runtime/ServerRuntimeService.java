@@ -2,7 +2,6 @@ package br.com.mc_manager.server.service.runtime;
 
 import br.com.mc_manager.server.dto.server.ServerMetricsDTO;
 import br.com.mc_manager.server.model.Server;
-import br.com.mc_manager.server.model.ServerStatus;
 import br.com.mc_manager.server.repository.ServerRepository;
 import br.com.mc_manager.server.service.files.ServerFilesService;
 import com.github.dockerjava.api.exception.NotFoundException;
@@ -18,7 +17,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
-
 public class ServerRuntimeService {
 
   private final Map<Long, ManagedServerProcess> instances = new ConcurrentHashMap<>();
@@ -41,7 +39,12 @@ public class ServerRuntimeService {
   }
 
   public void start(Long serverId) {
-    getOrCreateInstance(serverId).start();
+    ManagedServerProcess instance = getOrCreateInstance(serverId);
+    instance.start();
+
+    if (!instance.isRunning() && instance.getStatus() == ServerStatus.OFFLINE) {
+      discard(serverId);
+    }
   }
 
   public void stop(Long serverId) {

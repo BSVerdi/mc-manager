@@ -1,7 +1,6 @@
 package br.com.mc_manager.server.service.runtime;
 
 import br.com.mc_manager.server.dto.LogLineDTO;
-import br.com.mc_manager.server.model.ServerStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

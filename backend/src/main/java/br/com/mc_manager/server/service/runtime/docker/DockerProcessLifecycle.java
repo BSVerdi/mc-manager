@@ -24,6 +24,8 @@ public class DockerProcessLifecycle implements ProcessLifecycle {
 
   @Override
   public void start() {
+    if (isRunning()) throw new IllegalStateException("Servidor já está em execução");
+
     containerId = create.get();
 
     try {

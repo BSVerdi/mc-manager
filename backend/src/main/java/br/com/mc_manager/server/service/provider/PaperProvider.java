@@ -25,10 +25,13 @@ public class PaperProvider implements MinecraftProvider {
   record Build(String id, String channel, Map<String, Download> downloads) {
   }
 
-  record Download(String name, String url, Map<String, Checksum> checksums) {
+  record Download(String name, String url, Checksum checksums) {
   }
 
   record Checksum(String sha256) {
+  }
+
+  record Version(VersionJson version) {
   }
 
   record VersionJson(Java java) {
@@ -69,7 +72,7 @@ public class PaperProvider implements MinecraftProvider {
 
   private List<Build> getBuilds(String version) {
     return paper.get()
-            .uri("/projects/paper/versions/{version}" + version + "/builds")
+            .uri("/projects/paper/versions/" + version + "/builds")
             .retrieve()
             .body(new ParameterizedTypeReference<List<Build>>() {
             });
@@ -93,12 +96,12 @@ public class PaperProvider implements MinecraftProvider {
   }
 
   @Override
-  public String getJavaVersion(String version) {
-    VersionJson json = paper.get()
-            .uri("/projects/paper/versions/" + version)
+  public String getJavaVersion(String serverVersion) {
+    Version json = paper.get()
+            .uri("/projects/paper/versions/" + serverVersion)
             .retrieve()
-            .body(VersionJson.class);
+            .body(Version.class);
 
-    return json.java.version.minimum();
+    return json.version.java.version.minimum();
   }
 }

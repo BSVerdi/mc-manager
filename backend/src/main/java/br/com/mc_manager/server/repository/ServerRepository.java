@@ -10,10 +10,6 @@ import java.util.Optional;
 public interface ServerRepository extends JpaRepository<Server, Long> {
   List<Server> findByOwnerEmail(String username);
 
-  boolean existsByPort(Integer port);
-
-  boolean existsByPortAndIdNot(Integer port, Long id);
-
   @Query("SELECT s FROM Server s JOIN FETCH s.owner WHERE s.id = :id")
   Optional<Server> findByIdWithOwner(Long id);
 }

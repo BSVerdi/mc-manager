@@ -47,6 +47,7 @@ public class Server {
     this.name = dto.name();
     this.version = dto.version();
     this.port = 25565;
+    this.type = dto.type();
 
     if (dto.minRam() != null) {
       this.minRam = dto.minRam();
@@ -60,8 +61,8 @@ public class Server {
       this.maxRam = "2G";
     }
 
-    javaVersion = "JAVA_21";
     this.owner = owner;
+    this.javaVersion = "JAVA_21";
   }
 
   @PrePersist
