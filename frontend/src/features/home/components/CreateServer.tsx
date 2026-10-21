@@ -7,7 +7,7 @@ import { Portal } from "../../../components/Portal";
 import { SelectItem } from "../../../components/SelectItem";
 import { SubmitButton } from "../../../components/SubmitButton";
 import { useToast } from "../../../context/ToastContext";
-import { ramSizes, type Option } from "../../../data";
+import { ramSizes, serverTypes, type Option } from "../../../data";
 import { useCreateServer } from "../hooks/useCreateServer";
 import { useServerVersions } from "../hooks/useServerVersions";
 
@@ -20,19 +20,18 @@ interface CreateServerProps {
 const parseRam = (ram: string): number => parseInt(ram.replace("G", ""), 10);
 
 export default function CreateServer({ isOpen, setIsOpen, onCreate }: CreateServerProps) {
-  const { data } = useServerVersions();
+  const [serverName, setServerName] = useState<string>("");
+  const [serverType, setServerType] = useState<Option>(serverTypes[0]);
+  const [minRam, setMinRam] = useState<Option>(ramSizes[0]);
+  const [maxRam, setMaxRam] = useState<Option>(ramSizes[1]);
+
+  const { data } = useServerVersions(serverType.value);
+
+  const serverVersions: Option[] = useMemo(() => data.map((version) => ({ value: version, label: version })), [data]);
+  const [serverVersion, setServerVersion] = useState<Option>(serverVersions[0]);
+
   const { submitting, createServer } = useCreateServer();
   const { success, error } = useToast();
-
-  const serverVersions: Option[] = useMemo(
-    () => data.map((version) => ({ value: version.id, label: version.id })),
-    [data],
-  );
-
-  const [serverVersion, setServerVersion] = useState<Option>(serverVersions[0]);
-  const [serverName, setServerName] = useState<string>("");
-  const [minRam, setMinRam] = useState<Option | null>(ramSizes[0]);
-  const [maxRam, setMaxRam] = useState<Option | null>(ramSizes[1]);
 
   useEffect(() => {
     if (serverVersions.length > 0 && serverVersion === undefined) {
@@ -68,6 +67,7 @@ export default function CreateServer({ isOpen, setIsOpen, onCreate }: CreateServ
       version: serverVersion!.value,
       minRam: minRam!.value,
       maxRam: maxRam!.value,
+      type: serverType.label.toLocaleLowerCase(),
     });
 
     setIsOpen(false);
@@ -117,6 +117,12 @@ export default function CreateServer({ isOpen, setIsOpen, onCreate }: CreateServ
               </div>
               <form className="create-server-form" onSubmit={handleSubmit}>
                 <InputItem title="Server Name:" type="text" placeholder="My New Server" onChange={setServerName} />
+                <SelectItem
+                  title="Server type"
+                  value={serverType}
+                  options={serverTypes}
+                  onChange={(t) => t && setServerType(t)}
+                />
                 <SelectItem
                   title="Server Version:"
                   value={serverVersion}

@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
-import { destinations, onStompConnect, onStompDisconnect, stompClient, topics } from "../../../../lib/stompClient";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { destinations, onStompConnect, stompClient, topics } from "../../../../lib/stompClient";
 import type { Log } from "../types";
-
-const MAX_LINES = 2000;
+import { consoleLogStore } from "./consoleLogStore";
 
 export function useConsoleSocket(serverId: number) {
-  const [logs, setLogs] = useState<Log[]>([]);
+  const logs = useSyncExternalStore(
+    (cb) => consoleLogStore.subscribe(cb),
+    () => consoleLogStore.getLogs(serverId),
+  );
 
   useEffect(() => {
-    setLogs([]);
-
     let subscription: ReturnType<typeof stompClient.subscribe> | undefined;
 
     const unregister = onStompConnect(() => {
@@ -17,21 +17,15 @@ export function useConsoleSocket(serverId: number) {
       subscription = stompClient.subscribe(topics.console(serverId), (message) => {
         try {
           const log: Log = JSON.parse(message.body);
-          setLogs((old) => {
-            const updated = [...old, log];
-            return updated.length > MAX_LINES ? updated.slice(-MAX_LINES) : updated;
-          });
+          consoleLogStore.push(serverId, log);
         } catch (err) {
           console.error("[useConsoleSocket] JSON inválido: ", err);
         }
       });
     });
 
-    const offDisconnect = onStompDisconnect(() => setLogs([]));
-
     return () => {
       unregister();
-      offDisconnect();
       subscription?.unsubscribe();
     };
   }, [serverId]);
@@ -43,7 +37,7 @@ export function useConsoleSocket(serverId: number) {
       if (normalized === "") return;
 
       if (normalized.toLocaleLowerCase() === "clear") {
-        setLogs([]);
+        consoleLogStore.clear(serverId);
         return;
       }
 

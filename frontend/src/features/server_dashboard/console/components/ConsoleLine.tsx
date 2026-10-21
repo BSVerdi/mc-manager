@@ -11,7 +11,9 @@ export function ConsoleLine({ log }: ConsoleLineProps) {
   return (
     <div className="info">
       <span className="timestamp">[{time}]</span>
-      <span>{log.message}</span>
+      <span>
+        [{log.level}] {log.message}
+      </span>
     </div>
   );
 }

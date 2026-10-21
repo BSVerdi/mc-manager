@@ -3,4 +3,5 @@ export type CreateServerRequest = {
   version: string;
   minRam?: string;
   maxRam?: string;
+  type: string;
 };

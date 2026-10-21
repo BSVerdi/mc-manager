@@ -11,3 +11,8 @@ export const ramSizes: Option[] = [
   { value: "5G", label: "5GB" },
   { value: "6G", label: "6GB" },
 ];
+
+export const serverTypes: Option[] = [
+  { value: "VANILLA", label: "Vanilla" },
+  { value: "PAPER", label: "Paper" },
+];
