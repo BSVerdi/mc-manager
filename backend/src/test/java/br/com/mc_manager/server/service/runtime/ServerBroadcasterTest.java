@@ -1,6 +1,6 @@
 package br.com.mc_manager.server.service.runtime;
 
-import br.com.mc_manager.server.dto.LogLineDTO;
+import br.com.mc_manager.server.service.runtime.ServerBroadcaster.LogLineDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -65,10 +65,10 @@ class ServerBroadcasterTest {
     void deveEnviarLogLineComIdSequencialETimestampFixoQuandoChamado() {
       // Arrange
       String message = "Server started";
-      LogLineDTO expected = new LogLineDTO(1L, message, "2025-01-15T10:30:00Z");
+      LogLineDTO expected = new LogLineDTO(1L, LogLevel.CONSOLE, message, "2025-01-15T10:30:00Z");
 
       // Act
-      broadcaster.consoleLine(message);
+      broadcaster.consoleLine(LogLevel.CONSOLE, message);
 
       // Assert
       verify(template).convertAndSend("/topic/42/console", expected);
@@ -78,12 +78,12 @@ class ServerBroadcasterTest {
     @DisplayName("deveIncrementarIdSequencialmenteQuandoChamadoDuasVezes")
     void deveIncrementarIdSequencialmenteQuandoChamadoDuasVezes() {
       // Arrange
-      LogLineDTO first = new LogLineDTO(1L, "linha 1", "2025-01-15T10:30:00Z");
-      LogLineDTO second = new LogLineDTO(2L, "linha 2", "2025-01-15T10:30:00Z");
+      LogLineDTO first = new LogLineDTO(1L, LogLevel.CONSOLE, "linha 1", "2025-01-15T10:30:00Z");
+      LogLineDTO second = new LogLineDTO(2L, LogLevel.CONSOLE, "linha 2", "2025-01-15T10:30:00Z");
 
       // Act
-      broadcaster.consoleLine("linha 1");
-      broadcaster.consoleLine("linha 2");
+      broadcaster.consoleLine(LogLevel.CONSOLE, "linha 1");
+      broadcaster.consoleLine(LogLevel.CONSOLE, "linha 2");
 
       // Assert
       ArgumentCaptor<LogLineDTO> captor = forClass(LogLineDTO.class);
@@ -95,10 +95,10 @@ class ServerBroadcasterTest {
     @DisplayName("deveEnviarLogLineComMensagemVaziaQuandoMensagemForVazia")
     void deveEnviarLogLineComMensagemVaziaQuandoMensagemForVazia() {
       // Arrange
-      LogLineDTO expected = new LogLineDTO(1L, "", "2025-01-15T10:30:00Z");
+      LogLineDTO expected = new LogLineDTO(1L, LogLevel.CONSOLE, "", "2025-01-15T10:30:00Z");
 
       // Act
-      broadcaster.consoleLine("");
+      broadcaster.consoleLine(LogLevel.CONSOLE, "");
 
       // Assert
       verify(template).convertAndSend("/topic/42/console", expected);
@@ -108,10 +108,10 @@ class ServerBroadcasterTest {
     @DisplayName("deveEnviarLogLineComMensagemNulaQuandoMensagemForNula")
     void deveEnviarLogLineComMensagemNulaQuandoMensagemForNula() {
       // Arrange
-      LogLineDTO expected = new LogLineDTO(1L, null, "2025-01-15T10:30:00Z");
+      LogLineDTO expected = new LogLineDTO(1L, LogLevel.CONSOLE, null, "2025-01-15T10:30:00Z");
 
       // Act
-      broadcaster.consoleLine(null);
+      broadcaster.consoleLine(LogLevel.CONSOLE, null);
 
       // Assert
       verify(template).convertAndSend("/topic/42/console", expected);

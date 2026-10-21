@@ -47,13 +47,13 @@ class ServerConsoleLineProcessorTest {
     void deveRemoverPrefixoDeDataERepasarParaBroadcaster() {
       // arrange
       String rawLine = "[12:34:56] [INFO] Server started";
-      String esperada = "[INFO] Server started";
+      String esperada = "Server started";
 
       // act
       processor.accept(rawLine);
 
       // assert
-      verify(broadcaster).consoleLine(esperada);
+      verify(broadcaster).consoleLine(LogLevel.INFO, esperada);
     }
 
     @Test
@@ -66,7 +66,7 @@ class ServerConsoleLineProcessorTest {
       processor.accept(rawLine);
 
       // assert
-      verify(broadcaster).consoleLine(rawLine);
+      verify(broadcaster).consoleLine(LogLevel.UNKNOWN, rawLine);
     }
 
     @Test
@@ -74,7 +74,7 @@ class ServerConsoleLineProcessorTest {
     void deveRegistrarConexaoDoJogadorQuandoLinhaIndicaJoin() {
       // arrange
       String rawLine = "[12:34:56] [INFO] Steve[/Steve] logged in with entity id 12345 at (1.23, 4.56, 7.89)";
-      String clean = "[INFO] Steve[/Steve] logged in with entity id 12345 at (1.23, 4.56, 7.89)";
+      String clean = "Steve[/Steve] logged in with entity id 12345 at (1.23, 4.56, 7.89)";
 
       // act
       processor.accept(rawLine);
@@ -83,7 +83,7 @@ class ServerConsoleLineProcessorTest {
       verify(playerService).saveServerPlayer(serverId, "Steve");
       verify(playerService).playerConnected(serverId, "Steve");
       assertThat(processor.getOnlinePlayersCount()).isEqualTo(1);
-      verify(broadcaster).consoleLine(clean);
+      verify(broadcaster).consoleLine(LogLevel.INFO, clean);
     }
 
     @Test
@@ -94,7 +94,7 @@ class ServerConsoleLineProcessorTest {
       processor.accept(joinLine);
 
       String rawLine = "[12:34:57] [INFO] Steve lost connection: Disconnected";
-      String clean = "[INFO] Steve lost connection: Disconnected";
+      String clean = "Steve lost connection: Disconnected";
 
       // act
       processor.accept(rawLine);
@@ -102,7 +102,7 @@ class ServerConsoleLineProcessorTest {
       // assert
       verify(playerService).playerDisconnected(serverId, "Steve");
       assertThat(processor.getOnlinePlayersCount()).isEqualTo(0);
-      verify(broadcaster).consoleLine(clean);
+      verify(broadcaster).consoleLine(LogLevel.INFO, clean);
     }
 
     @Test
@@ -115,7 +115,7 @@ class ServerConsoleLineProcessorTest {
       processor.accept(rawLine);
 
       // assert
-      verify(broadcaster).consoleLine("[INFO] Server started");
+      verify(broadcaster).consoleLine(LogLevel.INFO, "Server started");
       verify(playerService, never()).saveServerPlayer(anyLong(), anyString());
       verify(playerService, never()).playerConnected(anyLong(), anyString());
       verify(playerService, never()).playerDisconnected(anyLong(), anyString());
@@ -137,7 +137,7 @@ class ServerConsoleLineProcessorTest {
       processor.accept("");
 
       // assert
-      verify(broadcaster).consoleLine("");
+      verify(broadcaster).consoleLine(LogLevel.UNKNOWN, "");
       verify(playerService, never()).saveServerPlayer(anyLong(), anyString());
       assertThat(processor.getOnlinePlayersCount()).isEqualTo(0);
     }

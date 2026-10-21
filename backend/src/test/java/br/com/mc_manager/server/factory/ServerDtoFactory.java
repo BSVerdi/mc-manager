@@ -16,7 +16,8 @@ public class ServerDtoFactory {
             "1G",
             "2G",
             "26.2",
-            "ExampleDomain.com.br"
+            "ExampleDomain.com.br",
+            ServerType.VANILLA
     );
   }
 
@@ -28,7 +29,8 @@ public class ServerDtoFactory {
             "1G",
             "2G",
             "26.2",
-            "ExampleDomain.com.br"
+            "ExampleDomain.com.br",
+            ServerType.VANILLA
     );
   }
 

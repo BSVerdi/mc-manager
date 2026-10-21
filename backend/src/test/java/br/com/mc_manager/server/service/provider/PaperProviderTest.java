@@ -53,13 +53,13 @@ class PaperProviderTest {
   class GetDownloadStreamTests {
 
     private static final String VERSION = "1.20";
-    private final String buildsUrl = "/projects/paper/versions/{version}" + VERSION + "/builds";
+    private final String buildsUrl = "/projects/paper/versions/" + VERSION + "/builds";
 
     @Test
     @DisplayName("Deve retornar o stream do download quando há build STABLE com server:default")
     void deveRetornarStreamDeDownloadQuandoHaBuildEstavelComServerDefault() {
       // Arrange
-      Download download = new Download("paper.jar", "https://example.com/paper.jar", Map.of());
+      Download download = new Download("paper.jar", "https://example.com/paper.jar", new Checksum(""));
       Build stable = new Build("1", "STABLE", Map.of("server:default", download));
       InputStream esperado = new ByteArrayInputStream(new byte[]{1, 2, 3});
 
@@ -79,8 +79,8 @@ class PaperProviderTest {
     @DisplayName("Deve usar o PRIMEIRO build STABLE quando há mais de um")
     void deveUsarPrimeiroBuildEstavelQuandoHaMaisDeUm() {
       // Arrange
-      Download primeiro = new Download("1.jar", "https://example.com/1.jar", Map.of());
-      Download segundo = new Download("2.jar", "https://example.com/2.jar", Map.of());
+      Download primeiro = new Download("1.jar", "https://example.com/1.jar", new Checksum(""));
+      Download segundo = new Download("2.jar", "https://example.com/2.jar", new Checksum(""));
       Build stable1 = new Build("1", "STABLE", Map.of("server:default", primeiro));
       Build stable2 = new Build("2", "STABLE", Map.of("server:default", segundo));
       InputStream esperado = new ByteArrayInputStream(new byte[]{1});
@@ -142,7 +142,7 @@ class PaperProviderTest {
     @DisplayName("Deve propagar a exceção quando a chamada de download falha")
     void devePropagarExcecaoQuandoChamadaDeDownloadFalha() {
       // Arrange
-      Download download = new Download("paper.jar", "https://example.com/paper.jar", Map.of());
+      Download download = new Download("paper.jar", "https://example.com/paper.jar", new Checksum(""));
       Build stable = new Build("1", "STABLE", Map.of("server:default", download));
 
       when(paper.get().uri(buildsUrl).retrieve().body(any(ParameterizedTypeReference.class)))
@@ -273,9 +273,9 @@ class PaperProviderTest {
     @DisplayName("Deve retornar a versão mínima de Java")
     void deveRetornarVersaoMinimaDeJava() {
       // Arrange
-      VersionJson json = new VersionJson(new Java(new JavaVersion("21")));
+      Version json = new Version(new VersionJson(new Java(new JavaVersion("21"))));
 
-      when(paper.get().uri("/projects/paper/versions/1.20").retrieve().body(VersionJson.class))
+      when(paper.get().uri("/projects/paper/versions/1.20").retrieve().body(Version.class))
               .thenReturn(json);
 
       // Act
@@ -289,9 +289,9 @@ class PaperProviderTest {
     @DisplayName("Deve lançar NullPointerException quando não há informação de Java")
     void deveLancarNullPointerExceptionQuandoNaoHaInfoDeJava() {
       // Arrange
-      VersionJson json = new VersionJson(null);
+      Version json = new Version(null);
 
-      when(paper.get().uri("/projects/paper/versions/1.20").retrieve().body(VersionJson.class))
+      when(paper.get().uri("/projects/paper/versions/1.20").retrieve().body(Version.class))
               .thenReturn(json);
 
       // Act & Assert
@@ -303,7 +303,7 @@ class PaperProviderTest {
     @DisplayName("Deve propagar a exceção quando a chamada falha")
     void devePropagarExcecaoQuandoChamadaFalha() {
       // Arrange
-      when(paper.get().uri("/projects/paper/versions/1.20").retrieve().body(VersionJson.class))
+      when(paper.get().uri("/projects/paper/versions/1.20").retrieve().body(Version.class))
               .thenThrow(new ResourceAccessException("falha na chamada"));
 
       // Act & Assert
