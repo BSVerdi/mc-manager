@@ -41,6 +41,9 @@ class DockerManagedServerProcessTest {
   @Mock
   private PlayerService playerService;
 
+  @Mock
+  private DockerServerContainerFactory containerFactory;
+
   private DockerManagedServerProcess process;
   private Server server;
 
@@ -53,7 +56,7 @@ class DockerManagedServerProcessTest {
             template,
             executor,
             dockerClient,
-            "test-container-id",
+            containerFactory,
             playerService,
             Clock.fixed(Instant.EPOCH, ZoneOffset.UTC)
     );
@@ -82,6 +85,8 @@ class DockerManagedServerProcessTest {
     @Test
     @DisplayName("deveRetornarDockerConsoleGatewayQuandoCriaConsoleGateway")
     void deveRetornarDockerConsoleGatewayQuandoCriaConsoleGateway() {
+      process.createLifecycle();
+
       // Act
       ConsoleGateway result = process.createConsoleGateway();
 

@@ -66,7 +66,7 @@ public class DockerMetricsCollector implements MetricsCollector {
 
     return new ServerMetricsDTO(
             server.getId(),
-            Math.round(cpuUsage) / 10.0,
+            Math.round(cpuUsage * 10) / 10.0,
             ramUsedMb,
             maxRamMb,
             uptimeSeconds,

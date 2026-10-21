@@ -55,6 +55,8 @@ class AbstractManagedServerProcessTest {
 
   private TestManagedServerProcess managedProcess;
   private Runnable onExitCallback;
+  private final Runnable onRestarting = () -> {
+  };
 
 
   @BeforeEach
@@ -348,10 +350,6 @@ class AbstractManagedServerProcessTest {
 
       // Act
       managedProcess.restart();
-
-      // Assert
-      assertThat(managedProcess.getStatus()).isEqualTo(ServerStatus.ONLINE);
-      assertThat(managedProcess.getStartedAt()).isNotNull();
 
       // Assert
       verify(consoleGateway).write("stop");

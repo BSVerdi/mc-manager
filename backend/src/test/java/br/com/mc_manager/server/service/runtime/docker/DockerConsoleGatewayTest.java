@@ -34,7 +34,7 @@ class DockerConsoleGatewayTest {
 
   @BeforeEach
   void setUp() {
-    gateway = new DockerConsoleGateway(dockerClient, CONTAINER_ID);
+    gateway = new DockerConsoleGateway(dockerClient, () -> CONTAINER_ID);
   }
 
   @Nested

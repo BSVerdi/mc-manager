@@ -21,10 +21,10 @@ public class LocalManagedServerProcessFactory implements ManagedServerProcessFac
   private final ExecutorService executor;
   private final PlayerService playerService;
   private final SystemInfo systemInfo;
-  private final DefaultServerProcessFactory processFactory;
+  private final LocalServerProcessFactory processFactory;
   private final Clock clock;
 
-  public LocalManagedServerProcessFactory(SimpMessagingTemplate template, ExecutorService executor, PlayerService playerService, SystemInfo systemInfo, DefaultServerProcessFactory processFactory, Clock clock) {
+  public LocalManagedServerProcessFactory(SimpMessagingTemplate template, ExecutorService executor, PlayerService playerService, SystemInfo systemInfo, LocalServerProcessFactory processFactory, Clock clock) {
     this.template = template;
     this.executor = executor;
     this.playerService = playerService;

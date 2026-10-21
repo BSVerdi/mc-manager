@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 @Component
-public class DefaultServerProcessFactory implements ServerProcessFactory {
-  @Override
+public class LocalServerProcessFactory {
   public Process create(String javaExecutable, String minRam, String maxRam, Path serverDirectory) throws IOException {
     ProcessBuilder pb = new ProcessBuilder(
             javaExecutable,

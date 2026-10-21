@@ -8,28 +8,34 @@ import com.github.dockerjava.api.model.Frame;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class DockerConsoleGateway implements ConsoleGateway {
 
   private final DockerClient dockerClient;
-  private final String containerId;
+  private final Supplier<String> containerIdSupplier;
 
   private volatile Closeable logStream;
   private volatile Closeable attachStream;
   private volatile PipedOutputStream stdinPipe;
 
-  public DockerConsoleGateway(DockerClient dockerClient, String containerId) {
+  public DockerConsoleGateway(DockerClient dockerClient, Supplier<String> containerIdSupplier) {
     this.dockerClient = dockerClient;
-    this.containerId = containerId;
+    this.containerIdSupplier = containerIdSupplier;
   }
 
   @Override
   public void attach(Consumer<String> online) {
-    attatchStdin();
-    attatchLogs(online);
+    String containerId = containerIdSupplier.get();
+    if (containerId == null) {
+      throw new IllegalStateException("Container ainda não foi criado.");
+    }
+
+    attatchStdin(containerId);
+    attatchLogs(containerId, online);
   }
 
-  private void attatchStdin() {
+  private void attatchStdin(String containerId) {
     try {
       PipedInputStream pipeIn = new PipedInputStream();
       stdinPipe = new PipedOutputStream(pipeIn);
@@ -45,7 +51,7 @@ public class DockerConsoleGateway implements ConsoleGateway {
     }
   }
 
-  private void attatchLogs(Consumer<String> online) {
+  private void attatchLogs(String containerId, Consumer<String> online) {
     logStream = dockerClient.logContainerCmd(containerId)
             .withStdOut(true)
             .withStdErr(true)

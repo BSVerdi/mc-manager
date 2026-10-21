@@ -7,42 +7,68 @@ import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.WaitResponse;
 
+import java.util.function.Supplier;
+
 public class DockerProcessLifecycle implements ProcessLifecycle {
 
   private final DockerClient dockerClient;
-  private final String containerId;
+  private final Supplier<String> create;
 
+  private volatile String containerId;
   private volatile Runnable onExitCallback;
 
-  public DockerProcessLifecycle(DockerClient dockerClient, String containerId) {
+  public DockerProcessLifecycle(DockerClient dockerClient, Supplier<String> create) {
     this.dockerClient = dockerClient;
-    this.containerId = containerId;
+    this.create = create;
   }
 
   @Override
   public void start() {
-    dockerClient.startContainerCmd(containerId).exec();
+    containerId = create.get();
+
+    try {
+      dockerClient.startContainerCmd(containerId).exec();
+    } catch (RuntimeException e) {
+      cleanup();
+      throw e;
+    }
+
     watchExit();
   }
 
   @Override
   public boolean isRunning() {
-    InspectContainerResponse info = dockerClient.inspectContainerCmd(containerId).exec();
-    return Boolean.TRUE.equals(info.getState().getRunning());
+    String id = containerId;
+    if (id == null) return false;
+
+    try {
+      InspectContainerResponse info = dockerClient.inspectContainerCmd(id).exec();
+      return Boolean.TRUE.equals(info.getState().getRunning());
+    } catch (NotFoundException e) {
+      return false;
+    }
   }
 
   @Override
   public void stop(int timeoutSeconds) {
-    if (!isRunning()) return;
+    String id = containerId;
+    if (id == null) return;
 
-    dockerClient.stopContainerCmd(containerId).withTimeout(timeoutSeconds).exec();
-    dockerClient.removeContainerCmd(containerId).withForce(true).exec();
+    try {
+      if (!isRunning()) return;
+      dockerClient.stopContainerCmd(id).withTimeout(timeoutSeconds).exec();
+    } finally {
+      cleanup();
+    }
   }
 
   @Override
   public void cleanup() {
+    String id = containerId;
+    if (id == null) return;
+
     try {
-      dockerClient.removeContainerCmd(containerId).withForce(true).exec();
+      dockerClient.removeContainerCmd(id).withForce(true).exec();
     } catch (NotFoundException ignored) {
     }
   }
@@ -52,7 +78,7 @@ public class DockerProcessLifecycle implements ProcessLifecycle {
     this.onExitCallback = callback;
   }
 
-  String getContainerId() {
+  public String getContainerId() {
     return containerId;
   }
 

@@ -14,12 +14,18 @@ public class LocalProcessLifeCycle implements ProcessLifecycle {
   private final String javaExecutable;
   private final Path serverDirectory;
   private final ExecutorService executor;
-  private final ServerProcessFactory processFactory;
+  private final LocalServerProcessFactory processFactory;
 
   private volatile Process process;
   private volatile Runnable onExitCallback;
 
-  public LocalProcessLifeCycle(Server server, String javaExecutable, Path serverDirectory, ExecutorService executor, ServerProcessFactory processFactory) {
+  public LocalProcessLifeCycle(
+          Server server,
+          String javaExecutable,
+          Path serverDirectory,
+          ExecutorService executor,
+          LocalServerProcessFactory processFactory
+  ) {
     this.server = server;
     this.javaExecutable = javaExecutable;
     this.serverDirectory = serverDirectory;
@@ -51,7 +57,6 @@ public class LocalProcessLifeCycle implements ProcessLifecycle {
     if (!isRunning()) return;
 
     Process p = process;
-    ;
 
     try {
       boolean exited = p.waitFor(timeoutSeconds, TimeUnit.SECONDS);

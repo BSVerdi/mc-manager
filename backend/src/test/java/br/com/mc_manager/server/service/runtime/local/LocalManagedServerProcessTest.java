@@ -44,7 +44,7 @@ class LocalManagedServerProcessTest {
   private SystemInfo systemInfo;
 
   @Mock
-  private DefaultServerProcessFactory processFactory;
+  private LocalServerProcessFactory processFactory;
 
   @Mock
   private Clock clock;

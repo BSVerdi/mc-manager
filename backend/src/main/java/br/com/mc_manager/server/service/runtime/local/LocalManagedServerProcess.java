@@ -17,7 +17,7 @@ public class LocalManagedServerProcess extends AbstractManagedServerProcess {
 
   private final String javaExecutablePath;
   private final Path serverDirectory;
-  private final DefaultServerProcessFactory processFactory;
+  private final LocalServerProcessFactory processFactory;
   private final SystemInfo systemInfo;
   private final Clock clock;
 
@@ -29,7 +29,7 @@ public class LocalManagedServerProcess extends AbstractManagedServerProcess {
           Path serverDirectory,
           PlayerService playerService,
           SystemInfo systemInfo,
-          DefaultServerProcessFactory processFactory,
+          LocalServerProcessFactory processFactory,
           Clock clock
   ) {
     super(server, template, executor, playerService, clock);

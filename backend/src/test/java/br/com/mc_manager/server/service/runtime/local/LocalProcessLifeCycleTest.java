@@ -37,7 +37,7 @@ class LocalProcessLifeCycleTest {
   private ExecutorService executor;
 
   @Mock
-  private ServerProcessFactory processFactory;
+  private LocalServerProcessFactory processFactory;
 
   @Mock
   private Process process;

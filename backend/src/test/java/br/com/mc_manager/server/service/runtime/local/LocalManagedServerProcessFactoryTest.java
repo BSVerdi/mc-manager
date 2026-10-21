@@ -33,16 +33,22 @@ class LocalManagedServerProcessFactoryTest {
           Clock.fixed(Instant.parse("2025-01-15T10:30:00Z"), ZoneOffset.UTC);
 
   private Server server;
+  
   @Mock
   private SimpMessagingTemplate template;
+
   @Mock
   private ExecutorService executor;
+
   @Mock
   private PlayerService playerService;
+
   @Mock
   private SystemInfo systemInfo;
+
   @Mock
-  private DefaultServerProcessFactory processFactory;
+  private LocalServerProcessFactory processFactory;
+
   @InjectMocks
   private LocalManagedServerProcessFactory factory;
 
