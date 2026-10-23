@@ -18,6 +18,8 @@ import java.io.UncheckedIOException;
 import java.security.Principal;
 import java.util.List;
 
+import static br.com.mc_manager.server.service.JavaVersionPolicy.resolveJavaVersion;
+
 @Service
 public class ServerManagementService {
 
@@ -66,7 +68,7 @@ public class ServerManagementService {
 
     ServerType serverType = server.getType();
     String javaVersion = registry.get(serverType).getJavaVersion(server.getVersion());
-    server.updateJavaVersion("JAVA_" + javaVersion);
+    server.updateJavaVersion("JAVA_" + resolveJavaVersion(javaVersion));
 
     try (InputStream downloadStream = registry.get(serverType).getDownloadStream(server.getVersion())) {
       serverFilesService.createBaseServerFiles(server.getId(), server.getPort());

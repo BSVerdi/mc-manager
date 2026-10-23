@@ -27,6 +27,8 @@ public class ServerRuntimeService {
 
   @Value("${mcmanager.java_8}")
   private String java8;
+  @Value("${mcmanager.java_17}")
+  private String java17;
   @Value("${mcmanager.java_21}")
   private String java21;
   @Value("${mcmanager.java_25}")
@@ -158,6 +160,7 @@ public class ServerRuntimeService {
   private String selectJavaExecutablePath(String javaVersion) {
     return switch (javaVersion) {
       case "JAVA_8" -> java8;
+      case "JAVA_17" -> java17;
       case "JAVA_21" -> java21;
       case "JAVA_25" -> java25;
       default -> java25;

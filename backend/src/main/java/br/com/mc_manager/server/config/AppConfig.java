@@ -24,7 +24,7 @@ public class AppConfig {
   }
 
   @Bean
-  public RestClient.Builder resclientBuilder(@Value("HTTP.USER-AGENT") String userAgent) {
+  public RestClient.Builder restClientBuilder(@Value("HTTP.USER-AGENT") String userAgent) {
     return RestClient.builder().defaultHeader("User-Agent", userAgent);
   }
 
@@ -36,6 +36,16 @@ public class AppConfig {
   @Bean
   public RestClient paperClient(RestClient.Builder builder) {
     return builder.clone().baseUrl("https://fill.papermc.io/v3").build();
+  }
+
+  @Bean
+  public RestClient purpurClient(RestClient.Builder builder) {
+    return builder.clone().baseUrl("https://api.purpurmc.org/v2").build();
+  }
+
+  @Bean
+  RestClient fabricClient(RestClient.Builder builder) {
+    return builder.clone().baseUrl("https://meta.fabricmc.net/v2").build();
   }
 
   @Bean

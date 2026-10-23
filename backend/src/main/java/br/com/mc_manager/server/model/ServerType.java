@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ServerType {
   VANILLA("vanilla"),
-  PAPER("paper");
+  PAPER("paper"),
+  PURPUR("purpur"),
+  FABRIC("fabric"),
+  FORGE("forge");
 
   private final String value;
 
