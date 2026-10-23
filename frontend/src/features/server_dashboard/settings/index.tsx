@@ -1,50 +1,33 @@
 import { Trash2, TriangleAlert } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { InputItem } from "../../../components/InputItem";
 import { SelectItem } from "../../../components/SelectItem";
 import { SubmitButton } from "../../../components/SubmitButton";
 import { useConfirmDialog } from "../../../context/ConfirmDialogContext";
-import { useServers } from "../../../context/ServersContext";
-import { useToast } from "../../../context/ToastContext";
-import { ramSizes, type Option } from "../../../data";
+import { ramSizes } from "../../../data";
+import type { Option } from "../../../types/option";
 import { useServerId } from "../hooks/useServerId";
 import { useServerSettings } from "./hooks/useServerSettings";
 
 export function ServerSettings() {
   const [serverName, setServerName] = useState<string>("");
-  const [minRam, setMinRam] = useState<Option | null>(ramSizes[0]);
-  const [maxRam, setMaxRam] = useState<Option | null>(ramSizes[1]);
+  const [minRam, setMinRam] = useState<Option>(ramSizes[0]);
+  const [maxRam, setMaxRam] = useState<Option>(ramSizes[1]);
 
   const serverId = useServerId();
-  const navigate = useNavigate();
   const { submitting, updateServer, deleteServer } = useServerSettings(serverId);
-  const { error, success } = useToast();
   const { confirm } = useConfirmDialog();
-  const { reload } = useServers();
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
 
     if (submitting) return;
 
-    const ok = await updateServer({
+    await updateServer({
       name: serverName,
       minRam: minRam?.value,
       maxRam: maxRam?.value,
     });
-
-    if (ok) {
-      success("Dados do servidor atualizado com sucesso!", {
-        id: "server-settings-update-success",
-        duration: 2000,
-      });
-    } else {
-      error("Erro ao atualizar dados do servidor.", {
-        id: "server-settings-update-error",
-        duration: 2000,
-      });
-    }
   };
 
   const handleDelete = async () => {
@@ -59,22 +42,7 @@ export function ServerSettings() {
 
     if (!confirmed) return;
 
-    const ok = await deleteServer();
-
-    if (ok) {
-      success("Servidor deletado com sucesso!", {
-        id: "server-settings-delete-success",
-        duration: 2000,
-      });
-
-      reload();
-      navigate("/");
-    } else {
-      error("Erro ao deletar servidor.", {
-        id: "server-settings-delete-error",
-        duration: 2000,
-      });
-    }
+    await deleteServer();
   };
 
   return (

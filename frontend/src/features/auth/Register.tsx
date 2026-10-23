@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { InputItem } from "../../components/InputItem";
 import { SubmitButton } from "../../components/SubmitButton";
 import { useAuth } from "../../context/AuthContext";
-import { useToast } from "../../context/ToastContext";
 
 export function Register() {
   const [name, setName] = useState<string>("");
@@ -12,26 +11,12 @@ export function Register() {
   const [password, setPassword] = useState<string>("");
 
   const { loading, register } = useAuth();
-  const { success, error } = useToast();
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-
     if (loading) return;
 
-    const ok = await register(name, email, password);
-
-    if (ok) {
-      success("Registro realizado com sucesso", {
-        id: "auth-success",
-        duration: 2000,
-      });
-    } else {
-      error("Erro ao registrar nova conta", {
-        id: "auth-error",
-        duration: 2000,
-      });
-    }
+    await register(name, email, password);
   };
 
   return (

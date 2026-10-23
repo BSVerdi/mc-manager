@@ -2,13 +2,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { authApi } from "../features/auth/api";
 import { activateStomp, deactivateStomp } from "../lib/stompClient";
 import type { User } from "../types/user";
+import { useToast } from "./ToastContext";
 
 interface AuthContextData {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -21,6 +22,8 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const { success, error } = useToast();
 
   useEffect(() => {
     const verifySession = async () => {
@@ -40,7 +43,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     verifySession();
   }, []);
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (email: string, password: string): Promise<void> => {
     setLoading(true);
 
     try {
@@ -50,17 +53,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(response);
       activateStomp();
 
-      return true;
-    } catch (error) {
-      console.error("Erro ao realizar login: ", error);
+      success("Login realizado com sucesso.", {
+        id: "auth-success",
+        duration: 2000,
+      });
+    } catch (err) {
+      console.error("Erro ao realizar login: ", err);
 
-      return false;
+      error("Erro ao realizar login.", {
+        id: "auth-error",
+        duration: 2000,
+      });
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const logout = useCallback(async (): Promise<boolean> => {
+  const logout = useCallback(async (): Promise<void> => {
     setLoading(true);
 
     try {
@@ -68,17 +77,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
       deactivateStomp();
 
-      return true;
-    } catch (error) {
-      console.error("Erro ao realizar logout: ", error);
-
-      return false;
+      success("Logout realizado com sucesso", {
+        id: "auth-success",
+        duration: 2000,
+      });
+    } catch (err) {
+      console.error("Erro ao realizar logout: ", err);
+      error("Erro ao realizar logout", {
+        id: "auth-error",
+        duration: 2000,
+      });
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const register = useCallback(async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = useCallback(async (name: string, email: string, password: string): Promise<void> => {
     setLoading(true);
 
     try {
@@ -87,11 +101,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.me();
       setUser(response);
 
-      return true;
-    } catch (error) {
-      console.error("Erro ao realizar registro: ", error);
-
-      return false;
+      success("Registro realizado com sucesso", {
+        id: "auth-success",
+        duration: 2000,
+      });
+    } catch (err) {
+      console.error("Erro ao realizar registro: ", err);
+      error("Erro ao registrar nova conta", {
+        id: "auth-error",
+        duration: 2000,
+      });
     } finally {
       setLoading(false);
     }

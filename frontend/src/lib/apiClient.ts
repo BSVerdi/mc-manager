@@ -1,5 +1,5 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
-import { type Server } from "../types/server";
+import { type Catalog, type Server } from "../types/server";
 import type { Status } from "../types/status";
 import { deactivateStomp } from "./stompClient";
 
@@ -15,7 +15,9 @@ export const api = {
     list: () => http.get<Server[]>("/servers").then((res) => res.data),
 
     get: (serverId: number) => http.get<Server>(`/servers/${serverId}`).then((res) => res.data),
-  },
+
+    getCatalog: () => http.get<Catalog[]>("/servers/catalog").then((res) => res.data),
+  },  
 
   server: {
     start: (serverId: number) => http.post<void>(`/servers/${serverId}/start`).then((res) => res.data),

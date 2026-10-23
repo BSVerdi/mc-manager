@@ -1,58 +1,50 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { InputItem } from "../../../components/InputItem";
 import { Portal } from "../../../components/Portal";
 import { SelectItem } from "../../../components/SelectItem";
 import { SubmitButton } from "../../../components/SubmitButton";
-import { useToast } from "../../../context/ToastContext";
-import { ramSizes, serverTypes, type Option } from "../../../data";
+import { ramSizes } from "../../../data";
+import { useServerCatalog } from "../../../hooks/useServerCatalog";
+import { EMPTY_OPTION, type Option } from "../../../types/option";
 import { useCreateServer } from "../hooks/useCreateServer";
-import { useServerVersions } from "../hooks/useServerVersions";
 
 interface CreateServerProps {
   isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onCreate: () => void;
+  setIsOpen: (value: boolean) => void;
 }
 
-const parseRam = (ram: string): number => parseInt(ram.replace("G", ""), 10);
+function parseRam(ram: string): number {
+  return parseInt(ram.replace("G", ""), 10);
+}
 
-export default function CreateServer({ isOpen, setIsOpen, onCreate }: CreateServerProps) {
-  const [serverName, setServerName] = useState<string>("");
-  const [serverType, setServerType] = useState<Option>(serverTypes[0]);
+export default function CreateServer({ isOpen, setIsOpen }: CreateServerProps) {
+  const { submitting, createServer } = useCreateServer();
+  const { catalog, loading } = useServerCatalog();
+
+  const providers: Option[] = Array.from(catalog.keys());
+  const [serverType, setServerType] = useState<Option>(EMPTY_OPTION);
+  const serverVersions = catalog.get(serverType) ?? [];
+
+  const [serverVersion, setServerVersion] = useState<Option>(EMPTY_OPTION);
   const [minRam, setMinRam] = useState<Option>(ramSizes[0]);
   const [maxRam, setMaxRam] = useState<Option>(ramSizes[1]);
-
-  const { data } = useServerVersions(serverType.value);
-
-  const serverVersions: Option[] = useMemo(() => data.map((version) => ({ value: version, label: version })), [data]);
-  const [serverVersion, setServerVersion] = useState<Option>(serverVersions[0]);
-
-  const { submitting, createServer } = useCreateServer();
-  const { success, error } = useToast();
+  const [serverName, setServerName] = useState<string>("");
 
   useEffect(() => {
-    if (serverVersions.length > 0 && serverVersion === undefined) {
-      setServerVersion(serverVersions[0]);
-    }
-  }, [serverVersions, serverVersion]);
-
-  const navigate = useNavigate();
+    if (loading || catalog.size === 0) return;
+    const first = Array.from(catalog.keys())[0];
+    setServerType(first);
+    setServerVersion(catalog.get(first)![0]);
+  }, [loading, catalog]);
 
   const validate = (): boolean => {
-    if (!serverName.trim()) {
-      return false;
-    }
+    if (serverName.trim() === "") return false;
 
-    if (!serverVersion) {
-      return false;
-    }
+    if (!serverVersion || !serverType) return false;
 
-    if (minRam && maxRam && parseRam(minRam.value) > parseRam(maxRam.value)) {
-      return false;
-    }
+    if (minRam && maxRam && parseRam(minRam.value) > parseRam(maxRam.value)) return false;
 
     return true;
   };
@@ -62,30 +54,15 @@ export default function CreateServer({ isOpen, setIsOpen, onCreate }: CreateServ
 
     if (submitting || !validate()) return;
 
-    const serverId = await createServer({
+    await createServer({
       name: serverName.trim(),
       version: serverVersion!.value,
       minRam: minRam!.value,
       maxRam: maxRam!.value,
-      type: serverType.label.toLocaleLowerCase(),
+      type: serverType!.value,
     });
 
     setIsOpen(false);
-
-    if (serverId) {
-      success("Servidor criado com sucesso", {
-        id: "create-server-success",
-        duration: 2000,
-      });
-    } else {
-      error("Erro ao criar servidor", {
-        id: "create-server-error",
-        duration: 2000,
-      });
-    }
-
-    await onCreate();
-    navigate(`/servers/${serverId}`);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -120,7 +97,7 @@ export default function CreateServer({ isOpen, setIsOpen, onCreate }: CreateServ
                 <SelectItem
                   title="Server type"
                   value={serverType}
-                  options={serverTypes}
+                  options={providers}
                   onChange={(t) => t && setServerType(t)}
                 />
                 <SelectItem

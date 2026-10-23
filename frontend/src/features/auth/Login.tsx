@@ -4,33 +4,18 @@ import { Link } from "react-router-dom";
 import { InputItem } from "../../components/InputItem";
 import { SubmitButton } from "../../components/SubmitButton";
 import { useAuth } from "../../context/AuthContext";
-import { useToast } from "../../context/ToastContext";
 
 export function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const { error, success } = useToast();
 
   const { loading, login } = useAuth();
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-
     if (loading) return;
 
-    const ok = await login(email, password);
-
-    if (ok) {
-      success("Login realizado com sucesso.", {
-        id: "auth-success",
-        duration: 2000,
-      });
-    } else {
-      error("Erro ao realizar login.", {
-        id: "auth-error",
-        duration: 2000,
-      });
-    }
+    await login(email, password);
   };
 
   return (

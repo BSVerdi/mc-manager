@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import defaultProfilePic from "../assets/big-steve-face.png";
 import { useAuth } from "../context/AuthContext";
-import { useToast } from "../context/ToastContext";
 import type { User } from "../types/user";
 
 interface HeaderProps {
@@ -18,26 +17,13 @@ export function Header({ opened, user, onToggleSideBar }: HeaderProps) {
   const navigate = useNavigate();
 
   const { loading, logout } = useAuth();
-  const { success, error } = useToast();
 
   const toggleUserSettings = () => setUserSettings((prev) => !prev);
 
   const handleLogout = async () => {
     if (loading) return;
 
-    const ok = await logout();
-
-    if (ok) {
-      success("Logout realizado com sucesso", {
-        id: "auth-success",
-        duration: 2000,
-      });
-    } else {
-      error("Erro ao realizar logout", {
-        id: "auth-error",
-        duration: 2000,
-      });
-    }
+    await logout();
   };
 
   return (

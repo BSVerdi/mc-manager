@@ -7,7 +7,7 @@ import { ServerCard } from "./components/ServerCard";
 
 export function Home() {
   const { user } = useAuth();
-  const { servers, reload } = useServers();
+  const { servers } = useServers();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
@@ -26,7 +26,7 @@ export function Home() {
           <button onClick={() => setIsOpen(true)} className="create-server-btn">
             <PlusCircle /> Create New Server
           </button>
-          <CreateServer isOpen={isOpen} setIsOpen={setIsOpen} onCreate={reload} />
+          <CreateServer isOpen={isOpen} setIsOpen={setIsOpen} />
         </section>
         <section className="server-grid-container">
           <section className="server-grid">

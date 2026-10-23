@@ -6,3 +6,8 @@ export type Server = {
   version: string;
   domain: string;
 };
+
+export type Catalog = {
+  provider: string;
+  versions: string[];
+};
