@@ -1,4 +1,11 @@
 package br.com.mc_manager.server.dto;
 
-public record ProviderResponseDTO() {
+import br.com.mc_manager.server.model.ServerType;
+
+import java.util.List;
+
+public record ProviderResponseDTO(
+        ServerType provider,
+        List<String> versions
+) {
 }

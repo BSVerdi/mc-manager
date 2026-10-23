@@ -1,5 +1,6 @@
 package br.com.mc_manager.server.controller;
 
+import br.com.mc_manager.server.dto.ProviderResponseDTO;
 import br.com.mc_manager.server.dto.StatusResponseDTO;
 import br.com.mc_manager.server.dto.server.CreateServerDTO;
 import br.com.mc_manager.server.dto.server.ServerDetailsDTO;
@@ -116,17 +117,15 @@ public class ServerController {
     return ResponseEntity.ok().body(statusResponse);
   }
 
-  @GetMapping("/versions/released")
-  public ResponseEntity<List<String>> getReleasedVersions(@RequestParam ServerType type) {
-    var releasedVersions = registry.get(type).getReleasedVersions();
-
-    return ResponseEntity.ok(releasedVersions);
+  @GetMapping("/catalog")
+  public ResponseEntity<List<ProviderResponseDTO>> listServerTypes() {
+    var catalog = registry.getProviderCatalog();
+    return ResponseEntity.ok(catalog);
   }
 
   @GetMapping("/versions")
   public ResponseEntity<List<String>> getAllVersions(@RequestParam ServerType type) {
     var allVersions = registry.get(type).getAllVersions();
-
     return ResponseEntity.ok(allVersions);
   }
 
