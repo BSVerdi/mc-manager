@@ -65,7 +65,7 @@ Copie `.env.example` para `.env` e ajuste os valores:
 | `DB_USER`             | Sim         | Usuário do MySQL                                                                        | `mc_user`                     |
 | `DB_PASSWORD`         | Sim         | Senha do MySQL                                                                          | -                             |
 | `JWT_SECRET`          | Sim         | Chave de assinatura dos tokens (mín. 32 caracteres). Gere com `openssl rand -base64 48` | -                             |
-| `BASE_DOMAIN`         | Sim         | Domínio base; cada servidor é acessado em `<id>.BASE_DOMAIN`                            | `example.com`                 |
+| `BASE_DOMAIN`         | Sim         | Domínio base; cada servidor é acessado em `<nome>-<id>.BASE_DOMAIN`                     | `example.com`                 |
 | `DATA_ROOT_DIRECTORY` | Sim         | Diretório onde os arquivos dos servidores Minecraft ficam armazenados                   | `/var/lib/mc-manager/servers` |
 
 ## Como rodar
