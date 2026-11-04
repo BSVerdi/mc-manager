@@ -1,5 +1,6 @@
 package br.com.mc_manager.server.security.config;
 
+import br.com.mc_manager.server.security.csrf.SpaCsrfTokenRequestHandler;
 import br.com.mc_manager.server.security.filter.AccessTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +45,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                     .ignoringRequestMatchers(bearerRequests)
                     .ignoringRequestMatchers(
                             "/swagger-ui/**",
