@@ -75,7 +75,7 @@ Copie `.env.example` para `.env` e ajuste os valores:
 Pré-requisitos: Docker e Docker Compose.
 
 ```bash
-git clone https://github.com/<usuario>/mc-manager.git
+git clone https://github.com/BSVerdi/mc-manager.git
 cd mc-manager
 cp .env.example .env        # ajuste as variáveis
 docker compose up -d
