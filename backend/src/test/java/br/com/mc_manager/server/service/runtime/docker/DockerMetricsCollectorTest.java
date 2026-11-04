@@ -29,7 +29,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("DockerMetricsCollector")
 class DockerMetricsCollectorTest {
 
   private static final Instant FIXED_NOW = Instant.parse("2024-06-15T12:00:00Z");

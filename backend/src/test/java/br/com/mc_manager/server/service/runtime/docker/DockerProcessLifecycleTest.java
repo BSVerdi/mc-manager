@@ -22,7 +22,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("DockerProcessLifecycle")
 class DockerProcessLifecycleTest {
 
   private static final String CONTAINER_ID = "test-container-abc123";

@@ -8,7 +8,6 @@ import static br.com.mc_manager.server.service.runtime.util.RamUnitParser.toMb;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@DisplayName("RamUnitParser")
 class RamUnitParserTest {
 
   @Nested

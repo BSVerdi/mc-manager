@@ -26,14 +26,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("LocalManagedServerProcessFactory")
 class LocalManagedServerProcessFactoryTest {
 
   private static final Clock FIXED_CLOCK =
           Clock.fixed(Instant.parse("2025-01-15T10:30:00Z"), ZoneOffset.UTC);
 
   private Server server;
-  
+
   @Mock
   private SimpMessagingTemplate template;
 

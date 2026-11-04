@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("VanillaProvider")
 class VanillaProviderTest {
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -40,7 +39,7 @@ class VanillaProviderTest {
   private static final String MANIFEST_URL = "/mc/game/version_manifest_v2.json";
   private static final String VERSION_1_20_URL = "https://piston-meta.mojang.com/mc/game/versions/1.20.json";
   private static final String SERVER_JAR_URL = "https://piston-data.mojang.com/v1/objects/server-1.20.jar";
-  
+
   private Entry entry120() {
     return new Entry("1.20", "release", VERSION_1_20_URL);
   }

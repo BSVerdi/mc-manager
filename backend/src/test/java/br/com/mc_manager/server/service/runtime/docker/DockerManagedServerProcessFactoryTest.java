@@ -23,7 +23,6 @@ import static br.com.mc_manager.server.factory.ServerFactory.createServerWithAll
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("DockerManagedServerProcessFactory")
 class DockerManagedServerProcessFactoryTest {
 
   @Mock

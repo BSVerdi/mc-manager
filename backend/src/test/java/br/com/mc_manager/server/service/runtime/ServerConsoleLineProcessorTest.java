@@ -19,7 +19,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ServerConsoleLineProcessor")
 class ServerConsoleLineProcessorTest {
 
   private Long serverId = 1L;
