@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -145,7 +146,10 @@ class AuthControllerTest {
       when(authService.refreshToken(anyString())).thenReturn(tokenDTO);
 
       // Act & Assert
-      mockMvc.perform(post("/api/auth/refresh-token").cookie(validRefreshToken))
+      mockMvc.perform(post("/api/auth/refresh-token")
+                      .cookie(validRefreshToken)
+                      .with(csrf())
+              )
               .andExpect(status().isOk())
               .andExpect(cookie().exists("access_token"))
               .andExpect(cookie().exists("refresh_token"));
@@ -162,7 +166,8 @@ class AuthControllerTest {
       when(authService.refreshToken(invalidRefreshToken.getValue())).thenThrow(new BadCredentialsException("Invalid refresh token"));
 
       // Act & Assert
-      mockMvc.perform(post("/api/auth/refresh-token").cookie(invalidRefreshToken))
+      mockMvc.perform(post("/api/auth/refresh-token").cookie(invalidRefreshToken)
+                      .with(csrf()))
               .andExpect(status().isUnauthorized());
 
       verify(authService).refreshToken(anyString());
@@ -172,9 +177,19 @@ class AuthControllerTest {
     @DisplayName("Refresh token sem cookie")
     void refreshTokenWithoutCookie() throws Exception {
       // Act & Assert
-      mockMvc.perform(post("/api/auth/refresh-token"))
+      mockMvc.perform(post("/api/auth/refresh-token")
+                      .with(csrf()))
               .andExpect(status().isUnauthorized());
 
+      verify(authService, never()).refreshToken(anyString());
+    }
+
+    @Test
+    @DisplayName("Refresh token sem CSRF é rejeitado")
+    void refreshTokenWithoutCsrf() throws Exception {
+      mockMvc.perform(post("/api/auth/refresh-token")
+                      .cookie(new Cookie("refresh_token", "x")))
+              .andExpect(status().isForbidden());
       verify(authService, never()).refreshToken(anyString());
     }
   }
@@ -216,7 +231,9 @@ class AuthControllerTest {
       // Act & Assert
       mockMvc.perform(post("/api/auth/logout")
                       .cookie(new Cookie("access_token", accessToken))
-                      .cookie(new Cookie("refresh_token", refreshToken)))
+                      .cookie(new Cookie("refresh_token", refreshToken))
+                      .with(csrf())
+              )
               .andExpect(status().isOk())
               .andExpect(cookie().doesNotExist("access_token"))
               .andExpect(cookie().doesNotExist("refresh_token"));
@@ -226,7 +243,8 @@ class AuthControllerTest {
     @DisplayName("Logout sem cookies")
     void logoutWithoutCookies() throws Exception {
       // Act & Assert
-      mockMvc.perform(post("/api/auth/logout"))
+      mockMvc.perform(post("/api/auth/logout")
+                      .with(csrf()))
               .andExpect(status().isOk());
     }
   }
