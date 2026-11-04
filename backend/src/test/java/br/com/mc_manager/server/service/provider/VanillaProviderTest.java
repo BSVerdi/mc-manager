@@ -147,40 +147,6 @@ class VanillaProviderTest {
   }
 
   @Nested
-  @DisplayName("getJavaVersion")
-  class GetJavaVersionTests {
-
-    @Test
-    @DisplayName("Retorna a major version quando a versão existe")
-    void deveRetornarMajorVersionQuandoVersaoExiste() {
-      // Arrange
-      when(mojang.get().uri(MANIFEST_URL).retrieve().body(Manifest.class))
-              .thenReturn(manifestCom120());
-      when(mojang.get().uri(URI.create(VERSION_1_20_URL)).retrieve().body(VersionJson.class))
-              .thenReturn(versionJson120());
-
-      // Act
-      String result = vanillaProvider.getJavaVersion("1.20");
-
-      // Assert
-      assertThat(result).isEqualTo("21");
-    }
-
-    @Test
-    @DisplayName("Lança IllegalArgumentException quando a versão não existe")
-    void deveLancarIllegalArgumentExceptionQuandoVersaoNaoExiste() {
-      // Arrange
-      when(mojang.get().uri(MANIFEST_URL).retrieve().body(Manifest.class))
-              .thenReturn(manifestCom120());
-
-      // Act & Assert
-      assertThatThrownBy(() -> vanillaProvider.getJavaVersion("99.99"))
-              .isInstanceOf(IllegalArgumentException.class)
-              .hasMessage("Versão não encontrada.");
-    }
-  }
-
-  @Nested
   @DisplayName("getDownloadStream")
   class GetDownloadStreamTests {
 

@@ -7,6 +7,7 @@ import br.com.mc_manager.server.model.Server;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.ServerRepository;
 import br.com.mc_manager.server.service.files.ServerFilesService;
+import br.com.mc_manager.server.service.provider.JavaVersionProvider;
 import br.com.mc_manager.server.service.provider.MinecraftProvider;
 import br.com.mc_manager.server.service.provider.ServerProviderRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +59,9 @@ class ServerManagementServiceTest {
 
   @Mock
   private ServerProviderRegistry registry;
+
+  @Mock
+  private JavaVersionProvider javaVersionProvider;
 
   @Mock
   private MinecraftProvider provider;
@@ -190,7 +194,7 @@ class ServerManagementServiceTest {
       InputStream inputStream = new ByteArrayInputStream(new byte[0]);
 
       when(registry.get(any())).thenReturn(provider);
-      when(provider.getJavaVersion(anyString())).thenReturn("21");
+      when(javaVersionProvider.getJavaVersion(anyString())).thenReturn("21");
       when(provider.getDownloadStream(anyString())).thenReturn(inputStream);
     }
 
@@ -198,8 +202,6 @@ class ServerManagementServiceTest {
     @DisplayName("create - Cria servidor novo com sucesso")
     void create_criaServidorNovoComSucesso() throws Exception {
       // Arrange
-
-
       when(serverDomainGenerator.generate(any())).thenReturn("ExampleServer-1");
       when(serverRepository.save(any())).thenReturn(mockServerCriado);
       when(userService.currentUser(any())).thenReturn(owner);

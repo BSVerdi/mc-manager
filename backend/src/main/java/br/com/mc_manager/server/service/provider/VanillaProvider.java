@@ -62,7 +62,7 @@ public class VanillaProvider implements MinecraftProvider {
     return server.url();
   }
 
-  private VersionJson getVersionJson(String version) {
+  public VersionJson getVersionJson(String version) {
     Entry entry = getEntry(version);
     return mojang.get()
             .uri(URI.create(entry.url))
@@ -90,11 +90,5 @@ public class VanillaProvider implements MinecraftProvider {
     return manifest().versions().stream()
             .map(Entry::id)
             .collect(Collectors.toList());
-  }
-
-  @Override
-  public String getJavaVersion(String version) {
-    VersionJson json = getVersionJson(version);
-    return json.javaVersion.majorVersion();
   }
 }

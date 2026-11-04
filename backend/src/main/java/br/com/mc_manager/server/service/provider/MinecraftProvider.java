@@ -13,6 +13,4 @@ public interface MinecraftProvider {
   List<String> getReleasedVersions();
 
   List<String> getAllVersions();
-
-  String getJavaVersion(String version);
 }

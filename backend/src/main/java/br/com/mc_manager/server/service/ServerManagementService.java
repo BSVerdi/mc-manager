@@ -8,6 +8,7 @@ import br.com.mc_manager.server.model.ServerType;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.ServerRepository;
 import br.com.mc_manager.server.service.files.ServerFilesService;
+import br.com.mc_manager.server.service.provider.JavaVersionProvider;
 import br.com.mc_manager.server.service.provider.ServerProviderRegistry;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,6 @@ import java.io.UncheckedIOException;
 import java.security.Principal;
 import java.util.List;
 
-import static br.com.mc_manager.server.service.JavaVersionPolicy.resolveJavaVersion;
-
 @Service
 public class ServerManagementService {
 
@@ -28,19 +27,21 @@ public class ServerManagementService {
   private final ServerFilesService serverFilesService;
   private final ServerDomainGenerator domainGenerator;
   private final ServerProviderRegistry registry;
+  private final JavaVersionProvider javaVersionProvider;
 
   public ServerManagementService(
           ServerRepository serverRepository,
           UserService userService,
           ServerFilesService serverFilesService,
           ServerDomainGenerator domainGenerator,
-          ServerProviderRegistry registry
+          ServerProviderRegistry registry, JavaVersionProvider javaVersionProvider
   ) {
     this.serverRepository = serverRepository;
     this.userService = userService;
     this.serverFilesService = serverFilesService;
     this.domainGenerator = domainGenerator;
     this.registry = registry;
+    this.javaVersionProvider = javaVersionProvider;
   }
 
   public List<ServerDetailsDTO> listServers(String username) {
@@ -67,8 +68,8 @@ public class ServerManagementService {
     server.updateDomain(domain);
 
     ServerType serverType = server.getType();
-    String javaVersion = registry.get(serverType).getJavaVersion(server.getVersion());
-    server.updateJavaVersion("JAVA_" + resolveJavaVersion(javaVersion));
+    String javaVersion = javaVersionProvider.getJavaVersion(server.getVersion());
+    server.updateJavaVersion("JAVA_" + javaVersion);
 
     try (InputStream downloadStream = registry.get(serverType).getDownloadStream(server.getVersion())) {
       serverFilesService.createBaseServerFiles(server.getId(), server.getPort());

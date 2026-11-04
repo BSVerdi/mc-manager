@@ -1,7 +1,10 @@
 package br.com.mc_manager.server.service.provider;
 
 import br.com.mc_manager.server.model.ServerType;
-import br.com.mc_manager.server.service.provider.PaperProvider.*;
+import br.com.mc_manager.server.service.provider.PaperProvider.Build;
+import br.com.mc_manager.server.service.provider.PaperProvider.Checksum;
+import br.com.mc_manager.server.service.provider.PaperProvider.Download;
+import br.com.mc_manager.server.service.provider.PaperProvider.ProjectResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -261,53 +264,6 @@ class PaperProviderTest {
 
       // Act & Assert
       assertThatThrownBy(() -> paperProvider.getAllVersions())
-              .isInstanceOf(ResourceAccessException.class);
-    }
-  }
-
-  @Nested
-  @DisplayName("getJavaVersion(String)")
-  class GetJavaVersionTests {
-
-    @Test
-    @DisplayName("Deve retornar a versão mínima de Java")
-    void deveRetornarVersaoMinimaDeJava() {
-      // Arrange
-      Version json = new Version(new VersionJson(new Java(new JavaVersion("21"))));
-
-      when(paper.get().uri("/projects/paper/versions/1.20").retrieve().body(Version.class))
-              .thenReturn(json);
-
-      // Act
-      String resultado = paperProvider.getJavaVersion("1.20");
-
-      // Assert
-      assertThat(resultado).isEqualTo("21");
-    }
-
-    @Test
-    @DisplayName("Deve lançar NullPointerException quando não há informação de Java")
-    void deveLancarNullPointerExceptionQuandoNaoHaInfoDeJava() {
-      // Arrange
-      Version json = new Version(null);
-
-      when(paper.get().uri("/projects/paper/versions/1.20").retrieve().body(Version.class))
-              .thenReturn(json);
-
-      // Act & Assert
-      assertThatThrownBy(() -> paperProvider.getJavaVersion("1.20"))
-              .isInstanceOf(NullPointerException.class);
-    }
-
-    @Test
-    @DisplayName("Deve propagar a exceção quando a chamada falha")
-    void devePropagarExcecaoQuandoChamadaFalha() {
-      // Arrange
-      when(paper.get().uri("/projects/paper/versions/1.20").retrieve().body(Version.class))
-              .thenThrow(new ResourceAccessException("falha na chamada"));
-
-      // Act & Assert
-      assertThatThrownBy(() -> paperProvider.getJavaVersion("1.20"))
               .isInstanceOf(ResourceAccessException.class);
     }
   }

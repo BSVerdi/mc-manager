@@ -5,9 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -197,54 +194,6 @@ class FabricProviderTest {
       List<String> versoes = provider.getAllVersions();
 
       assertThat(versoes).isEmpty();
-    }
-  }
-
-  @Nested
-  @DisplayName("getJavaVersion")
-  class GetJavaVersionTests {
-
-    @Test
-    @DisplayName("Lança IllegalArgumentException quando a versão é nula")
-    void deveLancarExcecaoQuandoVersaoEhNula() {
-      assertThatThrownBy(() -> provider.getJavaVersion(null))
-              .isInstanceOf(IllegalArgumentException.class)
-              .hasMessage("Versão não pode ser nula");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"abc", "1"})
-    @DisplayName("Lança IllegalArgumentException quando a versão não segue o formato")
-    void deveLancarExcecaoQuandoVersaoNaoSegueFormato(String versao) {
-      assertThatThrownBy(() -> provider.getJavaVersion(versao))
-              .isInstanceOf(IllegalArgumentException.class)
-              .hasMessage("Versão inválida: " + versao);
-    }
-
-    @Test
-    @DisplayName("Lança IllegalArgumentException quando a versão é vazia")
-    void deveLancarExcecaoQuandoVersaoEhVazia() {
-      assertThatThrownBy(() -> provider.getJavaVersion(""))
-              .isInstanceOf(IllegalArgumentException.class)
-              .hasMessage("Versão inválida: ");
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-            "1.8.9, 8",
-            "1.16.5, 8",
-            "1.17.1, 17",
-            "1.19.4, 17",
-            "1.20.1, 21",
-            "25.0.1, 21",
-            "26.0, 25",
-            "30.1, 25"
-    })
-    @DisplayName("Retorna a versão do Java correspondente quando a versão é válida")
-    void deveRetornarVersaoDoJavaCorrespondenteQuandoVersaoEhValida(String versao, String javaEsperado) {
-      String java = provider.getJavaVersion(versao);
-
-      assertThat(java).isEqualTo(javaEsperado);
     }
   }
 }

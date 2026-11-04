@@ -94,14 +94,4 @@ public class PaperProvider implements MinecraftProvider {
 
     return response.versions.values().stream().flatMap(List::stream).toList();
   }
-
-  @Override
-  public String getJavaVersion(String serverVersion) {
-    Version json = paper.get()
-            .uri("/projects/paper/versions/" + serverVersion)
-            .retrieve()
-            .body(Version.class);
-
-    return json.version.java.version.minimum();
-  }
 }

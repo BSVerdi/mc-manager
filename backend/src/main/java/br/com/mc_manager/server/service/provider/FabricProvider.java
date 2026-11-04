@@ -9,7 +9,6 @@ import org.springframework.web.client.RestClient;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
@@ -73,25 +72,5 @@ public class FabricProvider implements MinecraftProvider {
     return fetch("/versions/game", GameVersion.class).stream()
             .map(GameVersion::version)
             .toList();
-  }
-
-  @Override
-  public String getJavaVersion(String version) {
-    if (version == null) throw new IllegalArgumentException("Versão não pode ser nula");
-
-    Matcher matcher = VERSION_PATTERN.matcher(version);
-    if (!matcher.find()) throw new IllegalArgumentException("Versão inválida: " + version);
-
-    Matcher m = VERSION_PATTERN.matcher(version);
-    if (!m.find()) throw new IllegalArgumentException("Versão inválida: " + version);
-
-    int major = Integer.parseInt(m.group(1));
-    int minor = Integer.parseInt(m.group(2));
-
-    if (major == 1 && minor < 17) return "8";
-    if (major == 1 && minor < 20) return "17";
-    if (major < 26) return "21";
-
-    return "25";
   }
 }

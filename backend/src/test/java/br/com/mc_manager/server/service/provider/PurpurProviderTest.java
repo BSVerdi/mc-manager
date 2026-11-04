@@ -8,10 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,7 +20,6 @@ import org.springframework.web.client.RestClientResponseException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -131,50 +126,6 @@ class PurpurProviderTest {
 
       assertThatThrownBy(() -> provider.getAllVersions())
               .isInstanceOf(NullPointerException.class);
-    }
-  }
-
-  @Nested
-  @DisplayName("getJavaVersion()")
-  class GetJavaVersionTests {
-
-    @ParameterizedTest
-    @MethodSource("versoesParaJava")
-    @DisplayName("deveRetornarVersaoJavaCorrespondenteQuandoMapearVersao")
-    void deveRetornarVersaoJavaCorrespondenteQuandoMapearVersao(String versao, String javaEsperado) {
-      assertThat(provider.getJavaVersion(versao)).isEqualTo(javaEsperado);
-    }
-
-    static Stream<Arguments> versoesParaJava() {
-      return Stream.of(
-              Arguments.arguments("1.8.9", "8"),
-              Arguments.arguments("1.16.5", "8"),
-              Arguments.arguments("1.17.1", "17"),
-              Arguments.arguments("1.19.4", "17"),
-              Arguments.arguments("1.20.1", "21"),
-              Arguments.arguments("2.0", "21"),
-              Arguments.arguments("2.5.3", "21"),
-              Arguments.arguments("1.20", "21"),
-              Arguments.arguments("26.0", "25"),
-              Arguments.arguments("27.1", "25")
-      );
-    }
-
-    @Test
-    @DisplayName("deveLancarQuandoVersaoNula")
-    void deveLancarQuandoVersaoNula() {
-      assertThatThrownBy(() -> provider.getJavaVersion(null))
-              .isInstanceOf(IllegalArgumentException.class)
-              .hasMessage("Versão não pode ser nula");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"abc", ""})
-    @DisplayName("deveLancarQuandoVersaoInvalida")
-    void deveLancarQuandoVersaoInvalida(String versao) {
-      assertThatThrownBy(() -> provider.getJavaVersion(versao))
-              .isInstanceOf(IllegalArgumentException.class)
-              .hasMessage("Versão inválida: " + versao);
     }
   }
 }
