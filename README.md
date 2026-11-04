@@ -5,7 +5,7 @@ Cada tenant recebe um servidor isolado em seu próprio container Docker,
 acessível por subdomínio.
 
 ![screenshot](docs/login.png)
-![screenshot](docs/serverDashboard.png)
+![screenshot](docs/server-dashboard.png)
 
 ## Funcionalidades
 
