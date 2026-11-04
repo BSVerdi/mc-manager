@@ -80,7 +80,7 @@ public class VanillaProvider implements MinecraftProvider {
   @Override
   public List<String> getReleasedVersions() {
     return manifest().versions().stream()
-            .filter(v -> v.type().equals("release"))
+            .filter(v -> v.type().equals("release") && !v.id.equals("1.17"))
             .map(Entry::id)
             .collect(Collectors.toList());
   }

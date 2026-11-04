@@ -64,6 +64,7 @@ public class FabricProvider implements MinecraftProvider {
     return fetch("/versions/game", GameVersion.class).stream()
             .filter(GameVersion::stable)
             .map(GameVersion::version)
+            .filter(v -> !v.equals("1.17"))
             .toList();
   }
 

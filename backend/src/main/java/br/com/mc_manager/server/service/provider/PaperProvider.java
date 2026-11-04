@@ -92,6 +92,6 @@ public class PaperProvider implements MinecraftProvider {
             .retrieve()
             .body(ProjectResponse.class);
 
-    return response.versions.values().stream().flatMap(List::stream).toList();
+    return response.versions.values().stream().flatMap(List::stream).filter(v -> !v.equals("1.17")).toList();
   }
 }

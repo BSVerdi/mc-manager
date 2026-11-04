@@ -65,6 +65,6 @@ public class PurpurProvider implements MinecraftProvider {
             .retrieve()
             .body(ProjectResponse.class);
 
-    return response.versions.reversed();
+    return response.versions.stream().filter(v -> !v.equals("1.17")).toList().reversed();
   }
 }
