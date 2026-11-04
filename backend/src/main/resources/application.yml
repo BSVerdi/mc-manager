@@ -17,17 +17,21 @@ spring:
     hibernate:
       ddl-auto: validate
 
+  springdoc:
+    api-docs:
+      enabled: false
+      path: /v3/api-docs
+    swagger-ui:
+      enabled: false
+      path: /swagger-ui.html
+      display-request-duration: true
+      tags-sorter: alpha
+
 server:
   port: 8080
 
 mcmanager:
   data_root_directory: ${DATA_ROOT_DIRECTORY}
-  host_data_root_directory: ${HOST_SERVERS_DATA_PATH}
-
-  java_8: ${JAVA8_PATH:/opt/java/jdk8/bin/java}
-  java_17: ${JAVA17_PATH:/opt/java/jdk17/bin/java}
-  java_21: ${JAVA21_PATH:/opt/java/jdk21/bin/java}
-  java_25: ${JAVA25_PATH:/opt/java/jdk25/bin/java}
 
   secret_key: ${JWT_SECRET}
   base_domain: ${BASE_DOMAIN}

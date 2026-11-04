@@ -14,7 +14,7 @@ import java.time.Clock;
 import java.util.concurrent.ExecutorService;
 
 @Component
-@Profile("!docker")
+@Profile("!prod")
 public class LocalManagedServerProcessFactory implements ManagedServerProcessFactory {
 
   private final SimpMessagingTemplate template;

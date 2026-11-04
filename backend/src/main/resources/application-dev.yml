@@ -1,0 +1,11 @@
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+mcmanager:
+  java_8: ${JAVA8_PATH}
+  java_17: ${JAVA17_PATH}
+  java_21: ${JAVA21_PATH}
+  java_25: ${JAVA25_PATH}

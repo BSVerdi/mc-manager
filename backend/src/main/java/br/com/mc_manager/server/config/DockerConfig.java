@@ -17,7 +17,7 @@ import java.time.Duration;
 public class DockerConfig {
 
   @Bean
-  @Profile("docker")
+  @Profile("prod")
   public DockerClient dockerClient() {
     DockerClientConfig clientConfig =
             DefaultDockerClientConfig.createDefaultConfigBuilder()

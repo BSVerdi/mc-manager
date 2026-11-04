@@ -25,5 +25,6 @@ mcmanager:
   data_root_directory: ./target/test-data
 
   java_8: /usr/lib/jvm/java-8/bin/java
+  java_17: /usr/liv/jvm/java-17/bin/java
   java_21: /usr/lib/jvm/java-21/bin/java
   java_25: /usr/lib/jvm/java-25/bin/java

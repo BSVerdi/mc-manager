@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 @Component
-@Profile("!docker")
+@Profile("!prod")
 public class LocalServerProcessFactory {
   public Process create(String javaExecutable, String minRam, String maxRam, Path serverDirectory) throws IOException {
     ProcessBuilder pb = new ProcessBuilder(

@@ -1,0 +1,3 @@
+mcmanager:
+  host_data_root_directory: ${HOST_SERVERS_DATA_PATH}
+

@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 @Component
-@Profile("docker")
+@Profile("prod")
 public class DockerServerContainerFactory {
 
   private static final String NETWORK_NAME = "mc-network";
@@ -35,7 +35,7 @@ public class DockerServerContainerFactory {
   public DockerServerContainerFactory(
           DockerClient dockerClient,
 
-          @Value("${mcmanager.host_data_root_directory}")
+          @Value("${mcmanager.data_root_directory}")
           String hostServerDirectory
   ) {
     this.dockerClient = dockerClient;
