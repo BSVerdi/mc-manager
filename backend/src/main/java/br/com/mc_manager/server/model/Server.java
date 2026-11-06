@@ -71,7 +71,9 @@ public class Server {
   }
 
   public void update(UpdateServerDTO dto) {
-    this.name = dto.name();
+    if (dto.name() != null) {
+      this.name = dto.name();
+    }
 
     if (dto.minRam() != null) {
       this.minRam = dto.minRam();
@@ -79,6 +81,14 @@ public class Server {
 
     if (dto.maxRam() != null) {
       this.maxRam = dto.maxRam();
+    }
+
+    if (dto.type() != this.type) {
+      this.type = dto.type();
+    }
+
+    if (dto.version() != null && !dto.version().equals(this.version)) {
+      this.version = dto.version();
     }
   }
 

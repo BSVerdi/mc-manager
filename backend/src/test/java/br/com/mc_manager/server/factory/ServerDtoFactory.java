@@ -43,7 +43,7 @@ public class ServerDtoFactory {
   }
 
   public static UpdateServerDTO createUpdateServerDTOWithAllAttributes() {
-    return new UpdateServerDTO("Updated Server", "2G", "4G");
+    return new UpdateServerDTO("Updated Server", "2G", "4G", ServerType.VANILLA, "26.3");
   }
 
   public static ServerMetricsDTO createServerMetricsDTOWithAllAttributes() {

@@ -4,6 +4,7 @@ import br.com.mc_manager.server.dto.server.CreateServerDTO;
 import br.com.mc_manager.server.dto.server.ServerDetailsDTO;
 import br.com.mc_manager.server.dto.server.UpdateServerDTO;
 import br.com.mc_manager.server.model.Server;
+import br.com.mc_manager.server.model.ServerType;
 import br.com.mc_manager.server.model.User;
 import br.com.mc_manager.server.repository.ServerRepository;
 import br.com.mc_manager.server.service.files.ServerFilesService;
@@ -32,6 +33,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static br.com.mc_manager.server.factory.ServerDtoFactory.createCreateServerDTOWithAllAttributes;
+import static br.com.mc_manager.server.factory.ServerDtoFactory.createUpdateServerDTOWithAllAttributes;
 import static br.com.mc_manager.server.factory.ServerFactory.createServerWithAllAttributes;
 import static br.com.mc_manager.server.factory.ServerFactory.createServerWithOwner;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -273,7 +275,10 @@ class ServerManagementServiceTest {
     @DisplayName("update - Atualiza servidor existente com sucesso")
     void update_atualizaServidorExistente() {
       // Arrange
-      UpdateServerDTO updateDTO = new UpdateServerDTO("Example Name", null, null);
+      InputStream is = new ByteArrayInputStream(new byte[0]);
+      when(registry.get(any(ServerType.class))).thenReturn(provider);
+      when(provider.getDownloadStream(anyString())).thenReturn(is);
+      UpdateServerDTO updateDTO = createUpdateServerDTOWithAllAttributes();
 
       // Act
       ServerDetailsDTO response = serverManagementService.update(1L, updateDTO);
@@ -281,9 +286,7 @@ class ServerManagementServiceTest {
       // Assert
       assertNotNull(response);
       assertThat(response.id()).isEqualTo(1L);
-      assertThat(response.name()).isEqualTo("Example Name");
-
-      verify(serverRepository).save(any(Server.class));
+      assertThat(response.name()).isEqualTo("Updated Server");
     }
 
     @Test
@@ -294,7 +297,7 @@ class ServerManagementServiceTest {
 
       // Act & Assert
       assertThrows(NoSuchElementException.class, () -> {
-        serverManagementService.update(99L, new UpdateServerDTO("Example Name", null, null));
+        serverManagementService.update(99L, createUpdateServerDTOWithAllAttributes());
       });
     }
 
@@ -302,15 +305,17 @@ class ServerManagementServiceTest {
     @DisplayName("update - Retorna resposta DTO após atualização")
     void update_retornaRespostaDtoApesAtualizacao() {
       // Arrange
+      InputStream is = new ByteArrayInputStream(new byte[0]);
+      when(registry.get(any(ServerType.class))).thenReturn(provider);
+      when(provider.getDownloadStream(anyString())).thenReturn(is);
       when(serverRepository.findById(anyLong())).thenReturn(Optional.of(mockServerExistente));
 
       // Act
-      ServerDetailsDTO response = serverManagementService.update(1L, new UpdateServerDTO("Example Name", null, null));
+      ServerDetailsDTO response = serverManagementService.update(1L, createUpdateServerDTOWithAllAttributes());
 
       // Assert
       assertNotNull(response);
       assertThat(response).isInstanceOf(ServerDetailsDTO.class);
-      verify(serverRepository).save(any(Server.class));
     }
   }
 

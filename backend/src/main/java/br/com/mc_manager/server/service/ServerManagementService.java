@@ -83,17 +83,36 @@ public class ServerManagementService {
     return new ServerDetailsDTO(server);
   }
 
+  @Transactional
   public ServerDetailsDTO update(Long id, UpdateServerDTO dto) {
     Server server = serverRepository.findById(id).orElseThrow();
 
+    ServerType actualType = server.getType();
+    String actualVersion = server.getVersion();
+
     server.update(dto);
 
-    String newDomain = domainGenerator.generate(server);
-    server.updateDomain(newDomain);
+    if (dto.name() != null) {
+      String newDomain = domainGenerator.generate(server);
+      server.updateDomain(newDomain);
+    }
 
-    serverRepository.save(server);
+    if (actualType != dto.type() || (dto.version() != null && !actualVersion.equals(dto.version()))) {
+      updateServerInstallation(server);
+    }
 
     return new ServerDetailsDTO(server);
+  }
+
+  private void updateServerInstallation(Server server) {
+    String javaVersion = javaVersionProvider.getJavaVersion(server.getVersion());
+    server.updateJavaVersion(javaVersion);
+
+    try (InputStream downloadStream = registry.get(server.getType()).getDownloadStream(server.getVersion())) {
+      serverFilesService.downloadServerJar(server.getId(), downloadStream);
+    } catch (IOException ex) {
+      throw new RuntimeException("Erro ao atualizar a instalação do servidor.", ex);
+    }
   }
 
   public void delete(Long id) {

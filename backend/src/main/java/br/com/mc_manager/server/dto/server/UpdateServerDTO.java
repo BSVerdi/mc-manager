@@ -1,10 +1,13 @@
 package br.com.mc_manager.server.dto.server;
 
+import br.com.mc_manager.server.model.ServerType;
 import jakarta.validation.constraints.NotBlank;
 
 public record UpdateServerDTO(
         @NotBlank String name,
         String minRam,
-        String maxRam
+        String maxRam,
+        ServerType type,
+        String version
 ) {
 }
