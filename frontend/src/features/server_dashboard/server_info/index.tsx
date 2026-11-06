@@ -41,6 +41,10 @@ export function ServerInfo({ serverId, setOnlinePlayers }: ServerInfoProps) {
       <section className="metrics">
         <ul>
           <li>
+            <strong>Server Domain: </strong>
+            <span>{server?.domain}</span>
+          </li>
+          <li>
             <strong>Server Name: </strong>
             <span>{server?.name}</span>
           </li>
@@ -55,23 +59,24 @@ export function ServerInfo({ serverId, setOnlinePlayers }: ServerInfoProps) {
             {status === Status.OFFLINE ? "--" : formatUptime(metrics.uptimeSeconds)}
           </li>
           <li>
+            <strong>Server provider: </strong>
+            <span>{server?.type}</span>
+          </li>
+          <li>
             <strong>Server Version: </strong>
             <span>{server?.version}</span>
           </li>
           <li>
-            <strong>Server Domain: </strong>
-            <span>{server?.domain}</span>
+            <strong>Online players: </strong>
+            <span>{metrics.onlinePlayers}</span>
           </li>
           <li>
             <strong>CPU Usage: </strong>
-            {status === Status.OFFLINE ? 0 : metrics.cpuUsagePercent}%
+            <span>{status === Status.OFFLINE ? 0 : metrics.cpuUsagePercent}%</span>
           </li>
           <li>
             <strong>RAM Usage: </strong>
-            {status === Status.OFFLINE ? "0MB / 0MB" : `${metrics.ramUsedMb}MB / ${metrics.ramMaxMb}MB`}
-          </li>
-          <li>
-            <strong>Online players: </strong> {metrics.onlinePlayers}
+            <span>{status === Status.OFFLINE ? "0MB / 0MB" : `${metrics.ramUsedMb}MB / ${metrics.ramMaxMb}MB`}</span>
           </li>
         </ul>
       </section>

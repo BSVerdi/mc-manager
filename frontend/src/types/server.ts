@@ -5,6 +5,7 @@ export type Server = {
   maxRam: string;
   version: string;
   domain: string;
+  type: string;
 };
 
 export type Catalog = {

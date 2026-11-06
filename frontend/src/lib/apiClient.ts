@@ -5,10 +5,15 @@ import { deactivateStomp } from "./stompClient";
 
 export const BASE_URL = import.meta.env.VITE_API_URL;
 
-export const http = axios.create({
+const clientConfig = {
   baseURL: BASE_URL,
   withCredentials: true,
-});
+  withXSRFToken: true,
+  xsrfCookieName: "XSRF-TOKEN",
+  xsrfHeaderName: "X-XSRF-TOKEN",
+};
+
+export const http = axios.create(clientConfig);
 
 export const api = {
   servers: {
@@ -17,7 +22,7 @@ export const api = {
     get: (serverId: number) => http.get<Server>(`/servers/${serverId}`).then((res) => res.data),
 
     getCatalog: () => http.get<Catalog[]>("/servers/catalog").then((res) => res.data),
-  },  
+  },
 
   server: {
     start: (serverId: number) => http.post<void>(`/servers/${serverId}/start`).then((res) => res.data),
@@ -30,65 +35,48 @@ export const api = {
   },
 };
 
-const refreshClient = axios.create({
-  baseURL: BASE_URL,
-  withCredentials: true,
-});
+const refreshClient = axios.create(clientConfig);
 
-type PendingRequest = {
-  resolve: (value: unknown) => void;
-  reject: (reason: unknown) => void;
-  config: RetryableRequestConfig;
-};
+const NO_REFRESH_URLS = ["/auth/login", "/auth/register", "/auth/refresh-token", "/auth/logout"];
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
-let isRefreshing = false;
-let pendingRequests: PendingRequest[] = [];
+let refreshPromise: Promise<void> | null = null;
+
+const refreshSession = () => {
+  refreshPromise ??= refreshClient
+    .post("/auth/refresh-token")
+    .then(() => undefined)
+    .finally(() => {
+      refreshPromise = null;
+    });
+  return refreshPromise;
+};
 
 http.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as RetryableRequestConfig | undefined;
-    const isAuthEndpoint = originalRequest?.url?.includes("/auth/");
+    const original = error.config as RetryableRequestConfig | undefined;
+    const skip = NO_REFRESH_URLS.some((u) => original?.url?.includes(u));
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isAuthEndpoint) {
-      if (isRefreshing) {
-        originalRequest._retry = true;
-
-        return new Promise((resolve, reject) => {
-          pendingRequests.push({ resolve, reject, config: originalRequest });
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        await refreshClient.post("/auth/refresh-token");
-
-        pendingRequests.forEach(({ resolve, config }) => resolve(http(config)));
-        pendingRequests = [];
-
-        return http(originalRequest);
-      } catch (refreshError) {
-        pendingRequests.forEach(({ reject }) => reject(refreshError));
-        pendingRequests = [];
-
-        deactivateStomp();
-
-        if (window.location.pathname !== "/login") {
-          window.location.href = "/login";
-        }
-
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
-      }
+    if (error.response?.status !== 401 || !original || original._retry || skip) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    original._retry = true;
+
+    try {
+      await refreshSession();
+    } catch (refreshError) {
+      deactivateStomp();
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+      return Promise.reject(refreshError);
+    }
+
+    return http(original);
   },
 );
