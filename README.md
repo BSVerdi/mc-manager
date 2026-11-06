@@ -125,7 +125,6 @@ docker-compose.yml
 - Cobertura completa de testes nas camadas de serviço e controller
 - Expansão dos provedores
 - Confirmação de nova conta através de email
-- Implementação de atualizar a versão ou provedor de um servidor
 
 ## Autor
 
